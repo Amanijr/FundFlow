@@ -1,4 +1,4 @@
-🎁 Daisy Donation Backend
+Daisy Donation Backend
 This is the backend component of the Daisy Donation System, a Spring Boot application that handles donation processing, receipt generation, and multi-channel delivery (email, SMS, and WhatsApp).
 
 🚀 Features
