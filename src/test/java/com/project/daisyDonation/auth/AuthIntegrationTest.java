@@ -58,4 +58,46 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty());
     }
+
+    @Test
+    void duplicateOrganizationNamesReceiveUniqueSlugs() throws Exception {
+        String firstPayload = """
+                {
+                  "organization": {
+                    "name": "Hope Foundation",
+                    "type": "NGO",
+                    "email": "first@hope.org"
+                  },
+                  "email": "first@hope.org",
+                  "password": "password123",
+                  "firstName": "First",
+                  "lastName": "Admin"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(firstPayload))
+                .andExpect(status().isCreated());
+
+        String secondPayload = """
+                {
+                  "organization": {
+                    "name": "Hope Foundation",
+                    "type": "CHARITY",
+                    "email": "second@hope.org"
+                  },
+                  "email": "second@hope.org",
+                  "password": "password123",
+                  "firstName": "Second",
+                  "lastName": "Admin"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(secondPayload))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.organizationId").isNotEmpty());
+    }
 }

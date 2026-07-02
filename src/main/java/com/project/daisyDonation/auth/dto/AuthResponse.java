@@ -3,6 +3,7 @@ package com.project.daisyDonation.auth.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import com.project.daisyDonation.auth.entity.Role;
+import com.project.daisyDonation.organization.entity.OrganizationType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class AuthResponse {
     private String tokenType;
     private Long userId;
     private Long organizationId;
+    private OrganizationType organizationType;
     private Role role;
     private String email;
     private String firstName;

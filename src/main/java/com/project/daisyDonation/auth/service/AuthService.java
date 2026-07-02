@@ -21,6 +21,7 @@ import com.project.daisyDonation.common.security.JwtService;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.organization.service.OrganizationService;
+import com.project.daisyDonation.platform.observability.service.SystemLogService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +34,7 @@ public class AuthService {
     private final OrganizationService organizationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final SystemLogService systemLogService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -52,6 +54,10 @@ public class AuthService {
         user.setEnabled(true);
 
         user = userRepository.save(user);
+        systemLogService.recordEvent(
+                "TENANT",
+                "Organization registered",
+                "organizationId=" + organization.getId() + ", email=" + user.getEmail());
         return buildAuthResponse(user);
     }
 
@@ -63,8 +69,10 @@ public class AuthService {
             UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
             User user = userRepository.findByEmailAndDeletedFalse(principal.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            systemLogService.recordEvent("AUTH", "User login succeeded", "email=" + user.getEmail());
             return buildAuthResponse(user);
         } catch (Exception ex) {
+            systemLogService.recordSecurity("AUTH", "User login failed", "email=" + request.getEmail(), request.getEmail());
             throw new UnauthorizedException("Invalid email or password");
         }
     }
@@ -85,6 +93,7 @@ public class AuthService {
                 .tokenType("Bearer")
                 .userId(user.getId())
                 .organizationId(organizationId)
+                .organizationType(user.getOrganization() != null ? user.getOrganization().getType() : null)
                 .role(user.getRole())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
@@ -100,6 +109,7 @@ public class AuthService {
                 .lastName(user.getLastName())
                 .role(user.getRole())
                 .organizationId(user.getOrganization() != null ? user.getOrganization().getId() : null)
+                .organizationType(user.getOrganization() != null ? user.getOrganization().getType() : null)
                 .enabled(user.isEnabled())
                 .build();
     }
