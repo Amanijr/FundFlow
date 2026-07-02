@@ -28,6 +28,7 @@ import com.project.daisyDonation.organization.service.OrganizationService;
 import com.project.daisyDonation.platform.dto.OrganizationStatusRequest;
 import com.project.daisyDonation.platform.dto.PlatformStatsResponse;
 import com.project.daisyDonation.platform.dto.PlatformUserResponse;
+import com.project.daisyDonation.platform.observability.service.SystemLogService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +41,7 @@ public class PlatformService {
     private final OrganizationService organizationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final SystemLogService systemLogService;
 
     @Value("${app.platform.bootstrap-secret:}")
     private String bootstrapSecret;
@@ -59,6 +61,7 @@ public class PlatformService {
         User user = createSuperAdminUser(request.getEmail(), request.getPassword(),
                 request.getFirstName(), request.getLastName());
         user = userRepository.save(user);
+        systemLogService.recordSecurity("PLATFORM", "Super administrator bootstrapped", "email=" + user.getEmail(), user.getEmail());
         return buildAuthResponse(user);
     }
 
@@ -72,7 +75,9 @@ public class PlatformService {
 
         User user = createSuperAdminUser(request.getEmail(), request.getPassword(),
                 request.getFirstName(), request.getLastName());
-        return toUserResponse(userRepository.save(user));
+        user = userRepository.save(user);
+        systemLogService.recordPlatformAction(principal, "PLATFORM", "Super administrator created", "email=" + user.getEmail());
+        return toUserResponse(user);
     }
 
     @Transactional(readOnly = true)
@@ -108,7 +113,13 @@ public class PlatformService {
 
         Organization organization = requireOrganization(organizationId);
         organization.setActive(request.isActive());
-        return organizationService.toResponse(organizationRepository.save(organization));
+        Organization saved = organizationRepository.save(organization);
+        systemLogService.recordPlatformAction(
+                principal,
+                "PLATFORM",
+                "Organization status updated",
+                "organizationId=" + organizationId + ", active=" + request.isActive());
+        return organizationService.toResponse(saved);
     }
 
     @Transactional(readOnly = true)

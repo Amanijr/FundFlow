@@ -14,16 +14,21 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.project.daisyDonation.common.config.SyncAsyncTestConfig;
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SyncAsyncTestConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PlatformIntegrationTest {
 
     private static final String BOOTSTRAP_SECRET = "test-bootstrap-secret";
+    private static final String DASHBOARD = "/api/v1/platform/dashboard";
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,7 +81,7 @@ class PlatformIntegrationTest {
 
     @Test
     @Order(3)
-    void superAdminCanViewPlatformStatsAndOrganizations() throws Exception {
+    void superAdminCanViewFullOwnerDashboard() throws Exception {
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -99,18 +104,26 @@ class PlatformIntegrationTest {
         churchOrganizationId = ((Number) com.jayway.jsonpath.JsonPath.read(
                 registerResult.getResponse().getContentAsString(), "$.data.organizationId")).longValue();
 
-        mockMvc.perform(get("/api/v1/platform/stats")
+        mockMvc.perform(get(DASHBOARD)
                         .header("Authorization", "Bearer " + superAdminToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.totalOrganizations").value(greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.data.superAdminCount").value(greaterThanOrEqualTo(1)));
+                .andExpect(jsonPath("$.data.platformStats.totalOrganizations").value(greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.data.platformStats.superAdminCount").value(greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.data.organizations.length()").value(greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.data.users.length()").value(greaterThanOrEqualTo(2)))
+                .andExpect(jsonPath("$.data.recentActivity").isArray());
 
-        mockMvc.perform(get("/api/v1/platform/organizations")
+        mockMvc.perform(get(DASHBOARD + "/stats")
+                        .header("Authorization", "Bearer " + superAdminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalOrganizations").value(greaterThanOrEqualTo(1)));
+
+        mockMvc.perform(get(DASHBOARD + "/organizations")
                         .header("Authorization", "Bearer " + superAdminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(greaterThanOrEqualTo(1)));
 
-        mockMvc.perform(get("/api/v1/platform/users")
+        mockMvc.perform(get(DASHBOARD + "/users")
                         .header("Authorization", "Bearer " + superAdminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(greaterThanOrEqualTo(2)));
@@ -119,7 +132,7 @@ class PlatformIntegrationTest {
     @Test
     @Order(4)
     void superAdminCanActOnOrganizationWithHeader() throws Exception {
-        mockMvc.perform(put("/api/v1/platform/organizations/" + churchOrganizationId + "/status")
+        mockMvc.perform(put(DASHBOARD + "/organizations/" + churchOrganizationId + "/status")
                         .header("Authorization", "Bearer " + superAdminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"active\": false}"))
@@ -134,7 +147,7 @@ class PlatformIntegrationTest {
 
     @Test
     @Order(5)
-    void orgAdminCannotAccessPlatformEndpoints() throws Exception {
+    void orgAdminCannotAccessOwnerDashboard() throws Exception {
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -149,7 +162,53 @@ class PlatformIntegrationTest {
         String orgAdminToken = com.jayway.jsonpath.JsonPath.read(
                 loginResult.getResponse().getContentAsString(), "$.data.accessToken");
 
-        mockMvc.perform(get("/api/v1/platform/stats")
+        mockMvc.perform(get(DASHBOARD)
+                        .header("Authorization", "Bearer " + orgAdminToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(6)
+    void ownerDashboardCapturesAndExposesSystemLogs() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "nobody-%d@example.org",
+                                  "password": "wrong-password"
+                                }
+                                """.formatted(orgSuffix)))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get(DASHBOARD + "/logs")
+                        .param("category", "AUTH")
+                        .header("Authorization", "Bearer " + superAdminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.data[0].category").value("AUTH"));
+
+        mockMvc.perform(get(DASHBOARD)
+                        .header("Authorization", "Bearer " + superAdminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.logsLast24Hours").value(greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.data.recentAlerts").isArray())
+                .andExpect(jsonPath("$.data.recentErrors").isArray());
+
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "church-%d@example.org",
+                                  "password": "password123"
+                                }
+                                """.formatted(orgSuffix)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String orgAdminToken = com.jayway.jsonpath.JsonPath.read(
+                loginResult.getResponse().getContentAsString(), "$.data.accessToken");
+
+        mockMvc.perform(get(DASHBOARD + "/logs")
                         .header("Authorization", "Bearer " + orgAdminToken))
                 .andExpect(status().isForbidden());
     }
