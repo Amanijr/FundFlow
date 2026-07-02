@@ -11,6 +11,7 @@ import com.project.daisyDonation.organization.dto.OrganizationRequest;
 import com.project.daisyDonation.organization.dto.OrganizationResponse;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.organization.repository.OrganizationRepository;
+import com.project.daisyDonation.organization.util.OrganizationSlugs;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,13 +23,12 @@ public class OrganizationService {
 
     @Transactional
     public Organization create(OrganizationRequest request) {
-        if (organizationRepository.existsBySlugAndDeletedFalse(request.getSlug())) {
-            throw new ConflictException("Organization slug already exists");
-        }
+        String slug = OrganizationSlugs.resolveUnique(
+                organizationRepository, request.getSlug(), request.getName());
 
         Organization organization = new Organization();
         organization.setName(request.getName());
-        organization.setSlug(request.getSlug());
+        organization.setSlug(slug);
         organization.setType(request.getType());
         organization.setEmail(request.getEmail());
         organization.setPhone(request.getPhone());
@@ -56,12 +56,16 @@ public class OrganizationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
 
         if (!organization.getSlug().equals(request.getSlug())
+                && request.getSlug() != null
+                && !request.getSlug().isBlank()
                 && organizationRepository.existsBySlugAndDeletedFalse(request.getSlug())) {
             throw new ConflictException("Organization slug already exists");
         }
 
         organization.setName(request.getName());
-        organization.setSlug(request.getSlug());
+        if (request.getSlug() != null && !request.getSlug().isBlank()) {
+            organization.setSlug(request.getSlug());
+        }
         organization.setType(request.getType());
         organization.setEmail(request.getEmail());
         organization.setPhone(request.getPhone());

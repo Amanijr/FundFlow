@@ -23,8 +23,7 @@ public class OrganizationRequest {
     @NotBlank
     @Size(max = 255)
     private String name;
-    @Schema(description = "slug")
-    @NotBlank
+    @Schema(description = "URL-safe identifier; auto-generated from name if omitted")
     @Size(max = 100)
     private String slug;
     @Schema(description = "type")
