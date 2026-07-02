@@ -35,7 +35,7 @@
 | Template | `material-shadcn-1.0.0/client/src/components/ui/button.tsx` |
 | ERP | `frontend/src/components/ui/button.tsx` |
 | Priority | P0 |
-| Action | Replace styling with Material gradient using brand orange |
+| Action | Replace styling with Material stone gradient (template `button.tsx`) |
 
 **Variants:** default, secondary, destructive, outline, ghost, link  
 **Sizes:** default (h-9), sm, lg, icon  

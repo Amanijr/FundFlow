@@ -1,99 +1,113 @@
 # FundFlow ERP — Color Guide
 
 **Phase:** 01  
+**Active palette:** Material + shadcn template (`material-shadcn-1.0.0/client/src/index.css`)  
 **Rule:** Never hardcode hex values in components. Always use CSS variables or Tailwind semantic classes.
+
+> **CrossLife brand colours are deferred.** See [§11 Deferred — CrossLife Brand](#11-deferred--crosslife-brand) at the end of this document. Do not use them during template migration phases.
 
 ---
 
 ## 1. Primary Palette
 
-CrossLife brand orange — the authoritative primary for all CTAs, active states, focus rings, and links.
+Material black / stone gradient — authoritative primary for CTAs, active nav, focus rings, and links.
 
-| Name | HEX | CSS Variable | HSL | Usage |
-|------|-----|--------------|-----|-------|
-| Primary | `#C85716` | `--color-primary` | 22° 80% 44% | Buttons, links, active nav, focus rings |
-| Primary hover | `#A84812` | `--color-primary-hover` | 20° 80% 36% | Button hover, pressed states |
-| Primary foreground | `#FFFFFF` | `--primary-foreground` | — | Text on primary backgrounds |
+| Name | HEX | CSS Variable | HSL (source) | Usage |
+|------|-----|--------------|--------------|-------|
+| Primary | `#000000` | `--primary` | `hsl(0, 0%, 0%)` | Semantic primary, focus ring |
+| Primary foreground | `#FFFFFF` | `--primary-foreground` | `hsl(0, 0%, 100%)` | Text on primary backgrounds |
+| Primary button gradient (from) | `#44403C` | — | stone-700 | Button gradient top |
+| Primary button gradient (to) | `#292524` | — | stone-800 | Button gradient bottom |
+| Primary button border | `#1C1917` | — | stone-900 | Button border |
 
-**Dark mode primary:** `#D4621F` (`--color-primary` under `.dark`)
+**Dark mode primary:** `#FFFFFF` (`--primary` under `.dark`)  
+**Dark mode primary foreground:** `#000000`
 
-### Material gradient adaptation
+### Material gradient (buttons & active nav)
 
-Primary buttons use a Material-style gradient mapped to brand orange:
+Primary buttons and active sidebar items use the template stone gradient — not a flat fill:
 
 ```
-gradient: linear-gradient(to bottom, #D4621F, #C85716)
-border: #A84812
-inset highlight: rgba(255,255,255,0.25) top, rgba(0,0,0,0.2) bottom
+gradient: linear-gradient(to bottom, #44403C, #292524)   /* stone-700 → stone-800 */
+border: #1C1917                                           /* stone-900 */
+text: #FAFAF9                                             /* stone-50 */
+inset highlight: inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.35)
+shadow: shadow-sm → shadow-md on hover
 ```
 
-Do not use template stone-800 gradient for primary actions.
+Map to semantic classes in implementation: `bg-primary` for flat contexts; gradient classes for `Button variant="default"` and active nav items.
 
 ---
 
 ## 2. Secondary Palette
 
-Warm neutrals derived from CrossLife cream palette — not template cool grays.
+Template warm off-white neutrals from shadcn tokens.
 
-| Name | HEX | CSS Variable | Usage |
-|------|-----|--------------|-------|
-| Secondary | `#F5EFE6` | `--secondary` | Subtle backgrounds, secondary buttons |
-| Secondary foreground | `#1A1715` | `--secondary-foreground` | Text on secondary |
-| Accent | `#F5EFE6` | `--accent` | Hover backgrounds, ghost button hover |
-| Accent foreground | `#1A1715` | `--accent-foreground` | Text on accent |
+| Name | HEX | CSS Variable | HSL (source) | Usage |
+|------|-----|--------------|--------------|-------|
+| Secondary | `#F5F5F4` | `--secondary` | `hsl(60, 4.8%, 95.9%)` | Subtle backgrounds, secondary buttons |
+| Secondary foreground | `#1C1917` | `--secondary-foreground` | `hsl(24, 9.8%, 10%)` | Text on secondary |
+| Accent | `#F5F5F4` | `--accent` | `hsl(60, 4.8%, 95.9%)` | Hover backgrounds, ghost button hover |
+| Accent foreground | `#1C1917` | `--accent-foreground` | `hsl(24, 9.8%, 10%)` | Text on accent |
+| Muted | `#F5F5F4` | `--muted` | `hsl(60, 4.8%, 95.9%)` | Table headers, tab lists, skeleton |
+| Muted foreground | `#78716C` | `--muted-foreground` | `hsl(25, 5.3%, 44.7%)` | Placeholders, captions, labels |
 
-**Dark mode secondary:** `#2D2825`
+**Dark mode secondary / muted:** `hsl(240, 3.7%, 15.9%)` ≈ `#27272A`
 
 ---
 
 ## 3. Semantic Status Colors
 
-| Status | Name | HEX | CSS Variable | Usage |
-|--------|------|-----|--------------|-------|
-| Success | Green | `#059652` | `--color-success` | Approved, paid, active, completed |
-| Warning | Amber | `#E8A317` | `--color-warning` | Pending, draft, attention required |
-| Error | Red | `#DF1529` | `--color-danger` / `--destructive` | Failed, rejected, delete, overdue |
-| Info | Blue | `#2563EB` | `--color-info` | Informational banners, help text, links |
+| Status | Name | HEX | CSS Variable | Source |
+|--------|------|-----|--------------|--------|
+| Success | Green | `#22C55E` | `--color-success` | Template chart accent (`green-500`) |
+| Warning | Amber | `#EAB308` | `--color-warning` | Standard attention state |
+| Error | Red | `#EF4444` | `--destructive` | `hsl(0, 84.2%, 60.2%)` from template |
+| Info | Blue | `#3B82F6` | `--color-info` | Template mini-chart accent (`blue-500`) |
+
+**Dark mode destructive:** `hsl(0, 62.8%, 30.6%)` ≈ `#7F1D1D`
 
 ### Status background tints (alerts, badges)
 
 | Status | Background | Border | Text |
 |--------|------------|--------|------|
-| Success | `#059652` at 10% opacity | `#059652` at 30% | `#059652` |
-| Warning | `#E8A317` at 10% opacity | `#E8A317` at 30% | `#92680D` |
-| Error | `#DF1529` at 10% opacity | `#DF1529` at 30% | `#DF1529` |
-| Info | `#2563EB` at 10% opacity | `#2563EB` at 30% | `#2563EB` |
+| Success | `#22C55E` at 10% | `#22C55E` at 30% | `#16A34A` |
+| Warning | `#EAB308` at 10% | `#EAB308` at 30% | `#A16207` |
+| Error | `#EF4444` at 10% | `#EF4444` at 30% | `#EF4444` |
+| Info | `#3B82F6` at 10% | `#3B82F6` at 30% | `#3B82F6` |
 
 ---
 
-## 4. Neutral Grayscale
+## 4. Neutral Grayscale — Stone Scale
 
-Warm stone-inspired scale mapped to CrossLife brand. Use semantic tokens first; reach for scale steps only when semantic tokens don't apply.
+Template uses Tailwind `stone-*` as the dominant neutral scale. Map to semantic tokens in components.
 
-| Step | HEX | Name | Maps to |
-|------|-----|------|---------|
-| 50 | `#FAFAF8` | Warm white | Near `--color-background` |
-| 100 | `#F5EFE6` | Cream light | `--secondary`, `--muted` bg |
-| 200 | `#E8E0D8` | Warm border | `--color-border` |
-| 300 | `#D4CCC4` | Warm gray light | Disabled borders |
-| 400 | `#A8A29E` | Warm gray | Placeholder text (dark mode) |
-| 500 | `#6B6560` | Muted text | `--color-muted` |
-| 600 | `#57534E` | Body secondary | Supporting text |
-| 700 | `#44403C` | Dark gray | — |
-| 800 | `#2D2825` | Sidebar hover | `--color-sidebar-hover` |
-| 900 | `#1A1715` | Sidebar / body text | `--color-sidebar`, `--color-text` |
-| 950 | `#110A06` | Heading / dark bg | `--color-heading`, dark `--color-background` |
+| Step | HEX | Tailwind | Maps to |
+|------|-----|----------|---------|
+| 50 | `#FAFAF9` | `stone-50` | App shell (`bg-stone-50`), button text on dark |
+| 100 | `#F5F5F4` | `stone-100` | Nav hover (`hover:bg-stone-100`), `--muted` |
+| 200 | `#E7E5E4` | `stone-200` | Card borders (`border-stone-200`), sidebar dividers |
+| 300 | `#D6D3D1` | `stone-300` | Secondary button border |
+| 400 | `#A8A29E` | `stone-400` | — |
+| 500 | `#78716C` | `stone-500` | Group labels, `--muted-foreground` |
+| 600 | `#57534E` | `stone-600` | — |
+| 700 | `#44403C` | `stone-700` | Gradient top, nav text (`text-stone-700`) |
+| 800 | `#292524` | `stone-800` | Gradient bottom, primary button fill |
+| 900 | `#1C1917` | `stone-900` | Headings, brand text (`text-stone-900`) |
+| 950 | `#0C0A09` | `stone-950` | `--foreground`, chart secondary series |
 
-### Template stone → ERP mapping
+### Semantic token → stone mapping
 
-| Template class | ERP equivalent |
-|----------------|----------------|
-| `bg-stone-50` | `bg-background` |
-| `border-stone-200` | `border-border` |
-| `text-stone-900` | `text-foreground` |
-| `text-stone-600` | `text-muted-foreground` |
-| `bg-stone-800` | `bg-primary` (with brand gradient) |
-| `text-stone-500` | `text-muted-foreground` |
+| Semantic class | Stone equivalent | HEX |
+|----------------|-----------------|-----|
+| `bg-background` | near `stone-50` / shell | `#F7F7F7` |
+| `bg-card` | white | `#FFFFFF` |
+| `border-border` | cool border token | `#E2E8F0` |
+| `border-stone-200` | card borders (template override) | `#E7E5E4` |
+| `text-foreground` | `stone-950` | `#0C0A09` |
+| `text-muted-foreground` | `stone-500` | `#78716C` |
+
+**Note:** Template uses both shadcn semantic tokens (`--border`: `#E2E8F0`) and hardcoded `stone-*` on cards/nav. During implementation, prefer semantic tokens and set `--border` to `#E7E5E4` (stone-200) for visual parity.
 
 ---
 
@@ -101,71 +115,95 @@ Warm stone-inspired scale mapped to CrossLife brand. Use semantic tokens first; 
 
 | Level | Name | HEX | Variable | Usage |
 |-------|------|-----|----------|-------|
-| L0 | Canvas | `#FFFAF2` | `--color-background` | App shell background |
-| L1 | Surface | `#FFFFFF` | `--color-surface` / `--card` | Cards, panels, inputs, modals |
-| L2 | Muted surface | `#F5EFE6` | `--muted` | Table headers, tab lists, skeleton |
+| L0 | Canvas | `#FAFAF9` | `bg-stone-50` | App shell with optional `.grain-texture` |
+| L0 alt | Canvas (token) | `#F7F7F7` | `--background` | shadcn background token |
+| L1 | Surface | `#FFFFFF` | `--card` | Cards, panels, inputs, modals |
+| L2 | Muted surface | `#F5F5F4` | `--muted` | Table headers, tab lists, skeleton |
 | L3 | Popover | `#FFFFFF` | `--popover` | Dropdowns, tooltips, select menus |
 | L4 | Overlay | `rgba(0,0,0,0.8)` | — | Dialog/drawer backdrop |
-| L5 | Sidebar | `#1A1715` | `--color-sidebar` | Navigation chrome |
+| L5 | Sidebar | `#FFFFFF` | `--sidebar-background` | Light sidebar panel (template) |
 
 ### Dark mode backgrounds
 
-| Level | HEX |
-|-------|-----|
-| Canvas | `#110A06` |
-| Surface | `#1A1715` |
-| Muted surface | `#2D2825` |
-| Sidebar | `#1A1715` (unchanged) |
+| Level | HEX | Variable |
+|-------|-----|----------|
+| Canvas | `#09090B` | `--background` (`hsl(240, 10%, 3.9%)`) |
+| Surface | `#09090B` | `--card` |
+| Muted surface | `#27272A` | `--muted` |
+| Sidebar | `#09090B` | `--sidebar-background` |
 
 ---
 
 ## 6. Sidebar Chrome
 
-| Name | HEX | Variable | Usage |
-|------|-----|----------|-------|
-| Sidebar background | `#1A1715` | `--color-sidebar` | Sidebar panel |
-| Sidebar foreground | `#FFFFFF` | `--color-sidebar-foreground` | Nav labels, logo |
-| Sidebar muted | `#B8B0A8` | `--color-sidebar-muted` | Group labels, secondary nav text |
-| Sidebar border | `#3D3835` | `--color-sidebar-border` | Dividers, scrollbar |
-| Sidebar accent | `#2D2825` | `--color-sidebar-accent` | Nav item hover |
-| Sidebar active | `#C85716` | `--color-sidebar-active` | Active route left border |
+Template uses a **light sidebar** (white/transparent), not a dark chrome bar.
+
+| Name | HEX | Variable / Class | Usage |
+|------|-----|----------------|-------|
+| Sidebar background | `#FFFFFF` | `--sidebar-background` | Sidebar panel |
+| Sidebar foreground | `#0C0A09` | `--sidebar-foreground` | Nav labels, brand text |
+| Sidebar border | `#E7E5E4` | `border-stone-200` | Right border, section dividers |
+| Nav item default | `#44403C` | `text-stone-700` | Inactive nav text |
+| Nav item hover | `#F5F5F4` | `hover:bg-stone-100` | Hover background |
+| Nav item active | stone gradient | See §1 gradient | Active route — same as primary button |
+| Group label | `#78716C` | `text-stone-500` | `text-xs uppercase tracking-wide` |
 
 ---
 
 ## 7. Chart Colors
 
+From template `charts-showcase.tsx` and `mini-chart.tsx`:
+
 | Token | HEX | Usage |
 |-------|-----|-------|
-| `--chart-1` | `#C85716` | Primary data series |
-| `--chart-2` | `#059652` | Positive / income |
-| `--chart-3` | `#2563EB` | Secondary comparison |
-| `--chart-4` | `#E8A317` | Warning / budget variance |
-| `--chart-5` | `#6B6560` | Neutral / baseline |
+| `--chart-1` | `#22C55E` | Primary series (green-500) |
+| `--chart-2` | `#0C0A09` | Secondary series (stone-950) |
+| `--chart-3` | `#3B82F6` | Tertiary / mini-chart active (blue-500) |
+| `--chart-4` | `#78716C` | Neutral comparison (stone-500) |
+| `--chart-5` | `#E7E5E4` | Inactive bars / baseline (stone-200) |
 
-**Sparkline inactive bars:** `hsl(var(--muted))`  
-**Sparkline active bars:** `--chart-1` or `--chart-3`
+**Sparkline inactive bars:** `hsl(var(--muted))` or `#E7E5E4`  
+**Sparkline active bars:** `#3B82F6`
 
 ---
 
 ## 8. shadcn Semantic Aliases
 
-These map CrossLife tokens to shadcn component expectations:
+Source: `material-shadcn-1.0.0/client/src/index.css`
 
 ```css
 :root {
-  --background: var(--color-background);
-  --foreground: var(--color-text);
-  --card: var(--color-surface);
-  --card-foreground: var(--color-text);
-  --primary: var(--color-primary);
-  --primary-foreground: #ffffff;
-  --secondary: #f5efe6;
-  --muted: #f5efe6;
-  --muted-foreground: var(--color-muted);
-  --destructive: var(--color-danger);
-  --border: var(--color-border);
-  --input: var(--color-border);
-  --ring: var(--color-primary);
+  --background: hsl(0, 0%, 97%);           /* #F7F7F7 */
+  --foreground: hsl(20, 14.3%, 4.1%);      /* #0C0A09 */
+  --card: hsl(0, 0%, 100%);                /* #FFFFFF */
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --primary: hsl(0, 0%, 0%);               /* #000000 */
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(60, 4.8%, 95.9%);       /* #F5F5F4 */
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%); /* #78716C */
+  --destructive: hsl(0, 84.2%, 60.2%);     /* #EF4444 */
+  --border: hsl(214, 32%, 91%);            /* #E2E8F0 */
+  --input: hsl(214, 32%, 91%);
+  --ring: hsl(0, 0%, 0%);
+  --radius: 0.75rem;
+
+  --sidebar-background: hsl(0, 0%, 100%);
+  --sidebar-foreground: hsl(20, 14.3%, 4.1%);
+  --sidebar-primary: hsl(0, 0%, 0%);
+  --sidebar-border: hsl(214, 32%, 91%);
+
+  /* Chart tokens (define in implementation — missing from template CSS) */
+  --chart-1: #22c55e;
+  --chart-2: #0c0a09;
+  --chart-3: #3b82f6;
+  --chart-4: #78716c;
+  --chart-5: #e7e5e4;
+
+  /* ERP semantic extensions */
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-info: #3b82f6;
 }
 ```
 
@@ -175,19 +213,20 @@ These map CrossLife tokens to shadcn component expectations:
 
 ### Do
 
-- Use `bg-primary`, `text-muted-foreground`, `border-border` in components
-- Use `--color-success` for approved/paid status badges
-- Use `--color-danger` for destructive button variant
-- Use `--color-sidebar-active` for current navigation item
-- Test all color pairs in both light and dark mode
+- Use `bg-stone-50` for app shell, `bg-card` for surfaces
+- Use stone gradient for primary buttons and active nav items
+- Use `text-muted-foreground` / `text-stone-500` for secondary text
+- Use `border-stone-200` on cards (template pattern)
+- Use `--destructive` for error states and destructive buttons
+- Test all pairs in both light and dark mode
 
 ### Don't
 
-- Hardcode `#C85716` in JSX or CSS modules
-- Use template `stone-*` classes directly — map to semantic tokens
-- Use pure `#000000` or `#FFFFFF` for text (use `--color-text` / `--color-heading`)
+- Use CrossLife orange (`#C85716`) during template migration phases
+- Use dark sidebar chrome (`#1A1715`) — template sidebar is light
+- Hardcode `#292524` or `#000000` in JSX — use tokens or `stone-*` via theme
 - Create module-specific color palettes
-- Use red and green as the only status indicators without icons (colorblind accessibility)
+- Use red/green as the only status indicators without icons
 
 ---
 
@@ -197,12 +236,31 @@ These map CrossLife tokens to shadcn component expectations:
 |------|-------------|----------|
 | Body text on background | ≥ 7:1 | WCAG AAA |
 | Muted text on background | ≥ 4.5:1 | WCAG AA |
-| Primary button text on primary | ≥ 4.5:1 | WCAG AA |
-| Sidebar text on sidebar bg | ≥ 4.5:1 | WCAG AA |
+| White text on stone-800 button | ≥ 4.5:1 | WCAG AA |
+| stone-700 text on stone-50 | ≥ 4.5:1 | WCAG AA |
 | Focus ring on surface | ≥ 3:1 | WCAG AA (non-text) |
 
-**Verified pairs:**
-- `#1A1715` on `#FFFAF2` → 12.4:1 ✓
-- `#6B6560` on `#FFFAF2` → 4.6:1 ✓
-- `#FFFFFF` on `#C85716` → 4.5:1 ✓
-- `#B8B0A8` on `#1A1715` → 5.8:1 ✓
+**Verified pairs (template):**
+- `#0C0A09` on `#FAFAF9` → 19.8:1 ✓
+- `#78716C` on `#FAFAF9` → 4.6:1 ✓
+- `#FAFAF9` on `#292524` → 14.2:1 ✓
+- `#44403C` on `#F5F5F4` → 9.7:1 ✓
+
+---
+
+## 11. Deferred — CrossLife Brand
+
+The following palette is **documented but not active**. It lives in `docs/CROSSLIFE_BRAND.md` and `frontend/src/app/globals.css` for future brand rollout. Do not apply during Phase 02–08 template migration.
+
+| Name | HEX | Notes |
+|------|-----|-------|
+| Primary | `#C85716` | CrossLife burnt orange |
+| Primary hover | `#A84812` | — |
+| Background | `#FFFAF2` | Warm cream canvas |
+| Sidebar | `#1A1715` | Dark navigation chrome |
+| Sidebar active | `#C85716` | Orange active accent |
+| Success | `#059652` | — |
+| Warning | `#E8A317` | — |
+| Danger | `#DF1529` | — |
+
+**When to activate:** After template migration is complete and stakeholders approve brand switch. Requires a dedicated phase to remap tokens in `globals.css` and restyle gradient buttons to orange.

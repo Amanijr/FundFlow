@@ -20,7 +20,7 @@ Primary interactive control for actions, form submission, and navigation trigger
 
 | Variant | Visual | Usage |
 |---------|--------|-------|
-| `default` | Brand orange Material gradient, inset highlight, `shadow-sm` | Primary CTAs: Save, Submit, Create |
+| `default` | Stone Material gradient (`stone-700` → `stone-800`), inset highlight, `shadow-sm` | Primary CTAs: Save, Submit, Create |
 | `secondary` | Transparent, warm border, stone text | Secondary actions: Cancel adjacent, Export |
 | `destructive` | `--color-danger` fill | Delete, Reject, irreversible actions |
 | `outline` | Border `--border`, transparent bg | Tertiary actions, toolbar buttons |
@@ -628,9 +628,10 @@ Structured form layout with validation, labels, and error messages.
 ### Sidebar item
 
 ```
-Default:  text-[13px] font-nav px-3 py-2 rounded-md text-sidebar-muted
-Hover:    bg-sidebar-accent text-sidebar-foreground
-Active:   bg-sidebar-accent text-white border-l-[3px] border-sidebar-active
+Default:  text-sm text-stone-700 px-3 py-2 rounded-lg border border-transparent
+Hover:    hover:bg-stone-100 transition-colors duration-200
+Active:   stone gradient (same as Button default), text-stone-50, shadow-sm
+Group:    text-xs font-semibold uppercase tracking-wide text-stone-500
 ```
 
 ### Top bar action button

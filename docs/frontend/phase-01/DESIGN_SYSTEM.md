@@ -3,7 +3,8 @@
 **Phase:** 01 — Design System Extraction  
 **Date:** 2026-06-30  
 **Status:** Approved foundation  
-**Sources:** Material + shadcn template (`material-shadcn-1.0.0/`), CrossLife brand (`docs/CROSSLIFE_BRAND.md`), ERP production tokens (`frontend/src/app/globals.css`)
+**Sources:** Material + shadcn template (`material-shadcn-1.0.0/client/src/index.css`) — **active palette**  
+**Deferred:** CrossLife brand (`docs/CROSSLIFE_BRAND.md`) — not used during template migration
 
 ---
 
@@ -11,9 +12,11 @@
 
 This document is the single source of truth for FundFlow ERP visual design. It unifies:
 
-- **CrossLife brand identity** — warm orange primary, cream backgrounds, dark sidebar chrome
+- **Material + shadcn template palette** — stone neutrals, black primary, light sidebar, gradient buttons
 - **Material + shadcn patterns** — component structure, elevation, animations, Radix accessibility
 - **ERP density standards** — compact 14px base, border-defined surfaces, financial data layouts
+
+> CrossLife brand colours (`#C85716` orange, cream canvas, dark sidebar) are **deferred** — see `COLOR_GUIDE.md` §11.
 
 Any future ERP page must be built from these tokens and primitives. Do not invent new colors, spacing, or component styles.
 
@@ -26,7 +29,7 @@ Any future ERP page must be built from these tokens and primitives. Do not inven
 | **Token-first** | Use CSS variables and Tailwind semantic classes. Never hardcode hex in components. |
 | **Border over shadow** | Data surfaces use borders for separation. Shadows reserved for overlays, dropdowns, and primary buttons. |
 | **Compact density** | 14px body, `h-9` default controls, tight vertical rhythm for data-heavy screens. |
-| **Warm neutrals** | Cream canvas, warm gray borders — not cool gray or pure white shell. |
+| **Stone neutrals** | `stone-50` canvas, `stone-200` borders, `stone-700/800` primary gradient. |
 | **Accessible by default** | Radix primitives, visible focus rings, WCAG AA contrast minimum. |
 | **Dark mode parity** | Every light token has a dark counterpart. Same semantic hues, adjusted surfaces. |
 
@@ -35,11 +38,13 @@ Any future ERP page must be built from these tokens and primitives. Do not inven
 ## 3. Token Architecture
 
 ```
-CrossLife brand tokens (--color-*)
+Material template tokens (index.css :root)
         ↓
-shadcn semantic aliases (--primary, --muted, --border, etc.)
+shadcn semantic aliases (--primary, --muted, --border, --radius, etc.)
         ↓
-Tailwind 4 @theme inline mappings
+Stone scale overrides (border-stone-200, bg-stone-50 — template page layer)
+        ↓
+Tailwind @theme inline mappings
         ↓
 Component className (variant CVA)
 ```
@@ -57,16 +62,17 @@ See [COLOR_GUIDE.md](./COLOR_GUIDE.md) for complete palette, HEX values, and usa
 
 | Role | Variable | Light HEX |
 |------|----------|-----------|
-| Primary | `--color-primary` | `#C85716` |
-| Background | `--color-background` | `#FFFAF2` |
-| Surface | `--color-surface` | `#FFFFFF` |
-| Text | `--color-text` | `#1A1715` |
-| Muted | `--color-muted` | `#6B6560` |
-| Border | `--color-border` | `#E8E0D8` |
-| Success | `--color-success` | `#059652` |
-| Warning | `--color-warning` | `#E8A317` |
-| Danger | `--color-danger` | `#DF1529` |
-| Info | `--color-info` | `#2563EB` |
+| Primary | `--primary` | `#000000` |
+| Primary button | stone gradient | `#44403C` → `#292524` |
+| Background | `--background` / `bg-stone-50` | `#F7F7F7` / `#FAFAF9` |
+| Surface | `--card` | `#FFFFFF` |
+| Text | `--foreground` | `#0C0A09` |
+| Muted | `--muted-foreground` | `#78716C` |
+| Border | `--border` / `stone-200` | `#E2E8F0` / `#E7E5E4` |
+| Success | `--color-success` | `#22C55E` |
+| Warning | `--color-warning` | `#EAB308` |
+| Danger | `--destructive` | `#EF4444` |
+| Info | `--color-info` | `#3B82F6` |
 
 ---
 
@@ -117,14 +123,14 @@ See [TYPOGRAPHY.md](./TYPOGRAPHY.md) for complete type scale.
 
 | Token | Value | Tailwind | Usage |
 |-------|-------|----------|-------|
-| `--radius-sm` | 4px | `rounded-sm` | Checkboxes, small chips |
-| `--radius-md` | 6px | `rounded-md` | Inputs, buttons (ERP default) |
-| `--radius-lg` | 8px | `rounded-lg` | Cards, dialogs, panels |
-| `--radius-xl` | 12px | `rounded-xl` | Drawers (top corners), modals |
+| `--radius-sm` | 8px | `rounded-sm` | `calc(--radius - 4px)` |
+| `--radius-md` | 10px | `rounded-md` | `calc(--radius - 2px)` — inputs |
+| `--radius-lg` | 12px | `rounded-lg` | `--radius` (0.75rem) — cards, buttons, nav |
+| `--radius-xl` | 16px | `rounded-xl` | Drawers (top corners) |
 | `--radius-full` | 9999px | `rounded-full` | Badges, avatars, switches |
 
-**ERP default:** `--radius-md` (6px) for controls; `--radius-lg` (8px) for containers.  
-**Template reference:** 12px (`0.75rem`) — adopted only for marketing-style auth cards.
+**Template default:** `--radius: 0.75rem` (12px). Dark mode shrinks to `0.5rem`.  
+**ERP density note:** Controls may use `rounded-md` (10px) while cards/nav use `rounded-lg` (12px).
 
 ---
 
@@ -147,7 +153,7 @@ All interactive elements:
 ```
 focus-visible:outline-none
 focus-visible:ring-2
-focus-visible:ring-ring        /* --color-primary */
+focus-visible:ring-ring        /* --ring → black / white in dark */
 focus-visible:ring-offset-2
 focus-visible:ring-offset-background
 ```
@@ -159,8 +165,8 @@ focus-visible:ring-offset-background
 | Primary button | `shadow-sm` → `shadow-md`, gradient shift |
 | Table row | `hover:bg-muted/50` (no shadow) |
 | Ghost button | `hover:bg-accent` |
-| Nav item | Background fill + left border accent |
-| Card (interactive) | Border color → `--color-primary` (no shadow) |
+| Nav item | `hover:bg-stone-100`; active → stone gradient |
+| Card (interactive) | Border color → `stone-400` (no shadow) |
 
 ---
 
@@ -201,12 +207,12 @@ focus-visible:ring-offset-background
 ## 11. Background Hierarchy
 
 ```
-Level 0 — App canvas        --color-background (#FFFAF2 cream)
+Level 0 — App canvas        bg-stone-50 (#FAFAF9) + optional .grain-texture
 Level 1 — Content area      transparent (inherits canvas)
-Level 2 — Surface           --color-surface (#FFFFFF cards/panels)
-Level 3 — Elevated          --color-surface + shadow-lg (dialogs)
+Level 2 — Surface           --card (#FFFFFF cards/panels)
+Level 3 — Elevated          --card + shadow-lg (dialogs)
 Level 4 — Overlay           bg-black/80 (modal backdrop)
-Level 5 — Sidebar chrome    --color-sidebar (#1A1715 dark)
+Level 5 — Sidebar           --sidebar-background (#FFFFFF light)
 ```
 
 **Texture overlay (optional):** `.grain-texture::before` at 8% opacity — adopt in layout phase only.
@@ -219,11 +225,12 @@ Level 5 — Sidebar chrome    --color-sidebar (#1A1715 dark)
 
 | State | Style |
 |-------|-------|
-| Default | `text-sidebar-muted`, transparent background |
-| Hover | `bg-sidebar-accent` (`#2D2825`) |
-| Active | `bg-sidebar-accent`, left border `3px solid --color-primary`, text white |
-| Group label | `text-xs uppercase tracking-wider text-sidebar-muted font-nav` |
-| Item | `text-[13px] font-nav px-3 py-2 rounded-md` |
+| Default | `text-stone-700`, transparent background |
+| Hover | `hover:bg-stone-100` |
+| Active | Stone gradient (same as primary button), `text-stone-50` |
+| Group label | `text-xs uppercase tracking-wide text-stone-500` |
+| Item | `text-sm px-3 py-2 rounded-lg` |
+| Panel | `w-60 bg-white border-r border-stone-200` |
 
 ### Top bar
 
@@ -248,11 +255,11 @@ Level 5 — Sidebar chrome    --color-sidebar (#1A1715 dark)
 
 | Token | HEX | Usage |
 |-------|-----|-------|
-| `--chart-1` | `#C85716` | Primary series (brand orange) |
-| `--chart-2` | `#059652` | Success / positive trend |
-| `--chart-3` | `#2563EB` | Secondary series |
-| `--chart-4` | `#E8A317` | Warning / attention |
-| `--chart-5` | `#6B6560` | Neutral / comparison |
+| `--chart-1` | `#22C55E` | Primary series (green) |
+| `--chart-2` | `#0C0A09` | Secondary series (stone-950) |
+| `--chart-3` | `#3B82F6` | Tertiary / sparkline active (blue) |
+| `--chart-4` | `#78716C` | Neutral comparison (stone-500) |
+| `--chart-5` | `#E7E5E4` | Inactive bars (stone-200) |
 
 Chart text and grid lines use `--color-border` and `--color-muted`.
 
@@ -264,11 +271,12 @@ Toggle via `next-themes` with `attribute="class"`. All tokens redefined under `.
 
 | Light token | Dark adjustment |
 |-------------|----------------|
-| `--color-background` | `#110A06` (deep warm black) |
-| `--color-surface` | `#1A1715` |
-| `--color-primary` | `#D4621F` (slightly brighter) |
-| `--color-border` | `#3D3835` |
-| Sidebar | Unchanged (always dark chrome) |
+| `--background` | `hsl(240, 10%, 3.9%)` ≈ `#09090B` |
+| `--card` | Same as background |
+| `--primary` | `#FFFFFF` (inverted) |
+| `--border` | `hsl(240, 3.7%, 15.9%)` ≈ `#27272A` |
+| `--radius` | `0.5rem` (shrinks from 0.75rem) |
+| Sidebar | Follows `--sidebar-background` (dark in `.dark`) |
 
 ---
 

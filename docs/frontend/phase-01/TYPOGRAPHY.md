@@ -167,10 +167,10 @@ h1–h6 {
 
 | Element | Size | Weight | Font | Color |
 |---------|------|--------|------|-------|
-| Sidebar brand | 18px | 700 | Montserrat | `--color-primary` |
-| Sidebar item | 13px | 500 | Montserrat | `--color-sidebar-foreground` |
-| Sidebar item (muted) | 13px | 400 | Montserrat | `--color-sidebar-muted` |
-| Sidebar group label | 11px | 600 | Montserrat | `--color-sidebar-muted` |
+| Sidebar brand | 18px | 600 | sans | `text-stone-900` |
+| Sidebar item | 14px | 400 | sans | `text-stone-700` |
+| Sidebar item (active) | 14px | 400 | sans | `text-stone-50` on gradient |
+| Sidebar group label | 12px | 600 | sans | `text-stone-500` |
 | Top bar title | 14px | 600 | Lato | `--color-heading` |
 | Tab trigger | 14px | 500 | Roboto | active: `--color-text`, inactive: `--color-muted` |
 
