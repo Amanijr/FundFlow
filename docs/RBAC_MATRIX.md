@@ -18,22 +18,41 @@ FundFlow ERP uses **JWT authentication** plus **role-based access control** (`@P
 **Legend:** **Auth** = any authenticated user · **Public** = no JWT required · ✓ = role allowed · ✗ = forbidden (403)
 
 User management (`/api/v1/users`) is **ORG_ADMIN only**.  
-Platform management (`/api/v1/platform`) is **SUPER_ADMIN only**.
+Platform owner dashboard (`/api/v1/platform/dashboard`) is **SUPER_ADMIN only** — the single control center for full platform access.
 
 ---
 
-## Platform — `/api/v1/platform`
+## Platform owner dashboard — `/api/v1/platform/dashboard`
+
+All super-admin operations live under the owner dashboard. Bootstrap (`POST /api/v1/platform/bootstrap`) is the only exception.
 
 | Endpoint | SUPER_ADMIN | Others |
 |----------|-------------|--------|
-| POST `/bootstrap` | Public with bootstrap secret (first super admin only) | — |
-| POST `/super-admins` | ✓ | ✗ |
+| GET `/` | ✓ Full dashboard (stats, orgs, users, logs, alerts) | ✗ |
 | GET `/stats` | ✓ | ✗ |
 | GET `/organizations`, `/{id}` | ✓ | ✗ |
 | PUT `/organizations/{id}/status` | ✓ | ✗ |
 | GET `/users` | ✓ | ✗ |
+| POST `/super-admins` | ✓ | ✗ |
+| GET `/logs`, `/logs/{id}` | ✓ | ✗ |
+| PUT `/logs/{id}/resolve` | ✓ | ✗ |
+| POST `/bootstrap` (outside dashboard) | Public with bootstrap secret (first super admin only) | — |
 
-**Acting on an organization:** super admins have no default tenant. For org-scoped APIs, pass header `X-Organization-Id: <orgId>`.
+**Acting on a tenant:** super admins have no default organization. For org-scoped APIs (donations, church, analytics, etc.), pass header `X-Organization-Id: <orgId>`.
+
+### Platform observability (within dashboard)
+
+The owner dashboard includes system health and an append-only `system_log` feed:
+
+| Log type | Description |
+|----------|-------------|
+| `EVENT` | Normal operations (registration, API requests, platform actions) |
+| `SECURITY` | Auth failures, access issues (may auto-generate alerts) |
+| `ERROR` | Handled application errors (4xx) |
+| `EXCEPTION` | Unhandled or 5xx errors with stack traces |
+| `ALERT` | Actionable items for the owner (auto-created on 5xx/security) |
+
+`GET /api/v1/platform/dashboard` returns the full snapshot. Use `GET /api/v1/platform/dashboard/logs` with filters (`type`, `severity`, `category`, `organizationId`, `alertsOnly`, `from`, `to`) for deeper search.
 
 ---
 
