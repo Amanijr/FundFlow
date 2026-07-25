@@ -333,19 +333,3 @@ The platform should enable organizations to answer:
 FundFlow ERP is not just a donation system.
 
 It is a complete accountability, financial management, and governance platform for nonprofit organizations.
-
----
-
-# Documentation
-
-User guides and developer docs are published with [MkDocs](https://www.mkdocs.org/) (Material theme).
-
-```bash
-pip install -r requirements-docs.txt
-mkdocs serve    # http://127.0.0.1:8000
-mkdocs build    # static site in site/
-```
-
-- **User manual:** [docs/USER_MANUAL.md](docs/USER_MANUAL.md)
-- **Role guides:** [docs/guides/](docs/guides/getting-started.md)
-- **Site setup:** [docs/documentation-site.md](docs/documentation-site.md)

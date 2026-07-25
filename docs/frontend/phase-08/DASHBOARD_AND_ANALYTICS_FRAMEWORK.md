@@ -227,7 +227,7 @@ Widget registry must support `id`, `defaultVisible`, `defaultOrder` from day one
 | [DASHBOARD_LAYOUTS.md](./DASHBOARD_LAYOUTS.md) | Zones, grids, responsive |
 | [ROLE_BASED_DASHBOARDS.md](./ROLE_BASED_DASHBOARDS.md) | Role configs, routing |
 | Phase 06 [ENTERPRISE_DATA_EXPERIENCE.md](../phase-06/ENTERPRISE_DATA_EXPERIENCE.md) | Table widgets |
-| Phase 04 [DESIGN_TOKENS.md](../phase-04/DESIGN_TOKENS.md) | Chart colors (`--chart-1`…) |
+| Phase 04 [DESIGN_TOKENS_AND_THEME.md](../phase-04/DESIGN_TOKENS_AND_THEME.md) | Chart colors (`--chart-1`…) |
 
 ---
 

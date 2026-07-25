@@ -1,0 +1,12 @@
+title: User Guides
+nav:
+  - getting-started.md
+  - organization-admin.md
+  - fundraising.md
+  - finance.md
+  - accounting.md
+  - reports.md
+  - programs-and-grants.md
+  - church.md
+  - school.md
+  - platform-owner.md

@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### MkDocs ###
+site/
+.venv-docs/
+
+### Docs scripts ###
+docs/scripts/node_modules/
