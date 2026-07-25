@@ -48,7 +48,7 @@ export function TenantSwitcher() {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="w-full max-w-md space-y-1">
         <p className="text-sm font-medium">Tenant context</p>
         <p className="text-xs text-muted-foreground">

@@ -18,14 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.daisyDonation.auth.dto.CreateSuperAdminRequest;
+import com.project.daisyDonation.auth.dto.UpdateUserRoleRequest;
 import com.project.daisyDonation.auth.dto.UserResponse;
 import com.project.daisyDonation.common.config.OpenApiConfig;
 import com.project.daisyDonation.common.dto.ApiResponse;
 import com.project.daisyDonation.common.security.UserPrincipal;
+import com.project.daisyDonation.organization.dto.OrganizationRequest;
 import com.project.daisyDonation.organization.dto.OrganizationResponse;
 import com.project.daisyDonation.platform.dto.OrganizationStatusRequest;
+import com.project.daisyDonation.platform.dto.PlatformCreateUserRequest;
 import com.project.daisyDonation.platform.dto.PlatformStatsResponse;
 import com.project.daisyDonation.platform.dto.PlatformUserResponse;
+import com.project.daisyDonation.platform.dto.PlatformUserStatusRequest;
 import com.project.daisyDonation.platform.observability.dto.PlatformDashboardResponse;
 import com.project.daisyDonation.platform.observability.dto.SystemLogResponse;
 import com.project.daisyDonation.platform.observability.entity.LogSeverity;
@@ -87,6 +91,16 @@ public class PlatformOwnerDashboardController {
         return ResponseEntity.ok(ApiResponse.ok(dashboardService.listOrganizations(principal)));
     }
 
+    @PostMapping("/organizations")
+    @Operation(summary = "Create organization", description = "Manually provisions a tenant from the platform owner dashboard.")
+    public ResponseEntity<ApiResponse<OrganizationResponse>> createOrganization(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody OrganizationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Organization created",
+                        dashboardService.createOrganization(principal, request)));
+    }
+
     @GetMapping("/organizations/{id}")
     @Operation(summary = "Get organization", description = "Organization details by ID.")
     public ResponseEntity<ApiResponse<OrganizationResponse>> getOrganization(
@@ -111,6 +125,46 @@ public class PlatformOwnerDashboardController {
     public ResponseEntity<ApiResponse<List<PlatformUserResponse>>> listUsers(
             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(ApiResponse.ok(dashboardService.listUsers(principal)));
+    }
+
+    @PostMapping("/users")
+    @Operation(summary = "Create tenant user", description = "Creates a user inside any tenant organization.")
+    public ResponseEntity<ApiResponse<PlatformUserResponse>> createTenantUser(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody PlatformCreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Tenant user created",
+                        dashboardService.createTenantUser(principal, request)));
+    }
+
+    @GetMapping("/users/{id}")
+    @Operation(summary = "Get platform user", description = "Returns any tenant or platform user by ID.")
+    public ResponseEntity<ApiResponse<PlatformUserResponse>> getUser(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "User identifier") @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(dashboardService.getUser(principal, id)));
+    }
+
+    @PutMapping("/users/{id}/role")
+    @Operation(summary = "Update tenant user role", description = "Changes a tenant user's role from the platform dashboard.")
+    public ResponseEntity<ApiResponse<PlatformUserResponse>> updateUserRole(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "User identifier") @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRoleRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "User role updated",
+                dashboardService.updateUserRole(principal, id, request)));
+    }
+
+    @PutMapping("/users/{id}/status")
+    @Operation(summary = "Enable or disable user", description = "Suspends or reactivates any user account.")
+    public ResponseEntity<ApiResponse<PlatformUserResponse>> updateUserStatus(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "User identifier") @PathVariable Long id,
+            @Valid @RequestBody PlatformUserStatusRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                request.getEnabled() ? "User account enabled" : "User account disabled",
+                dashboardService.updateUserStatus(principal, id, request)));
     }
 
     @PostMapping("/super-admins")

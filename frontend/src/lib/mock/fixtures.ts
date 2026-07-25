@@ -38,6 +38,36 @@ export const MOCK_ORG: OrganizationProfile = {
   createdAt: "2024-01-15T08:00:00Z",
 };
 
+export const MOCK_ORGANIZATIONS: Record<number, OrganizationProfile> = {
+  1: MOCK_ORG,
+  2: {
+    id: 2,
+    name: "Hope Foundation",
+    slug: "hope-foundation",
+    type: "FOUNDATION",
+    email: "hello@hopefoundation.org",
+    phone: "+255 754 111 222",
+    address: "Sokoine Drive",
+    city: "Arusha",
+    country: "Tanzania",
+    active: true,
+    createdAt: "2023-06-01T08:00:00Z",
+  },
+  3: {
+    id: 3,
+    name: "Children First NGO",
+    slug: "children-first",
+    type: "NGO",
+    email: "info@childrenfirst.org",
+    phone: "+255 765 333 444",
+    address: "Nyamagana District",
+    city: "Mwanza",
+    country: "Tanzania",
+    active: true,
+    createdAt: "2022-11-20T08:00:00Z",
+  },
+};
+
 export const MOCK_DEMO_PASSWORD = "demo";
 
 export const MOCK_DEMO_USERS: Record<

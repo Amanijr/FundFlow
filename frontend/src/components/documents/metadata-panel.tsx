@@ -34,7 +34,7 @@ export function MetadataPanel({ document, className }: MetadataPanelProps) {
   }
 
   return (
-    <aside className={cn("w-64 shrink-0 border-l border-border bg-muted/20 p-4", className)}>
+    <aside className={cn("w-64 shrink-0 border-l border-border bg-surface p-4", className)}>
       <h3 className="mb-3 text-sm font-semibold text-foreground">Details</h3>
       <dl className="space-y-3">
         {rows.map((row) => (

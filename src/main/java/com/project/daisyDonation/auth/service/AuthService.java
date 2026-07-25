@@ -18,6 +18,7 @@ import com.project.daisyDonation.common.exception.ConflictException;
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
 import com.project.daisyDonation.common.exception.UnauthorizedException;
 import com.project.daisyDonation.common.security.JwtService;
+import com.project.daisyDonation.common.security.TokenType;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.organization.service.OrganizationService;
@@ -69,8 +70,32 @@ public class AuthService {
             UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
             User user = userRepository.findByEmailAndDeletedFalse(principal.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+            if (user.getRole() == Role.SUPER_ADMIN) {
+                systemLogService.recordSecurity(
+                        "AUTH",
+                        "Platform owner blocked from tenant login",
+                        "email=" + user.getEmail(),
+                        user.getEmail());
+                throw new UnauthorizedException("Platform owners must sign in through the platform console");
+            }
+            if (!user.isEnabled()) {
+                systemLogService.recordSecurity("AUTH", "Disabled user login blocked", "email=" + user.getEmail(), user.getEmail());
+                throw new UnauthorizedException("Account disabled");
+            }
+            if (user.getOrganization() != null && !user.getOrganization().isActive()) {
+                systemLogService.recordSecurity(
+                        "AUTH",
+                        "Inactive organization login blocked",
+                        "organizationId=" + user.getOrganization().getId() + ", email=" + user.getEmail(),
+                        user.getEmail());
+                throw new UnauthorizedException("Organization inactive");
+            }
+
             systemLogService.recordEvent("AUTH", "User login succeeded", "email=" + user.getEmail());
             return buildAuthResponse(user);
+        } catch (UnauthorizedException ex) {
+            throw ex;
         } catch (Exception ex) {
             systemLogService.recordSecurity("AUTH", "User login failed", "email=" + request.getEmail(), request.getEmail());
             throw new UnauthorizedException("Invalid email or password");
@@ -86,11 +111,12 @@ public class AuthService {
 
     private AuthResponse buildAuthResponse(User user) {
         Long organizationId = user.getOrganization() != null ? user.getOrganization().getId() : null;
-        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole(), organizationId);
+        String token = jwtService.generateTenantToken(user.getId(), user.getEmail(), user.getRole(), organizationId);
 
         return AuthResponse.builder()
                 .accessToken(token)
                 .tokenType("Bearer")
+                .tokenPlane(TokenType.TENANT.name())
                 .userId(user.getId())
                 .organizationId(organizationId)
                 .organizationType(user.getOrganization() != null ? user.getOrganization().getType() : null)

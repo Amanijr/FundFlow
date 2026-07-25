@@ -31,7 +31,7 @@ export function FilterBar({
 }: FilterBarProps) {
   return (
     <div className={cn("mb-3 space-y-2", className)}>
-      <div className="flex flex-col gap-2 rounded-md border border-border bg-muted/20 p-2 lg:flex-row lg:items-center">
+      <div className="flex flex-col gap-2 rounded-md border border-border bg-surface p-2 lg:flex-row lg:items-center">
         <SearchInput
           value={searchValue}
           onChange={onSearchChange}

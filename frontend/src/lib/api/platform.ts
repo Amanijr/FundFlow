@@ -5,10 +5,14 @@ import type {
   CreateSuperAdminRequest,
   LogSearchParams,
   OrganizationStatusRequest,
+  PlatformCreateOrganizationRequest,
+  PlatformCreateUserRequest,
   PlatformDashboardResponse,
   PlatformOrganization,
   PlatformStatsResponse,
+  PlatformUpdateUserRoleRequest,
   PlatformUser,
+  PlatformUserStatusRequest,
   SystemLogResponse,
 } from "@/types/platform";
 
@@ -26,6 +30,10 @@ export function listPlatformOrganizations(token: string) {
   return apiRequest<PlatformOrganization[]>(`${DASHBOARD}/organizations`, { token });
 }
 
+export function createPlatformOrganization(token: string, body: PlatformCreateOrganizationRequest) {
+  return apiRequest<PlatformOrganization>(`${DASHBOARD}/organizations`, { method: "POST", token, body });
+}
+
 export function getPlatformOrganization(token: string, id: number) {
   return apiRequest<PlatformOrganization>(`${DASHBOARD}/organizations/${id}`, { token });
 }
@@ -40,6 +48,22 @@ export function updateOrganizationStatus(token: string, id: number, body: Organi
 
 export function listPlatformUsers(token: string) {
   return apiRequest<PlatformUser[]>(`${DASHBOARD}/users`, { token });
+}
+
+export function createPlatformUser(token: string, body: PlatformCreateUserRequest) {
+  return apiRequest<PlatformUser>(`${DASHBOARD}/users`, { method: "POST", token, body });
+}
+
+export function getPlatformUser(token: string, id: number) {
+  return apiRequest<PlatformUser>(`${DASHBOARD}/users/${id}`, { token });
+}
+
+export function updatePlatformUserRole(token: string, id: number, body: PlatformUpdateUserRoleRequest) {
+  return apiRequest<PlatformUser>(`${DASHBOARD}/users/${id}/role`, { method: "PUT", token, body });
+}
+
+export function updatePlatformUserStatus(token: string, id: number, body: PlatformUserStatusRequest) {
+  return apiRequest<PlatformUser>(`${DASHBOARD}/users/${id}/status`, { method: "PUT", token, body });
 }
 
 export function createSuperAdmin(token: string, body: CreateSuperAdminRequest) {

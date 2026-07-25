@@ -1,5 +1,6 @@
-import type { ApiResponse } from "@/types/api";
+import type { ApiResponse, OrganizationType, Role } from "@/types/api";
 import { ApiError } from "@/types/api";
+import type { PlatformOrganization, PlatformUser, SystemLogResponse } from "@/types/platform";
 
 import { mockDelay } from "@/lib/mock/config";
 import {
@@ -17,6 +18,7 @@ import {
   MOCK_INSIGHTS,
   MOCK_MINISTRIES,
   MOCK_ORG,
+  MOCK_ORGANIZATIONS,
   MOCK_PROGRAMS,
   MOCK_SPONSORSHIPS,
   MOCK_TRENDS,
@@ -68,6 +70,96 @@ function matchId(pathname: string, prefix: string): number | null {
   const match = pathname.match(new RegExp(`^${prefix}/(\\d+)(?:/|$)`));
   return match ? Number(match[1]) : null;
 }
+
+const mockPlatformOrganizations: PlatformOrganization[] = Object.values(MOCK_ORGANIZATIONS).map((organization) => ({
+  id: organization.id,
+  name: organization.name,
+  slug: organization.slug,
+  type: organization.type,
+  email: organization.email,
+  phone: organization.phone,
+  address: organization.address,
+  city: organization.city,
+  state: organization.state,
+  country: organization.country,
+  active: organization.active,
+  createdAt: organization.createdAt,
+}));
+
+const mockPlatformUsers: PlatformUser[] = [
+  {
+    id: 1,
+    email: "super@demo.local",
+    firstName: "Platform",
+    lastName: "Admin",
+    role: "SUPER_ADMIN",
+    organizationId: null,
+    organizationName: "Platform",
+    enabled: true,
+  },
+  {
+    id: 2,
+    email: "admin@demo.local",
+    firstName: "Grace",
+    lastName: "Admin",
+    role: "ORG_ADMIN",
+    organizationId: 1,
+    organizationName: "CrossLife Mission Network",
+    enabled: true,
+  },
+  {
+    id: 3,
+    email: "finance@demo.local",
+    firstName: "David",
+    lastName: "Mwangi",
+    role: "FINANCE_MANAGER",
+    organizationId: 1,
+    organizationName: "CrossLife Mission Network",
+    enabled: true,
+  },
+  {
+    id: 4,
+    email: "auditor@hopefoundation.org",
+    firstName: "Neema",
+    lastName: "Auditor",
+    role: "AUDITOR",
+    organizationId: 2,
+    organizationName: "Hope Foundation",
+    enabled: true,
+  },
+];
+
+const mockPlatformLogs: SystemLogResponse[] = [
+  {
+    id: 1,
+    logType: "EVENT",
+    severity: "INFO",
+    category: "AUTH",
+    message: "User login succeeded",
+    details: "email=finance@demo.local",
+    organizationId: 1,
+    userEmail: "finance@demo.local",
+    requestMethod: "POST",
+    requestPath: "/api/v1/auth/login",
+    httpStatus: 200,
+    alertResolved: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    logType: "ALERT",
+    severity: "WARNING",
+    category: "ALERT",
+    message: "Security event detected: User login failed",
+    details: "email=unknown@example.com",
+    userEmail: "unknown@example.com",
+    requestMethod: "POST",
+    requestPath: "/api/v1/auth/login",
+    httpStatus: 401,
+    alertResolved: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+  },
+];
 
 function handleAuth(
   pathname: string,
@@ -223,7 +315,9 @@ export async function mockApiRequest<T>(
 
   if (pathname === "/api/v1/organizations/me") {
     if (method === "GET" || method === "PUT") {
-      return ok(MOCK_ORG) as ApiResponse<T>;
+      const org =
+        (options.organizationId != null && MOCK_ORGANIZATIONS[options.organizationId]) || MOCK_ORG;
+      return ok(org) as ApiResponse<T>;
     }
   }
 
@@ -598,13 +692,144 @@ export async function mockApiRequest<T>(
     }) as ApiResponse<T>;
   }
 
-  if (pathname.startsWith("/api/v1/platform/")) {
-    return ok({
-      totalOrganizations: 3,
-      activeOrganizations: 2,
-      totalUsers: 12,
-      openLogs: 1,
-    }) as ApiResponse<T>;
+  if (pathname.startsWith("/api/v1/platform/dashboard")) {
+    if (pathname === "/api/v1/platform/dashboard" && method === "GET") {
+      return ok({
+        platformStats: {
+          totalOrganizations: mockPlatformOrganizations.length,
+          activeOrganizations: mockPlatformOrganizations.filter((organization) => organization.active).length,
+          totalUsers: mockPlatformUsers.length,
+          superAdminCount: mockPlatformUsers.filter((user) => user.role === "SUPER_ADMIN").length,
+        },
+        inactiveOrganizations: mockPlatformOrganizations.filter((organization) => !organization.active).length,
+        logsLast24Hours: mockPlatformLogs.length,
+        errorsLast24Hours: mockPlatformLogs.filter((log) => log.severity === "ERROR" || log.severity === "CRITICAL").length,
+        securityEventsLast24Hours: mockPlatformLogs.filter((log) => log.logType === "SECURITY").length,
+        unresolvedAlerts: mockPlatformLogs.filter((log) => log.logType === "ALERT" && !log.alertResolved).length,
+        organizations: mockPlatformOrganizations,
+        users: mockPlatformUsers,
+        recentActivity: mockPlatformLogs,
+        recentAlerts: mockPlatformLogs.filter((log) => log.logType === "ALERT"),
+        recentErrors: mockPlatformLogs.filter((log) => log.severity === "ERROR" || log.severity === "CRITICAL"),
+      }) as ApiResponse<T>;
+    }
+
+    if (pathname === "/api/v1/platform/dashboard/organizations") {
+      if (method === "GET") {
+        return ok(mockPlatformOrganizations) as ApiResponse<T>;
+      }
+      if (method === "POST") {
+        const request = (body ?? {}) as Partial<PlatformOrganization>;
+        const organization: PlatformOrganization = {
+          id: nextMockId(),
+          name: request.name ?? "New Organization",
+          slug: request.slug ?? String(request.name ?? "new-organization").toLowerCase().replace(/\s+/g, "-"),
+          type: (request.type ?? "NGO") as OrganizationType,
+          email: request.email,
+          phone: request.phone,
+          address: request.address,
+          city: request.city,
+          state: request.state,
+          country: request.country,
+          active: true,
+          createdAt: new Date().toISOString(),
+        };
+        mockPlatformOrganizations.unshift(organization);
+        return ok(organization as T, "Organization created");
+      }
+    }
+
+    const organizationId = matchId(pathname, "/api/v1/platform/dashboard/organizations");
+    if (organizationId != null) {
+      const organization = mockPlatformOrganizations.find((item) => item.id === organizationId);
+      if (!organization) throw new ApiError("Organization not found", 404);
+      if (pathname.endsWith("/status") && method === "PUT") {
+        organization.active = Boolean((body as { active?: boolean } | undefined)?.active);
+        return ok(organization as T, "Organization status updated");
+      }
+      if (method === "GET") {
+        return ok(organization as T);
+      }
+    }
+
+    if (pathname === "/api/v1/platform/dashboard/users") {
+      if (method === "GET") {
+        return ok(mockPlatformUsers) as ApiResponse<T>;
+      }
+      if (method === "POST") {
+        const request = (body ?? {}) as {
+          organizationId?: number;
+          email?: string;
+          firstName?: string;
+          lastName?: string;
+          role?: Role;
+        };
+        const organization = mockPlatformOrganizations.find((item) => item.id === Number(request.organizationId));
+        if (!organization) throw new ApiError("Organization not found", 404);
+        const user: PlatformUser = {
+          id: nextMockId(),
+          email: request.email ?? "new-user@example.com",
+          firstName: request.firstName ?? "New",
+          lastName: request.lastName ?? "User",
+          role: request.role ?? "STAFF",
+          organizationId: organization.id,
+          organizationName: organization.name,
+          enabled: true,
+        };
+        mockPlatformUsers.unshift(user);
+        return ok(user as T, "Tenant user created");
+      }
+    }
+
+    const userId = matchId(pathname, "/api/v1/platform/dashboard/users");
+    if (userId != null) {
+      const user = mockPlatformUsers.find((item) => item.id === userId);
+      if (!user) throw new ApiError("User not found", 404);
+      if (pathname.endsWith("/role") && method === "PUT") {
+        user.role = ((body as { role?: Role } | undefined)?.role ?? user.role);
+        return ok(user as T, "User role updated");
+      }
+      if (pathname.endsWith("/status") && method === "PUT") {
+        user.enabled = Boolean((body as { enabled?: boolean } | undefined)?.enabled);
+        return ok(user as T, user.enabled ? "User account enabled" : "User account disabled");
+      }
+      if (method === "GET") {
+        return ok(user as T);
+      }
+    }
+
+    if (pathname === "/api/v1/platform/dashboard/super-admins" && method === "POST") {
+      const request = (body ?? {}) as { email?: string; firstName?: string; lastName?: string };
+      const user: PlatformUser = {
+        id: nextMockId(),
+        email: request.email ?? "owner@example.com",
+        firstName: request.firstName ?? "Platform",
+        lastName: request.lastName ?? "Owner",
+        role: "SUPER_ADMIN",
+        organizationId: null,
+        organizationName: "Platform",
+        enabled: true,
+      };
+      mockPlatformUsers.unshift(user);
+      return ok(user as T, "Super administrator created");
+    }
+
+    if (pathname === "/api/v1/platform/dashboard/logs") {
+      return ok(mockPlatformLogs as T);
+    }
+
+    const logId = matchId(pathname, "/api/v1/platform/dashboard/logs");
+    if (logId != null) {
+      const log = mockPlatformLogs.find((item) => item.id === logId);
+      if (!log) throw new ApiError("System log entry not found", 404);
+      if (pathname.endsWith("/resolve") && method === "PUT") {
+        log.alertResolved = true;
+        return ok(log as T, "Alert resolved");
+      }
+      if (method === "GET") {
+        return ok(log as T);
+      }
+    }
   }
 
   if (pathname === "/api/v1/notifications/unread-count" && method === "GET") {

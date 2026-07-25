@@ -1,4 +1,4 @@
-import type { OrganizationType, Role } from "@/types/api";
+import type { OrganizationRequest, OrganizationType, Role } from "@/types/api";
 
 export type LogType = "EVENT" | "ERROR" | "EXCEPTION" | "ALERT" | "SECURITY";
 
@@ -71,6 +71,25 @@ export interface PlatformDashboardResponse {
 
 export interface OrganizationStatusRequest {
   active: boolean;
+}
+
+export type PlatformCreateOrganizationRequest = OrganizationRequest;
+
+export interface PlatformCreateUserRequest {
+  organizationId: number;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: Exclude<Role, "SUPER_ADMIN">;
+}
+
+export interface PlatformUserStatusRequest {
+  enabled: boolean;
+}
+
+export interface PlatformUpdateUserRoleRequest {
+  role: Exclude<Role, "SUPER_ADMIN">;
 }
 
 export interface CreateSuperAdminRequest {

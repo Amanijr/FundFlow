@@ -1,56 +1,76 @@
 "use client";
 
-import { Building2, Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
+import { ChevronsUpDown } from "lucide-react";
 
-import { useOrganization } from "@/hooks/use-organization";
-import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  OrganizationSwitcherCompactTrigger,
+  OrganizationSwitcherPanel,
+} from "@/components/layout/organization/organization-switcher-panel";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-media-query";
+import { useUserSession } from "@/hooks/use-user-session";
+import { cn } from "@/lib/utils";
 
-/**
- * Organization switcher — displays active org; multi-org switching UI placeholder.
- * Full switching requires backend support and is not wired in this phase.
- */
 export function OrganizationSwitcher() {
-  const organizationQuery = useOrganization();
-  const organization = organizationQuery.data;
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const { activeMembership, memberships, switchOrganization } = useUserSession();
 
-  if (!organization) {
+  if (!activeMembership) {
     return null;
   }
 
+  const panel = (
+    <OrganizationSwitcherPanel
+      activeMembership={activeMembership}
+      memberships={memberships}
+      onSwitch={switchOrganization}
+      onClose={() => setOpen(false)}
+    />
+  );
+
+  const trigger = (
+    <Button
+      variant="outline"
+      size="sm"
+      className={cn(
+        "h-9 max-w-none gap-1.5 border-border bg-surface px-2.5 hover:bg-accent/30",
+        "hidden sm:inline-flex",
+      )}
+      aria-label="Organization menu"
+      onClick={isMobile ? () => setOpen(true) : undefined}
+    >
+      <OrganizationSwitcherCompactTrigger membership={activeMembership} />
+      <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+    </Button>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent
+            showClose
+            className="inset-y-0 left-auto right-0 w-full max-w-md border-l border-border bg-surface text-foreground"
+          >
+            <SheetTitle className="mb-4 text-base font-semibold text-foreground">Organization</SheetTitle>
+            {panel}
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="hidden h-8 max-w-[11rem] gap-1.5 px-2 text-xs font-normal sm:flex"
-          aria-label="Switch organization"
-        >
-          <Building2 className="h-3.5 w-3.5 shrink-0 text-stone-500" />
-          <span className="truncate">{organization.name}</span>
-          <ChevronsUpDown className="ml-auto h-3.5 w-3.5 shrink-0 text-stone-400" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Organizations</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem disabled className="flex items-center justify-between">
-          <span className="truncate">{organization.name}</span>
-          <Check className="h-4 w-4 shrink-0 text-stone-600" />
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-          Additional organizations coming soon
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent align="end" className="w-[min(24rem,calc(100vw-2rem))] border border-border bg-surface p-4 shadow-none">
+        {panel}
+      </PopoverContent>
+    </Popover>
   );
 }

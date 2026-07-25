@@ -42,7 +42,7 @@ export function DocumentCard({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-md border border-border px-3 py-2.5 transition-colors hover:bg-muted/40",
+        "group flex items-center gap-3 rounded-md border border-border px-3 py-2.5 transition-colors hover:bg-accent/30",
         className,
       )}
     >
@@ -51,7 +51,7 @@ export function DocumentCard({
         onClick={onPreview}
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-surface">
           <Icon className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="min-w-0 flex-1">

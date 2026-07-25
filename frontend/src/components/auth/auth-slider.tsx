@@ -59,7 +59,7 @@ export function AuthSlider({ initialMode = "sign-in" }: AuthSliderProps) {
       </div>
 
       {/* Mobile: single panel */}
-      <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm lg:hidden">
+      <div className="overflow-hidden rounded-lg border border-border bg-surface lg:hidden">
         {signUpActive ? (
           <RegisterForm variant="panel" onSwitchToSignIn={showSignIn} />
         ) : (
@@ -70,7 +70,7 @@ export function AuthSlider({ initialMode = "sign-in" }: AuthSliderProps) {
       {/* Desktop: double-slider */}
       <div
         className={cn(
-          "auth-slider relative hidden min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface shadow-sm lg:block",
+          "auth-slider relative hidden min-h-[34rem] overflow-hidden rounded-lg border border-border bg-surface lg:block",
           signUpActive && "auth-slider--sign-up",
         )}
       >

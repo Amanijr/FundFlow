@@ -76,7 +76,7 @@ export function NotificationCard({
   return (
     <div
       className={cn(
-        "group flex w-full gap-3 rounded-md px-3 py-2.5 text-left transition-colors hover:bg-muted/60",
+        "group flex w-full gap-3 rounded-md px-3 py-2.5 text-left transition-colors hover:bg-accent/30",
         SEVERITY_BORDER[notification.severity],
         className,
       )}
@@ -118,7 +118,7 @@ export function NotificationCard({
             event.stopPropagation();
             onArchive();
           }}
-          className="mt-0.5 shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100 focus:opacity-100"
+          className="mt-0.5 shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100 focus:opacity-100"
           aria-label="Archive notification"
         >
           <Archive className="h-3.5 w-3.5" />

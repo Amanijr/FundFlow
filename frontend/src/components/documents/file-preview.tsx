@@ -82,7 +82,7 @@ export function FilePreview({
 
   if (isImage && url) {
     return (
-      <div className={cn("flex h-full min-h-[24rem] items-center justify-center overflow-auto bg-muted/30 p-4", className)}>
+      <div className={cn("flex h-full min-h-[24rem] items-center justify-center overflow-auto bg-background p-4", className)}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={url}
@@ -99,7 +99,7 @@ export function FilePreview({
     return (
       <pre
         className={cn(
-          "h-full min-h-[24rem] overflow-auto whitespace-pre-wrap rounded-none bg-muted/30 p-4 text-sm text-foreground",
+          "h-full min-h-[24rem] overflow-auto whitespace-pre-wrap rounded-none bg-background p-4 text-sm text-foreground",
           className,
         )}
       >

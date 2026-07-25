@@ -50,7 +50,7 @@ export function DataTableToolbar<TData>({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/20 px-3 py-1.5",
+        "flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 py-1.5",
         className,
       )}
       aria-live="polite"

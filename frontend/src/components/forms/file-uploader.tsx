@@ -29,7 +29,7 @@ export function FileUploader({ accept, multiple, onFilesSelected, className }: F
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 py-10 text-center",
+        "flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-background px-6 py-10 text-center",
         className,
       )}
       onDragOver={(e) => e.preventDefault()}

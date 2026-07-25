@@ -41,7 +41,7 @@ export function FormActions({
       className={cn(
         "flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-end",
         sticky &&
-          "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface p-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] sm:static sm:border-0 sm:p-0 sm:shadow-none",
+          "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface p-4 sm:static sm:border-0 sm:p-0",
         className,
       )}
     >

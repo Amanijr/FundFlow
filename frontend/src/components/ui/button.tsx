@@ -11,11 +11,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: materialGradientClasses,
-        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-stone-300 bg-background text-stone-700 shadow-sm hover:border-stone-600 hover:opacity-80",
+          "border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "border border-stone-300 bg-transparent text-stone-700 shadow-sm hover:border-stone-600 hover:opacity-60",
+          "border border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-foreground underline-offset-4 hover:underline",
       },

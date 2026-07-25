@@ -18,6 +18,7 @@ import { getDefaultDashboardPath } from "@/lib/navigation/permissions";
 import { isMockApiEnabled } from "@/lib/mock/config";
 import { MOCK_DEMO_PASSWORD } from "@/lib/mock/fixtures";
 import { useMfaStore } from "@/stores/mfa-store";
+import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 import type { AuthResponse } from "@/types/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
   const searchParams = useSearchParams();
   const { setSession } = useAuth();
   const setMfaChallenge = useMfaStore((state) => state.setChallenge);
+  const recordLogin = useSessionPreferencesStore((state) => state.recordLogin);
   const [error, setError] = useState<string | null>(null);
 
   const returnUrl = searchParams.get("returnUrl");
@@ -87,6 +89,7 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
       }
 
       setSession(data as AuthResponse, values.rememberMe);
+      recordLogin();
       router.replace(
         resolvePostLoginPath(returnUrl, getDefaultDashboardPath(data.role)),
       );

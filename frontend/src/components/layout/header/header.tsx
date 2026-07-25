@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumb/breadcrumbs";
+import { CurrencyButton } from "@/components/layout/header/currency-button";
 import { MobileSearchButton, SearchBar } from "@/components/layout/header/search-bar";
 import { UserMenu } from "@/components/layout/header/user-menu";
 import { NotificationDropdown } from "@/components/layout/notifications/notification-dropdown";
@@ -41,8 +42,9 @@ export function Header() {
 
       <SearchBar />
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1.5">
         <MobileSearchButton />
+        <CurrencyButton />
         <NotificationDropdown />
         <OrganizationSwitcher />
         <UserMenu />

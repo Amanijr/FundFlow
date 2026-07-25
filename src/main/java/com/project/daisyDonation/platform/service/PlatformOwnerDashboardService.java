@@ -8,12 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.daisyDonation.auth.dto.CreateSuperAdminRequest;
+import com.project.daisyDonation.auth.dto.UpdateUserRoleRequest;
 import com.project.daisyDonation.auth.dto.UserResponse;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.common.service.PlatformAccess;
+import com.project.daisyDonation.organization.dto.OrganizationRequest;
 import com.project.daisyDonation.organization.dto.OrganizationResponse;
 import com.project.daisyDonation.platform.dto.OrganizationStatusRequest;
+import com.project.daisyDonation.platform.dto.PlatformCreateUserRequest;
 import com.project.daisyDonation.platform.dto.PlatformUserResponse;
+import com.project.daisyDonation.platform.dto.PlatformUserStatusRequest;
 import com.project.daisyDonation.platform.observability.dto.PlatformDashboardResponse;
 import com.project.daisyDonation.platform.observability.dto.SystemLogResponse;
 import com.project.daisyDonation.platform.observability.entity.LogSeverity;
@@ -91,6 +95,11 @@ public class PlatformOwnerDashboardService {
         return platformService.listOrganizations(principal);
     }
 
+    @Transactional
+    public OrganizationResponse createOrganization(UserPrincipal principal, OrganizationRequest request) {
+        return platformService.createOrganization(principal, request);
+    }
+
     @Transactional(readOnly = true)
     public OrganizationResponse getOrganization(UserPrincipal principal, Long organizationId) {
         return platformService.getOrganization(principal, organizationId);
@@ -105,6 +114,27 @@ public class PlatformOwnerDashboardService {
     @Transactional(readOnly = true)
     public List<PlatformUserResponse> listUsers(UserPrincipal principal) {
         return platformService.listUsers(principal);
+    }
+
+    @Transactional(readOnly = true)
+    public PlatformUserResponse getUser(UserPrincipal principal, Long userId) {
+        return platformService.getUser(principal, userId);
+    }
+
+    @Transactional
+    public PlatformUserResponse createTenantUser(UserPrincipal principal, PlatformCreateUserRequest request) {
+        return platformService.createTenantUser(principal, request);
+    }
+
+    @Transactional
+    public PlatformUserResponse updateUserRole(UserPrincipal principal, Long userId, UpdateUserRoleRequest request) {
+        return platformService.updateUserRole(principal, userId, request);
+    }
+
+    @Transactional
+    public PlatformUserResponse updateUserStatus(
+            UserPrincipal principal, Long userId, PlatformUserStatusRequest request) {
+        return platformService.updateUserStatus(principal, userId, request);
     }
 
     @Transactional

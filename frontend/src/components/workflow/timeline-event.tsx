@@ -45,7 +45,7 @@ export function TimelineEvent({ event, isLast = false }: TimelineEventProps) {
         )}
       />
       {event.link ? (
-        <Link href={event.link} className="block rounded-md transition-colors hover:bg-muted/40">
+        <Link href={event.link} className="block rounded-md transition-colors hover:bg-accent/30">
           {body}
         </Link>
       ) : (

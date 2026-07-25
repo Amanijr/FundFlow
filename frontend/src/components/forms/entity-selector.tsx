@@ -52,7 +52,7 @@ export function EntitySelector({
         }}
       />
       {query && (
-        <ul className="max-h-48 overflow-auto rounded-md border border-border bg-surface shadow-sm">
+        <ul className="max-h-48 overflow-auto rounded-md border border-border bg-surface">
           {filtered.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted-foreground">No matches</li>
           ) : (
@@ -60,7 +60,7 @@ export function EntitySelector({
               <li key={option.id}>
                 <button
                   type="button"
-                  className="flex w-full flex-col px-3 py-2 text-left hover:bg-muted"
+                  className="flex w-full flex-col px-3 py-2 text-left hover:bg-accent/30"
                   onClick={() => {
                     onChange?.(option.id);
                     setQuery("");

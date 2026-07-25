@@ -26,7 +26,7 @@ export function WorkflowCard({
   return (
     <div
       className={cn(
-        "rounded-md border border-border px-4 py-3 transition-colors hover:bg-muted/40",
+        "rounded-md border border-border px-4 py-3 transition-colors hover:bg-accent/30",
         item.actionRequired && "border-l-2 border-l-stone-900",
         item.slaBreached && "border-l-red-600",
         className,

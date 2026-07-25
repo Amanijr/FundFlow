@@ -1,6 +1,8 @@
 package com.project.daisyDonation.platform.service;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.daisyDonation.auth.dto.AuthResponse;
 import com.project.daisyDonation.auth.dto.BootstrapSuperAdminRequest;
 import com.project.daisyDonation.auth.dto.CreateSuperAdminRequest;
+import com.project.daisyDonation.auth.dto.UpdateUserRoleRequest;
 import com.project.daisyDonation.auth.dto.UserResponse;
 import com.project.daisyDonation.auth.entity.Role;
 import com.project.daisyDonation.auth.entity.User;
@@ -22,12 +25,15 @@ import com.project.daisyDonation.common.security.JwtService;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.common.service.PlatformAccess;
 import com.project.daisyDonation.organization.dto.OrganizationResponse;
+import com.project.daisyDonation.organization.dto.OrganizationRequest;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.organization.repository.OrganizationRepository;
 import com.project.daisyDonation.organization.service.OrganizationService;
 import com.project.daisyDonation.platform.dto.OrganizationStatusRequest;
+import com.project.daisyDonation.platform.dto.PlatformCreateUserRequest;
 import com.project.daisyDonation.platform.dto.PlatformStatsResponse;
 import com.project.daisyDonation.platform.dto.PlatformUserResponse;
+import com.project.daisyDonation.platform.dto.PlatformUserStatusRequest;
 import com.project.daisyDonation.platform.observability.service.SystemLogService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +41,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PlatformService {
+
+    private static final Set<Role> TENANT_ASSIGNABLE_ROLES = EnumSet.of(
+            Role.ORG_ADMIN,
+            Role.FINANCE_MANAGER,
+            Role.ACCOUNTANT,
+            Role.FUNDRAISING_MANAGER,
+            Role.PROGRAM_MANAGER,
+            Role.STAFF,
+            Role.VOLUNTEER,
+            Role.AUDITOR,
+            Role.DONOR,
+            Role.VIEW_ONLY);
 
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
@@ -78,6 +96,48 @@ public class PlatformService {
         user = userRepository.save(user);
         systemLogService.recordPlatformAction(principal, "PLATFORM", "Super administrator created", "email=" + user.getEmail());
         return toUserResponse(user);
+    }
+
+    @Transactional
+    public OrganizationResponse createOrganization(UserPrincipal principal, OrganizationRequest request) {
+        PlatformAccess.requireSuperAdmin(principal);
+
+        Organization organization = organizationService.create(request);
+        systemLogService.recordPlatformAction(
+                principal,
+                "PLATFORM",
+                "Organization created",
+                "organizationId=" + organization.getId() + ", name=" + organization.getName());
+        return organizationService.toResponse(organization);
+    }
+
+    @Transactional
+    public PlatformUserResponse createTenantUser(UserPrincipal principal, PlatformCreateUserRequest request) {
+        PlatformAccess.requireSuperAdmin(principal);
+        validateTenantRole(request.getRole());
+
+        if (userRepository.existsByEmailAndDeletedFalse(request.getEmail())) {
+            throw new ConflictException("Email already registered");
+        }
+
+        Organization organization = requireOrganization(request.getOrganizationId());
+        User user = User.builder()
+                .organization(organization)
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .role(request.getRole())
+                .enabled(true)
+                .build();
+
+        User saved = userRepository.save(user);
+        systemLogService.recordPlatformAction(
+                principal,
+                "PLATFORM",
+                "Tenant user created",
+                "userId=" + saved.getId() + ", organizationId=" + organization.getId() + ", role=" + saved.getRole());
+        return toPlatformUserResponse(saved);
     }
 
     @Transactional(readOnly = true)
@@ -131,6 +191,52 @@ public class PlatformService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PlatformUserResponse getUser(UserPrincipal principal, Long userId) {
+        PlatformAccess.requireSuperAdmin(principal);
+        return toPlatformUserResponse(requireUser(userId));
+    }
+
+    @Transactional
+    public PlatformUserResponse updateUserRole(UserPrincipal principal, Long userId, UpdateUserRoleRequest request) {
+        PlatformAccess.requireSuperAdmin(principal);
+        validateTenantRole(request.getRole());
+
+        User user = requireUser(userId);
+        if (user.getRole() == Role.SUPER_ADMIN) {
+            throw new BadRequestException("Use super-admin management for platform owner accounts");
+        }
+
+        user.setRole(request.getRole());
+        User saved = userRepository.save(user);
+        systemLogService.recordPlatformAction(
+                principal,
+                "PLATFORM",
+                "Tenant user role updated",
+                "userId=" + saved.getId() + ", role=" + saved.getRole());
+        return toPlatformUserResponse(saved);
+    }
+
+    @Transactional
+    public PlatformUserResponse updateUserStatus(UserPrincipal principal, Long userId, PlatformUserStatusRequest request) {
+        PlatformAccess.requireSuperAdmin(principal);
+
+        if (principal.getId().equals(userId)) {
+            throw new BadRequestException("You cannot disable your own platform account");
+        }
+
+        User user = requireUser(userId);
+        user.setEnabled(Boolean.TRUE.equals(request.getEnabled()));
+        User saved = userRepository.save(user);
+        systemLogService.recordPlatformAction(
+                principal,
+                "PLATFORM",
+                saved.isEnabled() ? "User account enabled" : "User account disabled",
+                "userId=" + saved.getId() + ", organizationId="
+                        + (saved.getOrganization() != null ? saved.getOrganization().getId() : "platform"));
+        return toPlatformUserResponse(saved);
+    }
+
     private User createSuperAdminUser(String email, String password, String firstName, String lastName) {
         User user = new User();
         user.setOrganization(null);
@@ -146,6 +252,17 @@ public class PlatformService {
     private Organization requireOrganization(Long organizationId) {
         return organizationRepository.findByIdAndDeletedFalse(organizationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
+    }
+
+    private User requireUser(Long userId) {
+        return userRepository.findByIdAndDeletedFalse(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private void validateTenantRole(Role role) {
+        if (!TENANT_ASSIGNABLE_ROLES.contains(role)) {
+            throw new BadRequestException("Role cannot be assigned to tenant users: " + role);
+        }
     }
 
     private void validateBootstrapSecret(String providedSecret) {

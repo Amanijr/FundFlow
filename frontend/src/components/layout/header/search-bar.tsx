@@ -20,7 +20,7 @@ export function SearchBar({ className }: SearchBarProps) {
       <button
         type="button"
         onClick={openCommandPalette}
-        className="flex h-8 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-muted/60 px-3 text-sm text-muted-foreground transition-colors hover:border-input hover:bg-muted"
+        className="flex h-8 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm text-muted-foreground transition-colors hover:border-input"
         aria-label="Open global search"
       >
         <Search className="h-4 w-4 shrink-0" />

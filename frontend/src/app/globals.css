@@ -319,103 +319,7 @@ h6 {
 
 /* ── Loading animations ─────────────────────────────────────── */
 
-@keyframes loader-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes loader-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes loader-spin-reverse {
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes loader-orbit {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes loader-pulse-ring {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.15;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes loader-logo-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(0.96);
-  }
-}
-
-@keyframes loader-label-fade {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes loader-flow-line {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: scaleX(0.6);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes loader-flow-line-reverse {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: scaleX(0.6);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes skeleton-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-@keyframes skeleton-row-in {
+@keyframes loader-enter {
   from {
     opacity: 0;
     transform: translateY(4px);
@@ -426,57 +330,79 @@ h6 {
   }
 }
 
+@keyframes loader-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+@keyframes loader-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.88);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes skeleton-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loader-enter,
 .loader-fade-in {
-  animation: loader-fade-in 0.35s ease-out both;
+  animation: loader-enter 0.3s ease-out both;
 }
 
-.loader-spin {
-  animation: loader-spin 1.1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+.loader-indeterminate {
+  animation: loader-indeterminate 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.loader-spin-reverse {
-  animation: loader-spin-reverse 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-}
-
-.loader-orbit {
-  animation: loader-orbit 2.4s linear infinite;
-}
-
-.loader-pulse-ring {
-  animation: loader-pulse-ring 2s ease-in-out infinite;
-}
-
-.loader-logo-pulse {
-  animation: loader-logo-pulse 2s ease-in-out infinite;
-}
-
-.loader-label-fade {
-  animation: loader-label-fade 2.4s ease-in-out infinite;
-}
-
-.loader-flow-line {
-  transform-origin: left center;
-  animation: loader-flow-line 1.6s ease-in-out infinite;
-}
-
-.loader-flow-line-reverse {
-  transform-origin: right center;
-  animation: loader-flow-line-reverse 1.6s ease-in-out infinite;
+.loader-dot {
+  animation: loader-dot 1.2s ease-in-out infinite;
 }
 
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--muted) 0%,
-    color-mix(in srgb, var(--muted) 60%, var(--color-surface)) 50%,
-    var(--muted) 100%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  background-color: color-mix(in srgb, var(--border) 28%, var(--background));
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
 }
 
 .skeleton-row-in {
-  animation: skeleton-row-in 0.4s ease-out both;
+  animation: skeleton-row-in 0.35s ease-out both;
 }
 
 @keyframes content-reveal {
@@ -495,25 +421,26 @@ h6 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .loader-enter,
   .loader-fade-in,
-  .loader-spin,
-  .loader-spin-reverse,
-  .loader-orbit,
-  .loader-pulse-ring,
-  .loader-logo-pulse,
-  .loader-label-fade,
-  .loader-flow-line,
-  .loader-flow-line-reverse,
+  .loader-indeterminate,
+  .loader-dot,
   .skeleton-shimmer,
+  .skeleton-pulse,
   .skeleton-row-in,
   .content-reveal {
     animation: none;
   }
 
+  .loader-enter,
   .loader-fade-in,
   .skeleton-row-in,
   .content-reveal {
     opacity: 1;
     transform: none;
+  }
+
+  .loader-indeterminate {
+    transform: translateX(75%);
   }
 }

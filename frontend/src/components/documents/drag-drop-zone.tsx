@@ -38,8 +38,8 @@ export function DragDropZone({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-center transition-colors",
-        dragActive && "border-stone-900 bg-muted/50",
+        "flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-background text-center transition-colors",
+        dragActive && "border-primary bg-accent/40",
         disabled && "pointer-events-none opacity-50",
         compact ? "px-4 py-6" : "px-6 py-10",
         className,

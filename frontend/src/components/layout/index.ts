@@ -11,6 +11,8 @@ export { SidebarGroup } from "./sidebar/sidebar-group";
 export { SidebarItem } from "./sidebar/sidebar-item";
 export { SearchBar } from "./header/search-bar";
 export { UserMenu } from "./header/user-menu";
+export { UserProfileMenu } from "./header/user-profile-menu";
+export { CurrencyButton } from "./header/currency-button";
 export { OrgBadge } from "./header/org-badge";
 export { NotificationCenter, NotificationDropdown } from "./notifications/notification-dropdown";
 export { OrganizationSwitcher } from "./organization/organization-switcher";
