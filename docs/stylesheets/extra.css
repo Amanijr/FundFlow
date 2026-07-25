@@ -1,0 +1,20 @@
+/* FundFlow ERP documentation site — custom styles */
+
+:root {
+  --md-primary-fg-color: #0d9488;
+  --md-primary-fg-color--light: #14b8a6;
+  --md-primary-fg-color--dark: #0f766e;
+  --md-accent-fg-color: #f59e0b;
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.85rem;
+}
+
+.md-typeset .admonition {
+  border-radius: 0.25rem;
+}

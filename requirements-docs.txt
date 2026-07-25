@@ -1,0 +1,8 @@
+# Documentation site dependencies
+# Install: pip install -r requirements-docs.txt
+# Serve:  mkdocs serve
+# Build:  mkdocs build
+
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
+mkdocs-awesome-pages-plugin>=2.9.0

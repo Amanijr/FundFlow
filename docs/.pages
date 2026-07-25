@@ -1,0 +1,39 @@
+nav:
+  - Home: index.md
+  - User Documentation:
+      - User Manual: USER_MANUAL.md
+      - User Guides: guides
+  - Product:
+      - PRD.md
+      - Modules: MODULES.md
+      - Information Architecture: INFORMATION_ARCHITECTURE.md
+      - Screen Inventory: SCREEN_INVENTORY.md
+      - Workflows: WORKFLOWS.md
+      - Gap Analysis: GAP_ANALYSIS.md
+      - ERD: ERD.md
+      - Decisions: DECISIONS.md
+  - Reference:
+      - RBAC Matrix: RBAC_MATRIX.md
+      - Swagger / API: SWAGGER.md
+      - Platform Observability: PLATFORM_OBSERVABILITY.md
+  - Developer:
+      - developer
+      - FRONTEND_ARCHITECTURE.md
+      - FRONTEND_FEATURE_AUDIT.md
+      - DESIGN_SYSTEM.md
+      - COMPONENT_INVENTORY.md
+  - Implementation Phases:
+      - PHASE1_IMPLEMENTATION.md
+      - PHASE2_IMPLEMENTATION.md
+      - PHASE2_5_IMPLEMENTATION.md
+      - PHASE3_IMPLEMENTATION.md
+      - PHASE4_IMPLEMENTATION.md
+      - PHASE5_IMPLEMENTATION.md
+      - PHASE6_IMPLEMENTATION.md
+      - PHASE7_IMPLEMENTATION.md
+      - PHASE8_IMPLEMENTATION.md
+      - PHASE9_IMPLEMENTATION.md
+      - PHASE10_IMPLEMENTATION.md
+  - Frontend Documentation: frontend
+  - Meta:
+      - documentation-site.md
