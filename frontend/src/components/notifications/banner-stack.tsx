@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BannerAlert } from "@/components/notifications/banner-alert";
 import { useApiContext } from "@/hooks/use-api-context";
 import { listAnnouncements } from "@/lib/api/notifications";
+import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 
 const DISMISSED_KEY = "fundflow-dismissed-announcements";
 
@@ -24,6 +25,7 @@ function writeDismissed(ids: string[]) {
 
 export function BannerStack() {
   const { token, organizationId } = useApiContext();
+  const simpleMode = useSessionPreferencesStore((state) => state.simpleMode);
   const [dismissed, setDismissed] = useState<string[]>([]);
 
   useEffect(() => {
@@ -37,7 +39,12 @@ export function BannerStack() {
   });
 
   const visible =
-    announcementsQuery.data?.filter((item) => !dismissed.includes(item.id)) ?? [];
+    announcementsQuery.data?.filter((item) => {
+      if (dismissed.includes(item.id)) return false;
+      // Simple mode: only critical banners stay visible.
+      if (simpleMode && item.severity !== "critical") return false;
+      return true;
+    }) ?? [];
 
   function handleDismiss(id: string) {
     const next = [...dismissed, id];

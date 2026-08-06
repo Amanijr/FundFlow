@@ -1,0 +1,26 @@
+---
+description: Parked decision — public hosted giving form + gateway (do not build until asked)
+alwaysApply: true
+---
+
+# Public giving / hosted form (parked)
+
+When the user returns to “public form”, “Lipa number”, “hosted giving”, or “donor self-serve payment”, follow this agreed approach. **Do not implement until explicitly asked.**
+
+## Goal
+Church/NGO shareable page where a donor fills a form and pays via gateway; gift lands in FundFlow as a normal donation + payment.
+
+## Safest approach (harmonize current BP — no redesign)
+- **Parallel intake only** — do not replace staff **Receive a gift** wizard.
+- **Same domain path:** create Donation (`PENDING`) → Payment (gateway) → `COMPLETED`.
+- Reuse existing donation + payment APIs/services; public page is another entry point, not a second money model.
+- **Share Lipa / account numbers** = display/instructions on the public page; offline payers still recorded by staff via **manual payment**.
+- Do **not** build auto bank/Lipa matching, separate “online collections” entity, or accounting redesign in v1.
+
+## Phasing
+1. Public form → existing donation create + gateway payment (+ org give-link / branding settings).
+2. Optional manual pay details on the same page.
+3. Later: webhooks hardening, settlement matching, embed, recurring.
+
+## Out of scope until requested
+- Replacing staff flows, new gift types that bypass Donation/Payment, or full gateway vendor build-out without a thin Phase 1.

@@ -7,8 +7,8 @@ export const financeDashboardConfig: DashboardConfig = {
   path: "/dashboard/finance",
   getDescription: (data) =>
     data
-      ? `Cash, expenses, and budget utilization for ${data.fromDate} through ${data.toDate}`
-      : "Cash, expenses, and budget utilization",
+      ? `Cash and spending for ${data.fromDate} through ${data.toDate}`
+      : "Cash and spending",
   zones: [
     {
       id: "welcome",
@@ -17,23 +17,22 @@ export const financeDashboardConfig: DashboardConfig = {
     },
     {
       id: "kpi",
-      layout: "grid-4",
+      label: "At a glance",
+      layout: "grid-3",
       widgets: [
-        { id: "kpi-expenses", type: "kpi", props: { metric: "totalExpenses", label: "Total expenses", showTrend: true, invertTrend: true } },
-        { id: "kpi-cash", type: "kpi", props: { metric: "cashBalance", label: "Cash balance" } },
+        { id: "kpi-cash", type: "kpi", props: { metric: "cashBalance", label: "Cash on hand" } },
+        {
+          id: "kpi-expenses",
+          type: "kpi",
+          props: { metric: "totalExpenses", label: "Expenses", showTrend: true, invertTrend: true },
+        },
         { id: "kpi-fund", type: "kpi", props: { metric: "totalFundBalance", label: "Fund balance" } },
-        { id: "kpi-net", type: "kpi", props: { metric: "netPosition", label: "Net position" } },
       ],
     },
     {
       id: "tasks",
       layout: "full",
       widgets: [{ id: "finance-metrics", type: "finance-metrics" }],
-    },
-    {
-      id: "analytics",
-      layout: "full",
-      widgets: [{ id: "chart-expenses", type: "chart-expense-trend" }],
     },
     {
       id: "actions",

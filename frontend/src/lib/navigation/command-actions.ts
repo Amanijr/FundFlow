@@ -21,9 +21,9 @@ export function buildCommandActions(role?: Role, organizationType?: Organization
     quickActions.push(
       {
         id: "record-donation",
-        label: "Record donation",
+        label: "Receive a gift",
         group: "Quick actions",
-        href: "/donations/new",
+        href: "/receive-gift",
       },
       {
         id: "add-donor",
@@ -43,9 +43,9 @@ export function buildCommandActions(role?: Role, organizationType?: Organization
   if (role && ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"].includes(role)) {
     quickActions.push({
       id: "create-expense",
-      label: "Create expense",
+      label: "Spend money",
       group: "Quick actions",
-      href: "/expenses/new",
+      href: "/spend-money",
     });
   }
 

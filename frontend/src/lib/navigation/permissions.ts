@@ -43,7 +43,18 @@ export function canAccessAdmin(userRole?: Role) {
   return userRole != null && ADMIN.includes(userRole);
 }
 
+/** Post-login landing. Org users land on task Home; deep dashboards stay under More. */
 export function getDefaultDashboardPath(role: Role) {
+  switch (role) {
+    case "SUPER_ADMIN":
+      return "/platform/dashboard";
+    default:
+      return "/";
+  }
+}
+
+/** Role-specific analytics overview (linked from Home). */
+export function getRoleOverviewPath(role: Role) {
   switch (role) {
     case "SUPER_ADMIN":
       return "/platform/dashboard";

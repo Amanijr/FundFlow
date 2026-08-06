@@ -7,8 +7,8 @@ export const fundraisingDashboardConfig: DashboardConfig = {
   path: "/dashboard/fundraising",
   getDescription: (data) =>
     data
-      ? `Donor and campaign performance for ${data.fromDate} through ${data.toDate}`
-      : "Donor and campaign performance",
+      ? `Giving overview for ${data.fromDate} through ${data.toDate}`
+      : "Giving overview",
   zones: [
     {
       id: "welcome",
@@ -17,23 +17,21 @@ export const fundraisingDashboardConfig: DashboardConfig = {
     },
     {
       id: "kpi",
-      layout: "grid-4",
+      label: "At a glance",
+      layout: "grid-3",
       widgets: [
-        { id: "kpi-donations", type: "kpi", props: { metric: "totalDonations", label: "Total donations", showTrend: true } },
+        {
+          id: "kpi-donations",
+          type: "kpi",
+          props: { metric: "totalDonations", label: "Donations", showTrend: true },
+        },
         { id: "kpi-donors", type: "kpi", props: { metric: "donorCount", label: "Active donors" } },
-        { id: "kpi-avg", type: "kpi", props: { metric: "averageDonation", label: "Average gift" } },
-        { id: "kpi-campaigns", type: "kpi", props: { metric: "activeCampaignCount", label: "Active campaigns" } },
+        {
+          id: "kpi-campaigns",
+          type: "kpi",
+          props: { metric: "activeCampaignCount", label: "Active campaigns" },
+        },
       ],
-    },
-    {
-      id: "analytics",
-      layout: "full",
-      widgets: [{ id: "chart-donations", type: "chart-donation-trend" }],
-    },
-    {
-      id: "tasks",
-      layout: "full",
-      widgets: [{ id: "donation-sources", type: "donation-sources" }],
     },
     {
       id: "activity",
