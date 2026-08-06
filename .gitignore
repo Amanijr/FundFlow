@@ -38,3 +38,8 @@ site/
 
 ### Docs scripts ###
 docs/scripts/node_modules/
+
+### Docker / local secrets ###
+.env
+.env.local
+.env.*.local
