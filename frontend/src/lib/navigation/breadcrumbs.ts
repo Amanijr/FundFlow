@@ -14,6 +14,8 @@ const SEGMENT_LABELS: Record<string, string> = {
   fundraising: "Fundraising",
   new: "New",
   edit: "Edit",
+  "receive-gift": "Receive a gift",
+  "spend-money": "Spend money",
 };
 
 function titleCaseSegment(segment: string): string {

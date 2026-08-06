@@ -10,15 +10,21 @@ import { UserMenu } from "@/components/layout/header/user-menu";
 import { NotificationDropdown } from "@/components/layout/notifications/notification-dropdown";
 import { OrganizationSwitcher } from "@/components/layout/organization/organization-switcher";
 import { Button } from "@/components/ui/button";
+import { useUserSession } from "@/hooks/use-user-session";
 import { buildBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 import { useSidebarStore } from "@/stores/sidebar-store";
 
 export function Header() {
   const pathname = usePathname();
   const setMobileOpen = useSidebarStore((state) => state.setMobileOpen);
+  const simpleMode = useSessionPreferencesStore((state) => state.simpleMode);
+  const { memberships } = useUserSession();
 
   const breadcrumbs = buildBreadcrumbs({ pathname });
   const pageTitle = breadcrumbs[breadcrumbs.length - 1]?.label ?? "FundFlow";
+  const showOrgSwitcher = !simpleMode && memberships.length > 1;
+  const showCurrency = !simpleMode;
 
   return (
     <header className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-2 border-b border-border bg-card px-3 sm:px-5">
@@ -42,11 +48,11 @@ export function Header() {
 
       <SearchBar />
 
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1">
         <MobileSearchButton />
-        <CurrencyButton />
+        {showCurrency && <CurrencyButton />}
         <NotificationDropdown />
-        <OrganizationSwitcher />
+        {showOrgSwitcher && <OrganizationSwitcher />}
         <UserMenu />
       </div>
     </header>

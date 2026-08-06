@@ -1,9 +1,14 @@
+"use client";
+
+import { DotPulse } from "ldrs/react";
+import "ldrs/react/DotPulse.css";
+
 import { cn } from "@/lib/utils";
 
 const sizeMap = {
-  sm: { dot: "h-1 w-1", gap: "gap-1" },
-  default: { dot: "h-1.5 w-1.5", gap: "gap-1.5" },
-  lg: { dot: "h-2 w-2", gap: "gap-2" },
+  sm: 18,
+  default: 24,
+  lg: 32,
 } as const;
 
 export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -11,19 +16,20 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: string;
 }
 
-export function Spinner({ size = "default", label = "Loading…", className, ...props }: SpinnerProps) {
-  const s = sizeMap[size];
-
+/** Inline spinner powered by ldrs (UI Ball) DotPulse. */
+export function Spinner({
+  size = "default",
+  label = "Loading…",
+  className,
+  ...props
+}: SpinnerProps) {
   return (
-    <div role="status" className={cn("inline-flex items-center", s.gap, className)} {...props}>
-      {[0, 1, 2].map((index) => (
-        <span
-          key={index}
-          className={cn("loader-dot rounded-full bg-muted-foreground", s.dot)}
-          style={{ animationDelay: `${index * 120}ms` }}
-          aria-hidden
-        />
-      ))}
+    <div
+      role="status"
+      className={cn("inline-flex items-center text-muted-foreground", className)}
+      {...props}
+    >
+      <DotPulse size={sizeMap[size]} speed={1.2} color="currentColor" />
       <span className="sr-only">{label}</span>
     </div>
   );

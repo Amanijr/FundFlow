@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -12,6 +13,7 @@ import { ErrorAlert } from "@/components/feedback/error-alert";
 import { formatEnumLabel } from "@/components/finance/finance-status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import type { ExpenseCategory, ExpenseRequest, ExpenseType } from "@/types/finance";
 
 const categories: ExpenseCategory[] = [
@@ -46,6 +48,8 @@ interface ExpenseFormProps {
   onCancel?: () => void;
 }
 
+const steps = ["Spending details", "Optional details"] as const;
+
 export function ExpenseForm({
   fundOptions,
   defaultValues,
@@ -54,10 +58,13 @@ export function ExpenseForm({
   onSubmit,
   onCancel,
 }: ExpenseFormProps) {
+  const [step, setStep] = useState(0);
+
   const {
     register,
     control,
     handleSubmit,
+    trigger,
     formState: { errors, isSubmitting },
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
@@ -73,6 +80,13 @@ export function ExpenseForm({
       ...defaultValues,
     },
   });
+
+  async function goNext() {
+    const valid = await trigger(["title", "amount", "category", "expenseType"]);
+    if (valid) {
+      setStep(1);
+    }
+  }
 
   async function handleFormSubmit(values: ExpenseFormValues) {
     await onSubmit({
@@ -91,77 +105,121 @@ export function ExpenseForm({
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {serverError && <ErrorAlert message={serverError} />}
 
-      <FormSection title="Expense details" description="Request amount, category, and fund allocation">
-        <FormField label="Title" error={errors.title?.message} className="sm:col-span-2">
-          <Input {...register("title")} />
-        </FormField>
-        <FormField label="Description" className="sm:col-span-2">
-          <Input {...register("description")} />
-        </FormField>
-        <FormField label="Amount" error={errors.amount?.message}>
-          <Controller
-            control={control}
-            name="amount"
-            render={({ field }) => (
-              <CurrencyInput value={field.value} onChange={(v) => field.onChange(v === "" ? 0 : v)} />
-            )}
-          />
-        </FormField>
-        <FormField label="Category" error={errors.category?.message}>
-          <select
-            className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm"
-            {...register("category")}
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {formatEnumLabel(cat)}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <FormField label="Type" error={errors.expenseType?.message}>
-          <select
-            className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm"
-            {...register("expenseType")}
-          >
-            {expenseTypes.map((type) => (
-              <option key={type} value={type}>
-                {formatEnumLabel(type)}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <FormField label="Fund" className="sm:col-span-2">
-          <Controller
-            control={control}
-            name="fundId"
-            render={({ field }) => (
-              <EntitySelector
-                value={field.value}
-                onChange={field.onChange}
-                options={fundOptions}
-                placeholder="Select fund (optional)..."
-              />
-            )}
-          />
-        </FormField>
-        <FormField label="Payee">
-          <Input {...register("payeeName")} />
-        </FormField>
-        <FormField label="Department">
-          <Input {...register("department")} />
-        </FormField>
-      </FormSection>
+      <ol className="flex items-center gap-2 text-sm">
+        {steps.map((label, index) => (
+          <li key={label} className="flex items-center gap-2">
+            {index > 0 && <span className="h-px w-6 bg-border" aria-hidden />}
+            <span
+              className={cn(
+                "rounded-full px-2.5 py-1 text-xs font-medium",
+                index === step
+                  ? "bg-foreground text-background"
+                  : index < step
+                    ? "bg-muted text-foreground"
+                    : "bg-muted/60 text-muted-foreground",
+              )}
+            >
+              {index + 1}. {label}
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      {step === 0 ? (
+        <FormSection
+          title="What are you spending?"
+          description="Title, amount, and category are enough to start."
+        >
+          <FormField label="Title" error={errors.title?.message} className="sm:col-span-2">
+            <Input {...register("title")} placeholder="e.g. Office supplies" />
+          </FormField>
+          <FormField label="Amount" error={errors.amount?.message}>
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field }) => (
+                <CurrencyInput value={field.value} onChange={(v) => field.onChange(v === "" ? 0 : v)} />
+              )}
+            />
+          </FormField>
+          <FormField label="Category" error={errors.category?.message}>
+            <select
+              className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm"
+              {...register("category")}
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {formatEnumLabel(cat)}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Type" error={errors.expenseType?.message} className="sm:col-span-2">
+            <select
+              className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm"
+              {...register("expenseType")}
+            >
+              {expenseTypes.map((type) => (
+                <option key={type} value={type}>
+                  {formatEnumLabel(type)}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        </FormSection>
+      ) : (
+        <FormSection
+          title="Optional details"
+          description="Fund, payee, and notes help finance review — skip if unknown."
+        >
+          <FormField label="Description" className="sm:col-span-2">
+            <Input {...register("description")} placeholder="Optional description" />
+          </FormField>
+          <FormField label="Fund" className="sm:col-span-2">
+            <Controller
+              control={control}
+              name="fundId"
+              render={({ field }) => (
+                <EntitySelector
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={fundOptions}
+                  placeholder="Select fund (optional)..."
+                />
+              )}
+            />
+          </FormField>
+          <FormField label="Payee">
+            <Input {...register("payeeName")} />
+          </FormField>
+          <FormField label="Department">
+            <Input {...register("department")} />
+          </FormField>
+        </FormSection>
+      )}
 
       <div className="flex justify-end gap-2">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
+        {step === 0 ? (
+          <>
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
+            <Button type="button" onClick={goNext}>
+              Continue
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button type="button" variant="outline" onClick={() => setStep(0)}>
+              Back
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving…" : submitLabel}
+            </Button>
+          </>
         )}
-        <Button type="submit" disabled={isSubmitting}>
-          {submitLabel}
-        </Button>
       </div>
     </form>
   );

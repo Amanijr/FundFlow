@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { listCampaigns } from "@/lib/api/campaigns";
 import { createDonation } from "@/lib/api/donations";
 import { listDonors } from "@/lib/api/donors";
+import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 import { ApiError } from "@/types/api";
 import type { DonationCreateRequest } from "@/types/fundraising";
 
@@ -21,9 +22,11 @@ export default function NewDonationPage() {
   const searchParams = useSearchParams();
   const { accessToken } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
+  const lastCampaignId = useSessionPreferencesStore((state) => state.lastCampaignId);
+  const setLastCampaignId = useSessionPreferencesStore((state) => state.setLastCampaignId);
 
   const prefillDonorId = searchParams.get("donorId") ?? "";
-  const prefillCampaignId = searchParams.get("campaignId") ?? "";
+  const prefillCampaignId = searchParams.get("campaignId") ?? lastCampaignId ?? "";
 
   const donorsQuery = useQuery({
     queryKey: ["donors"],
@@ -67,6 +70,9 @@ export default function NewDonationPage() {
     setServerError(null);
     try {
       const response = await createDonation(accessToken!, values);
+      if (values.campaignId) {
+        setLastCampaignId(String(values.campaignId));
+      }
       toast.success("Donation recorded");
       router.push(`/donations/${response.data.id}`);
     } catch (err) {
@@ -90,7 +96,7 @@ export default function NewDonationPage() {
           { label: "Record donation" },
         ]}
         title="Record donation"
-        description="Create a new gift linked to a donor and optional campaign."
+        description="Two quick steps — gift details first, optional extras second."
       />
       <DonationForm
         donorOptions={donorOptions}

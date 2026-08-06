@@ -364,12 +364,37 @@ export async function mockApiRequest<T>(
         organizationId: 1,
         amount: (body as { amount?: number })?.amount ?? 0,
         donationTime: new Date().toISOString(),
-        status: "COMPLETED",
-        donationType: "ONE_TIME",
-        anonymous: false,
+        status: "PENDING",
+        donationType: (body as { donationType?: string })?.donationType ?? "ONE_TIME",
+        anonymous: Boolean((body as { anonymous?: boolean })?.anonymous),
+        campaignId: (body as { campaignId?: number })?.campaignId,
       }) as ApiResponse<T>;
     }
   }
+
+  const paymentMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/payments\/(gateway|manual)$/);
+  if (paymentMatch && method === "POST") {
+    const donationId = Number(paymentMatch[1]);
+    const channel = paymentMatch[2] === "manual" ? "MANUAL" : "GATEWAY";
+    const req = (body ?? {}) as {
+      paymentMethod?: string;
+      receiptNumber?: string;
+      simulateFailure?: boolean;
+    };
+    const successful = !req.simulateFailure;
+    return ok({
+      paymentId: nextMockId(),
+      donationId,
+      channel,
+      paymentMethod: req.paymentMethod ?? "MOBILE_MONEY",
+      transactionId: `${channel}-${Date.now()}`,
+      receiptNumber: req.receiptNumber,
+      successful,
+      processedAt: new Date().toISOString(),
+      donationStatus: successful ? "COMPLETED" : "FAILED",
+    }) as ApiResponse<T>;
+  }
+
   const donationId = matchId(pathname, "/api/v1/donations");
   if (donationId != null) {
     const detail = getDonationDetail(donationId);
@@ -431,13 +456,19 @@ export async function mockApiRequest<T>(
   const expenseId = matchId(pathname, "/api/v1/expenses");
   if (expenseId != null) {
     const expense = MOCK_EXPENSES.find((e) => e.id === expenseId) ?? MOCK_EXPENSES[0];
-    if (pathname.includes("/submit") || pathname.includes("/approve") || pathname.includes("/pay")) {
-      return ok({ ...expense, status: "APPROVED" }) as ApiResponse<T>;
+    if (pathname.includes("/submit")) {
+      return ok({ ...expense, id: expenseId, status: "SUBMITTED" }) as ApiResponse<T>;
+    }
+    if (pathname.includes("/approve") || pathname.includes("/pay")) {
+      return ok({ ...expense, id: expenseId, status: pathname.includes("/pay") ? "PAID" : "APPROVED" }) as ApiResponse<T>;
     }
     if (pathname.includes("/reject")) {
-      return ok({ ...expense, status: "REJECTED" }) as ApiResponse<T>;
+      return ok({ ...expense, id: expenseId, status: "REJECTED" }) as ApiResponse<T>;
     }
-    return ok(expense) as ApiResponse<T>;
+    if (pathname.includes("/reconcile")) {
+      return ok({ ...expense, id: expenseId, status: "RECONCILED" }) as ApiResponse<T>;
+    }
+    return ok({ ...expense, id: expenseId }) as ApiResponse<T>;
   }
 
   if (pathname === "/api/v1/budgets") {

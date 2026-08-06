@@ -12,6 +12,7 @@ import {
   HelpCircle,
   Keyboard,
   KeyRound,
+  LayoutList,
   LogOut,
   Moon,
   Settings,
@@ -34,8 +35,9 @@ import {
   formatPresenceStatus,
   formatRoleLabel,
 } from "@/lib/session/labels";
+import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 import { cn } from "@/lib/utils";
-import type { UserPresenceStatus } from "@/types/session";
+import type { DisplayCurrency, UserPresenceStatus } from "@/types/session";
 
 interface UserProfilePanelProps {
   onClose?: () => void;
@@ -89,8 +91,11 @@ export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfileP
     department,
     lastLoginLabel,
     setPresenceStatus,
+    setDisplayCurrency,
     canManageApiKeys,
   } = useUserSession();
+  const simpleMode = useSessionPreferencesStore((state) => state.simpleMode);
+  const setSimpleMode = useSessionPreferencesStore((state) => state.setSimpleMode);
 
   if (!user) {
     return null;
@@ -98,6 +103,12 @@ export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfileP
 
   const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
   const presenceOptions: UserPresenceStatus[] = ["online", "away", "busy"];
+  const currencies: DisplayCurrency[] = ["TZS", "USD", "EUR", "GBP"];
+
+  function cycleCurrency() {
+    const index = currencies.indexOf(displayCurrency);
+    setDisplayCurrency(currencies[(index + 1) % currencies.length]!);
+  }
 
   return (
     <div className="content-reveal space-y-4">
@@ -157,7 +168,16 @@ export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfileP
         <ProfileAction icon={User} label="My Profile" href="#" disabled onClick={onClose} />
         <ProfileAction icon={Settings} label="Account Settings" href="/admin/settings" onClick={onClose} />
         <ProfileAction icon={Settings} label="Preferences" href="/settings/notifications" onClick={onClose} />
-        <ProfileAction icon={Coins} label={`Display Currency · ${displayCurrency}`} href="#" disabled />
+        <ProfileAction
+          icon={LayoutList}
+          label={simpleMode ? "Simple mode · On" : "Simple mode · Off"}
+          onClick={() => setSimpleMode(!simpleMode)}
+        />
+        <ProfileAction
+          icon={Coins}
+          label={`Display Currency · ${displayCurrency}`}
+          onClick={cycleCurrency}
+        />
         <ProfileAction
           icon={theme === "dark" ? Sun : Moon}
           label="Theme"
