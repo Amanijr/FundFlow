@@ -22,8 +22,8 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
             SELECT COALESCE(SUM(a.attendanceCount), 0) FROM AttendanceRecord a
             WHERE a.organization.id = :organizationId
               AND a.deleted = false
-              AND (:fromDate IS NULL OR a.serviceDate >= :fromDate)
-              AND (:toDate IS NULL OR a.serviceDate <= :toDate)
+              AND (CAST(:fromDate AS LocalDate) IS NULL OR a.serviceDate >= CAST(:fromDate AS LocalDate))
+              AND (CAST(:toDate AS LocalDate) IS NULL OR a.serviceDate <= CAST(:toDate AS LocalDate))
             """)
     long sumAttendance(
             @Param("organizationId") Long organizationId,

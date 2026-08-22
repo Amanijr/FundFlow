@@ -274,8 +274,10 @@ See [docs/DOCKER.md](docs/DOCKER.md) for building and running containers on a VM
 
 ```bash
 cp .env.example .env
-docker compose up --build -d
+# Local default uses the test JWT/bootstrap secrets
+docker compose build && docker compose up -d
 # Web: http://localhost:3000  ·  API: http://localhost:8080
+# Mock UI only (no API/DB): docker compose -f docker-compose.mock.yml up --build -d
 ```
 
 ---

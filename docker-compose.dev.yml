@@ -1,0 +1,10 @@
+# Dummy/evaluation overlay — CrossLife demo org and admin@demo.local / demo.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  api:
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DEV_SEED_ENABLED: "true"
+      JWT_SECRET: test-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
+      PLATFORM_BOOTSTRAP_SECRET: test-bootstrap-secret
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001

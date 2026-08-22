@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
+import { AccountLabel } from "@/components/accounting/account-label";
 import { ExportActions } from "@/components/reports/export-actions";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { ReportSummary } from "@/components/reports/report-summary";
@@ -74,8 +75,11 @@ export default function FinancialReportsPage() {
 
   const lineColumns = useMemo<ColumnDef<ReportLineItem>[]>(
     () => [
-      { accessorKey: "code", header: "Code" },
-      { accessorKey: "name", header: "Account" },
+      {
+        accessorKey: "name",
+        header: "Account",
+        cell: ({ row }) => <AccountLabel name={row.original.name} code={row.original.code} />,
+      },
       {
         accessorKey: "amount",
         header: "Amount",
@@ -87,8 +91,11 @@ export default function FinancialReportsPage() {
 
   const fundColumns = useMemo<ColumnDef<FundReportLine>[]>(
     () => [
-      { accessorKey: "fundCode", header: "Code" },
-      { accessorKey: "fundName", header: "Fund" },
+      {
+        accessorKey: "fundName",
+        header: "Fund",
+        cell: ({ row }) => <AccountLabel name={row.original.fundName} code={row.original.fundCode} />,
+      },
       {
         accessorKey: "fundType",
         header: "Type",
@@ -227,7 +234,7 @@ export default function FinancialReportsPage() {
                 <option value="">All funds</option>
                 {(fundsQuery.data ?? []).map((fund) => (
                   <option key={fund.id} value={fund.id}>
-                    {fund.code} — {fund.name}
+                    {fund.name}
                   </option>
                 ))}
               </select>

@@ -17,6 +17,11 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+    private static final String CLAIM_USER_ID = "userId";
+    private static final String CLAIM_ROLE = "role";
+    private static final String CLAIM_ORGANIZATION_ID = "organizationId";
+    private static final String CLAIM_TOKEN_TYPE = "tokenType";
+
     private final SecretKey secretKey;
     private final long expirationMs;
 
@@ -27,19 +32,35 @@ public class JwtService {
         this.expirationMs = expirationMs;
     }
 
-    public String generateToken(Long userId, String email, Role role, Long organizationId) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMs);
+    public String generateTenantToken(Long userId, String email, Role role, Long organizationId) {
+        return issueToken(userId, email, role, organizationId, TokenType.TENANT);
+    }
 
-        return Jwts.builder()
-                .subject(email)
-                .claim("userId", userId)
-                .claim("role", role.name())
-                .claim("organizationId", organizationId)
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(secretKey)
-                .compact();
+    public String generatePlatformToken(Long userId, String email, Role role) {
+        return issueToken(userId, email, role, null, TokenType.PLATFORM);
+    }
+
+    public String generateImpersonationToken(Long userId, String email, Long organizationId) {
+        return issueToken(userId, email, Role.SUPER_ADMIN, organizationId, TokenType.IMPERSONATION);
+    }
+
+    public String generateToken(Long userId, String email, Role role, Long organizationId) {
+        if (organizationId == null && role == Role.SUPER_ADMIN) {
+            return generatePlatformToken(userId, email, role);
+        }
+        return generateTenantToken(userId, email, role, organizationId);
+    }
+
+    public TokenType resolveTokenType(Claims claims) {
+        String raw = claims.get(CLAIM_TOKEN_TYPE, String.class);
+        if (raw != null && !raw.isBlank()) {
+            try {
+                return TokenType.valueOf(raw);
+            } catch (IllegalArgumentException ignored) {
+                return null;
+            }
+        }
+        return claims.get(CLAIM_ORGANIZATION_ID) != null ? TokenType.TENANT : TokenType.PLATFORM;
     }
 
     public Claims parseClaims(String token) {
@@ -53,5 +74,25 @@ public class JwtService {
     public boolean isTokenValid(String token, String email) {
         Claims claims = parseClaims(token);
         return email.equals(claims.getSubject()) && claims.getExpiration().after(new Date());
+    }
+
+    private String issueToken(Long userId, String email, Role role, Long organizationId, TokenType tokenType) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expirationMs);
+
+        var builder = Jwts.builder()
+                .subject(email)
+                .claim(CLAIM_USER_ID, userId)
+                .claim(CLAIM_ROLE, role.name())
+                .claim(CLAIM_TOKEN_TYPE, tokenType.name())
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(secretKey);
+
+        if (organizationId != null) {
+            builder.claim(CLAIM_ORGANIZATION_ID, organizationId);
+        }
+
+        return builder.compact();
     }
 }

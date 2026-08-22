@@ -42,6 +42,8 @@ public final class DonationMapper {
                 .anonymous(donation.isAnonymous())
                 .campaignId(donation.getCampaign() != null ? donation.getCampaign().getId() : null)
                 .campaignName(donation.getCampaign() != null ? donation.getCampaign().getName() : null)
+                .fundId(donation.getFund() != null ? donation.getFund().getId() : null)
+                .fundName(donation.getFund() != null ? donation.getFund().getName() : null)
                 .pledgeId(donation.getPledge() != null ? donation.getPledge().getId() : null)
                 .recurringDonationId(
                         donation.getRecurringDonation() != null ? donation.getRecurringDonation().getId() : null)

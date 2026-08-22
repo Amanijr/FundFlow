@@ -1,6 +1,23 @@
+# FundFlow ERP — full stack (Postgres + API + web)
+#
+# Live API (default):
+#   docker compose build
+#   docker compose up -d
+#
+# Frontend mock data only (no API/DB):
+#   docker compose -f docker-compose.mock.yml up --build -d
+#
+# Live API + dummy CrossLife seed:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+
+name: fundflow
+
 services:
   postgres:
-    image: postgres:16-alpine
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    image: fundflow-db:local
     container_name: fundflow-postgres
     restart: unless-stopped
     environment:
@@ -32,10 +49,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fundflow}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-at-least-256-bit-secret-key-here}
-      PLATFORM_BOOTSTRAP_SECRET: ${PLATFORM_BOOTSTRAP_SECRET:-local-dev-bootstrap-secret}
+      JWT_SECRET: ${JWT_SECRET}
+      PLATFORM_BOOTSTRAP_SECRET: ${PLATFORM_BOOTSTRAP_SECRET}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
-      DEV_SEED_ENABLED: ${DEV_SEED_ENABLED:-true}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DEV_SEED_ENABLED: ${DEV_SEED_ENABLED:-false}
       JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75.0}
     ports:
       - "${API_PORT:-8080}:8080"
@@ -48,7 +66,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 90s
+      start_period: 240s
 
   web:
     build:
@@ -56,6 +74,7 @@ services:
       dockerfile: Dockerfile
       args:
         API_URL: ${INTERNAL_API_URL:-http://api:8080}
+        NEXT_PUBLIC_MOCK_API: "false"
     image: fundflow-web:local
     container_name: fundflow-web
     restart: unless-stopped
@@ -63,8 +82,9 @@ services:
       api:
         condition: service_healthy
     environment:
-      # Used if the Next process re-reads env; rewrites are primarily build-time.
       API_URL: ${INTERNAL_API_URL:-http://api:8080}
+      MOCK_API: "false"
+      NEXT_PUBLIC_MOCK_API: "false"
       HOSTNAME: 0.0.0.0
       PORT: 3000
     ports:

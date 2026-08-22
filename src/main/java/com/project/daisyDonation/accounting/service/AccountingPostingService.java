@@ -3,7 +3,6 @@ package com.project.daisyDonation.accounting.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import com.project.daisyDonation.accounting.repository.FiscalPeriodRepository;
 import com.project.daisyDonation.accounting.repository.JournalEntryRepository;
 import com.project.daisyDonation.accounting.repository.JournalLineRepository;
 import com.project.daisyDonation.expense.entity.Expense;
-import com.project.daisyDonation.expense.entity.ExpenseCategory;
 import com.project.daisyDonation.fund.entity.Fund;
 import com.project.daisyDonation.organization.entity.Organization;
 
@@ -35,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountingPostingService {
 
     private final ChartOfAccountSetupService chartOfAccountSetupService;
+    private final LedgerAccountResolver ledgerAccountResolver;
     private final ChartOfAccountRepository chartOfAccountRepository;
     private final FiscalPeriodRepository fiscalPeriodRepository;
     private final JournalEntryRepository journalEntryRepository;
@@ -42,6 +41,7 @@ public class AccountingPostingService {
 
     @Transactional
     public void postDonationPayment(Organization organization, Long userId, Donation donation, Payment payment) {
+        chartOfAccountSetupService.initializeForOrganization(organization);
         if (journalEntryRepository.existsByOrganizationIdAndSourceTypeAndSourceIdAndDeletedFalse(
                 organization.getId(), JournalSourceType.DONATION_PAYMENT, payment.getId())) {
             return;
@@ -55,27 +55,36 @@ public class AccountingPostingService {
                 ? payment.getProcessedAt()
                 : donation.getDonationTime());
 
+        String assetCode = ledgerAccountResolver.assetAccount(organization, payment.getPaymentMethod());
+        String incomeCode = ledgerAccountResolver.contributionIncomeAccount(organization, donation);
+        Fund fund = donation.getFund();
+        String methodLabel = payment.getPaymentMethod() != null
+                ? payment.getPaymentMethod().name().replace('_', ' ').toLowerCase()
+                : "receipt";
+
         postBalancedEntry(
                 organization,
                 userId,
                 entryDate,
                 sourceType,
                 payment.getId(),
-                "Donation received - " + donation.getAmount(),
+                "Gift received - " + donation.getAmount() + " via " + methodLabel,
                 List.of(
-                        line(AccountCodes.CASH, donation.getAmount(), BigDecimal.ZERO, null, "Cash received"),
-                        line(AccountCodes.DONATION_REVENUE, BigDecimal.ZERO, donation.getAmount(), null,
-                                "Donation revenue")));
+                        line(assetCode, donation.getAmount(), BigDecimal.ZERO, fund, "Received via " + methodLabel),
+                        line(incomeCode, BigDecimal.ZERO, donation.getAmount(), fund, "Contribution income")));
     }
 
     @Transactional
     public void postInKindDonation(Organization organization, Long userId, Donation donation) {
+        chartOfAccountSetupService.initializeForOrganization(organization);
         if (journalEntryRepository.existsByOrganizationIdAndSourceTypeAndSourceIdAndDeletedFalse(
                 organization.getId(), JournalSourceType.IN_KIND_DONATION, donation.getId())) {
             return;
         }
 
         LocalDate entryDate = toEntryDate(donation.getDonationTime());
+        String assetCode = ledgerAccountResolver.inKindAssetAccount(organization);
+        String incomeCode = ledgerAccountResolver.contributionIncomeAccount(organization, donation);
 
         postBalancedEntry(
                 organization,
@@ -85,20 +94,22 @@ public class AccountingPostingService {
                 donation.getId(),
                 "In-kind donation - " + donation.getAmount(),
                 List.of(
-                        line(AccountCodes.IN_KIND_CONTRIBUTIONS, donation.getAmount(), BigDecimal.ZERO, null,
+                        line(assetCode, donation.getAmount(), BigDecimal.ZERO, donation.getFund(),
                                 "In-kind contribution"),
-                        line(AccountCodes.DONATION_REVENUE, BigDecimal.ZERO, donation.getAmount(), null,
-                                "Donation revenue")));
+                        line(incomeCode, BigDecimal.ZERO, donation.getAmount(), donation.getFund(),
+                                "Contribution income")));
     }
 
     @Transactional
     public void postExpensePayment(Organization organization, Long userId, Expense expense) {
+        chartOfAccountSetupService.initializeForOrganization(organization);
         if (journalEntryRepository.existsByOrganizationIdAndSourceTypeAndSourceIdAndDeletedFalse(
                 organization.getId(), JournalSourceType.EXPENSE_PAYMENT, expense.getId())) {
             return;
         }
 
-        String expenseAccountCode = mapExpenseCategory(expense.getCategory());
+        String expenseAccountCode = ledgerAccountResolver.expenseAccount(organization, expense.getCategory());
+        String creditAccountCode = ledgerAccountResolver.expenseCreditAccount(organization, expense);
         LocalDate entryDate = toEntryDate(expense.getPaidAt());
         Fund fund = expense.getFund();
 
@@ -111,7 +122,7 @@ public class AccountingPostingService {
                 "Expense paid - " + expense.getTitle(),
                 List.of(
                         line(expenseAccountCode, expense.getAmount(), BigDecimal.ZERO, fund, expense.getTitle()),
-                        line(AccountCodes.CASH, BigDecimal.ZERO, expense.getAmount(), fund, "Cash paid")));
+                        line(creditAccountCode, BigDecimal.ZERO, expense.getAmount(), fund, "Paid from till / bank / Lipa")));
     }
 
     private void postBalancedEntry(
@@ -164,16 +175,6 @@ public class AccountingPostingService {
 
     private PostingLine line(String accountCode, BigDecimal debit, BigDecimal credit, Fund fund, String description) {
         return new PostingLine(accountCode, debit, credit, fund, description);
-    }
-
-    private String mapExpenseCategory(ExpenseCategory category) {
-        return switch (category) {
-            case OPERATIONS -> AccountCodes.OPERATIONS_EXPENSE;
-            case PROGRAM -> AccountCodes.PROGRAM_EXPENSE;
-            case ADMINISTRATIVE -> AccountCodes.ADMINISTRATIVE_EXPENSE;
-            case FUNDRAISING -> AccountCodes.FUNDRAISING_EXPENSE;
-            case MISCELLANEOUS -> AccountCodes.MISCELLANEOUS_EXPENSE;
-        };
     }
 
     private LocalDate toEntryDate(LocalDateTime dateTime) {

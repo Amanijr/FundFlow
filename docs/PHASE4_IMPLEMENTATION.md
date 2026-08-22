@@ -19,27 +19,33 @@
 
 ## Default Chart of Accounts
 
-| Code | Name | Type |
-|------|------|------|
-| 1000 | Cash | ASSET |
-| 1200 | In-Kind Contributions | ASSET |
-| 4000 | Donation Revenue | REVENUE |
-| 5100 | Operations Expense | EXPENSE |
-| 5200 | Program Expense | EXPENSE |
-| 5300 | Administrative Expense | EXPENSE |
-| 5400 | Fundraising Expense | EXPENSE |
-| 5900 | Miscellaneous Expense | EXPENSE |
+Seeded **names** follow `OrganizationType` (church, school, foundation, NGO). System **codes** stay stable for posting.
+
+| Code | Default role | Type |
+|------|--------------|------|
+| 1000 | Cash / cash on hand | ASSET |
+| 1010 | Bank account (optional detail) | ASSET |
+| 1020 | Mobile money / Lipa (optional detail) | ASSET |
+| 1200 | In-kind contributions | ASSET |
+| 4000 | Contribution / donation revenue (auto-posted) | REVENUE |
+| 4010–4030 | Church detail: tithes / offerings / building | REVENUE |
+| 5100–5900 | Expense categories (labels by org type) | EXPENSE |
 
 Initialize via `POST /api/v1/accounting/initialize` (also auto-initializes on first posting).
 
 ## Automatic Journal Entries
 
-| Event | Debit | Credit |
-|-------|-------|--------|
-| Donation received | Cash (1000) | Donation Revenue (4000) |
-| In-kind donation | In-Kind Contributions (1200) | Donation Revenue (4000) |
-| Collection verified | Cash (1000) | Donation Revenue (4000) |
-| Expense paid | Expense account (5xxx) | Cash (1000) |
+Accounts are chosen from the org chart based on the entry (not a single hardcoded pair):
+
+| Event | Debit (how money arrived / left) | Credit |
+|-------|----------------------------------|--------|
+| Gift paid in cash | Cash on hand `1000` | Tithe / offering / gifts (`4010` / `4020` / `4000` from fund or source) |
+| Gift via M-Pesa / Lipa | Mobile money `1020` (fallback cash) | Same income mapping |
+| Gift via bank / cheque | Bank `1010` (fallback cash) | Same income mapping |
+| In-kind | In-kind `1200` | Contribution income |
+| Expense paid | Expense `5xxx` by category | Cash / bank / Lipa from payment method |
+
+Income mapping (Tanzanian church language): zaka/tithe → `4010`, sadaka/offering/collection → `4020`, building/kanisa → `4030`, else `4000`. If an optional code is missing on that org’s chart, posting falls back to cash and contribution income.
 
 Posting is idempotent — duplicate source events do not create duplicate entries.
 

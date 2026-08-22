@@ -18,9 +18,10 @@ USER fundflow
 COPY --from=build /workspace/app.jar /app/app.jar
 
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+ENV SPRING_PROFILES_ACTIVE=prod
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '"status":"UP"' || exit 1
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

@@ -15,7 +15,7 @@ import type { AccountType, ChartOfAccountRequest } from "@/types/accounting";
 const accountTypes: AccountType[] = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
 
 const schema = z.object({
-  code: z.string().min(1, "Code is required").max(20),
+  code: z.string().min(1, "Bookkeeping number is required").max(20),
   name: z.string().min(1, "Name is required").max(255),
   accountType: z.enum(["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"]),
   description: z.string().max(500).optional(),
@@ -43,12 +43,19 @@ export function ChartOfAccountForm({ serverError, onSubmit, onCancel }: ChartOfA
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {serverError && <ErrorAlert message={serverError} />}
-      <FormSection title="Account" description="Add a ledger account">
-        <FormField label="Code" error={errors.code?.message}>
-          <Input {...register("code")} placeholder="e.g. 5100" />
+      <FormSection
+        title="Account"
+        description="Give it a name people in the church will recognize. The number is only for the books."
+      >
+        <FormField label="Account name" error={errors.name?.message} required>
+          <Input {...register("name")} placeholder="e.g. Tithes, Lipa, Building fund" />
         </FormField>
-        <FormField label="Name" error={errors.name?.message}>
-          <Input {...register("name")} />
+        <FormField
+          label="Bookkeeping number"
+          error={errors.code?.message}
+          description="Internal only. Staff see the name, not this number."
+        >
+          <Input {...register("code")} placeholder="e.g. 4010" />
         </FormField>
         <FormField label="Type" error={errors.accountType?.message}>
           <select

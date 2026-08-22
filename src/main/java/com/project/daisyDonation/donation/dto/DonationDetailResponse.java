@@ -32,6 +32,8 @@ public class DonationDetailResponse {
     private boolean anonymous;
     private Long campaignId;
     private String campaignName;
+    private Long fundId;
+    private String fundName;
     private Long pledgeId;
     private Long recurringDonationId;
     private Long collectionSessionId;

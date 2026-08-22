@@ -20,32 +20,53 @@ import {
   donationTypeOptions,
   type DonationFormValues,
 } from "@/components/donations/donation.schema";
+import {
+  DonationPaymentFields,
+  donationPaymentSchema,
+  type DonationPaymentFormValues,
+} from "@/components/donations/donation-payment-fields";
 import { ErrorAlert } from "@/components/feedback/error-alert";
 import { cn } from "@/lib/utils";
 import type { DonationCreateRequest } from "@/types/fundraising";
+import type { PaymentMethod } from "@/types/payment";
+
+export interface DonationIntakePayload {
+  donation: DonationCreateRequest;
+  payment?: {
+    skip: boolean;
+    channel: "GATEWAY" | "MANUAL";
+    paymentMethod: PaymentMethod;
+    receiptNumber?: string;
+    paymentNotes?: string;
+  };
+}
 
 interface DonationFormProps {
   donorOptions: { id: string; label: string; description?: string }[];
   campaignOptions: { id: string; label: string; description?: string }[];
+  fundOptions?: { id: string; label: string; description?: string }[];
   defaultValues?: Partial<DonationFormValues>;
   serverError?: string | null;
-  onSubmit: (values: DonationCreateRequest) => Promise<void>;
+  canRecordManual?: boolean;
+  onSubmit: (values: DonationIntakePayload) => Promise<void>;
   onCancel?: () => void;
 }
 
-const steps = ["Gift details", "Optional details"] as const;
+const steps = ["Gift", "Details", "Payment"] as const;
 
 export function DonationForm({
   donorOptions,
   campaignOptions,
+  fundOptions = [],
   defaultValues,
   serverError,
+  canRecordManual = false,
   onSubmit,
   onCancel,
 }: DonationFormProps) {
   const [step, setStep] = useState(0);
 
-  const form = useForm<DonationFormValues>({
+  const giftForm = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
       donorId: "",
@@ -53,56 +74,101 @@ export function DonationForm({
       donationType: "ONE_TIME",
       anonymous: false,
       campaignId: "",
+      fundId: "",
       source: "",
       notes: "",
       ...defaultValues,
     },
   });
 
-  const {
-    control,
-    handleSubmit,
-    trigger,
-    watch,
-    formState: { errors, isSubmitting, isSubmitted },
-  } = form;
+  const paymentForm = useForm<DonationPaymentFormValues>({
+    resolver: zodResolver(donationPaymentSchema),
+    defaultValues: {
+      skipPayment: false,
+      channel: canRecordManual ? "MANUAL" : "GATEWAY",
+      paymentMethod: "CASH",
+      receiptNumber: "",
+      paymentNotes: "",
+    },
+  });
 
-  const anonymous = watch("anonymous");
-  const donationType = watch("donationType");
+  const anonymous = giftForm.watch("anonymous");
+  const donationType = giftForm.watch("donationType");
+  const skipPayment = paymentForm.watch("skipPayment");
+  const isSubmitting = giftForm.formState.isSubmitting || paymentForm.formState.isSubmitting;
 
-  async function goNext() {
+  async function goToDetails() {
     const fields: (keyof DonationFormValues)[] = anonymous
       ? ["amount", "donationType", "anonymous"]
       : ["amount", "donationType", "anonymous", "donorId"];
-    const valid = await trigger(fields);
-    if (valid) {
+    if (await giftForm.trigger(fields)) {
       setStep(1);
     }
   }
 
-  async function handleFormSubmit(values: DonationFormValues) {
+  async function goToPayment() {
+    if (donationType === "IN_KIND") {
+      await finish();
+      return;
+    }
+    setStep(2);
+  }
+
+  async function finish() {
+    const giftValid = await giftForm.trigger();
+    const needsPayment = donationType !== "IN_KIND";
+    const paymentValid = !needsPayment || skipPayment ? true : await paymentForm.trigger();
+    if (!giftValid || !paymentValid) {
+      return;
+    }
+
+    const gift = giftForm.getValues();
+    const payment = paymentForm.getValues();
+
     await onSubmit({
-      donorId: values.donorId ? Number(values.donorId) : undefined,
-      amount: values.amount,
-      donationType: values.donationType,
-      anonymous: values.anonymous,
-      campaignId: values.campaignId ? Number(values.campaignId) : undefined,
-      source: values.source || undefined,
-      notes: values.notes || undefined,
-      itemDescription: values.itemDescription || undefined,
-      estimatedValue: values.estimatedValue,
+      donation: {
+        donorId: gift.donorId ? Number(gift.donorId) : undefined,
+        amount: gift.amount,
+        donationType: gift.donationType,
+        anonymous: gift.anonymous,
+        campaignId: gift.campaignId ? Number(gift.campaignId) : undefined,
+        fundId: gift.fundId ? Number(gift.fundId) : undefined,
+        source: gift.source || undefined,
+        notes: gift.notes || undefined,
+        itemDescription: gift.itemDescription || undefined,
+        estimatedValue: gift.estimatedValue,
+      },
+      payment: needsPayment
+        ? {
+            skip: payment.skipPayment,
+            channel: payment.channel,
+            paymentMethod: payment.paymentMethod,
+            receiptNumber: payment.receiptNumber || undefined,
+            paymentNotes: payment.paymentNotes || undefined,
+          }
+        : undefined,
     });
   }
 
   return (
-    <FormContainer onSubmit={handleSubmit(handleFormSubmit)}>
+    <FormContainer
+      onSubmit={
+        step === 0
+          ? giftForm.handleSubmit(goToDetails)
+          : step === 1
+            ? giftForm.handleSubmit(goToPayment)
+            : paymentForm.handleSubmit(finish)
+      }
+    >
       {serverError && <ErrorAlert message={serverError} />}
-      {isSubmitted && Object.keys(errors).length > 0 && <ValidationSummary errors={errors} />}
+      {giftForm.formState.isSubmitted && Object.keys(giftForm.formState.errors).length > 0 && (
+        <ValidationSummary errors={giftForm.formState.errors} />
+      )}
 
-      <ol className="flex items-center gap-2 text-sm">
+      <ol className="flex flex-wrap items-center gap-2 text-sm">
         {steps.map((label, index) => (
           <li key={label} className="flex items-center gap-2">
-            {index > 0 && <span className="h-px w-6 bg-border" aria-hidden />}
+            {index > 0 && <span className="h-px w-5 bg-border" aria-hidden />}
             <span
               className={cn(
                 "rounded-full px-2.5 py-1 text-xs font-medium",
@@ -119,14 +185,11 @@ export function DonationForm({
         ))}
       </ol>
 
-      {step === 0 ? (
-        <FormSection
-          title="What was given?"
-          description="Only the essentials — you can add campaign and notes next."
-        >
-          <CurrencyField control={control} name="amount" label="Amount" required />
+      {step === 0 && (
+        <FormSection title="What was given?" description="Amount, type, and who gave.">
+          <CurrencyField control={giftForm.control} name="amount" label="Amount" required />
           <SelectField
-            control={control}
+            control={giftForm.control}
             name="donationType"
             label="Type"
             options={donationTypeOptions.map((option) => ({
@@ -136,7 +199,7 @@ export function DonationForm({
             required
           />
           <CheckboxField
-            control={control}
+            control={giftForm.control}
             name="anonymous"
             label="Anonymous gift"
             checkboxLabel="Record without identifying the donor"
@@ -144,7 +207,7 @@ export function DonationForm({
           />
           {!anonymous && (
             <LookupField
-              control={control}
+              control={giftForm.control}
               name="donorId"
               label="Donor"
               placeholder="Search donors..."
@@ -154,22 +217,37 @@ export function DonationForm({
             />
           )}
         </FormSection>
-      ) : (
+      )}
+
+      {step === 1 && (
         <FormSection
           title="Optional details"
-          description="Campaign, source, and notes help reporting — skip if you do not need them."
+          description="Fund tells the ledger whether this is zaka, sadaka, or building. Campaign is optional."
         >
           <LookupField
-            control={control}
+            control={giftForm.control}
             name="campaignId"
             label="Campaign"
             placeholder="Search campaigns (optional)..."
             options={campaignOptions}
             className="sm:col-span-2"
           />
-          <TextField control={control} name="source" label="Source" placeholder="e.g. Online, Event, Mail" />
+          <LookupField
+            control={giftForm.control}
+            name="fundId"
+            label="Fund"
+            placeholder="Tithe, offering, building..."
+            options={fundOptions}
+            className="sm:col-span-2"
+          />
           <TextField
-            control={control}
+            control={giftForm.control}
+            name="source"
+            label="Source"
+            placeholder="e.g. Sunday service, Lipa, Event"
+          />
+          <TextField
+            control={giftForm.control}
             name="notes"
             label="Notes"
             placeholder="Optional note"
@@ -178,31 +256,44 @@ export function DonationForm({
           {donationType === "IN_KIND" && (
             <>
               <TextField
-                control={control}
+                control={giftForm.control}
                 name="itemDescription"
                 label="Item description"
                 className="sm:col-span-2"
               />
-              <CurrencyField control={control} name="estimatedValue" label="Estimated value" allowEmpty />
+              <CurrencyField control={giftForm.control} name="estimatedValue" label="Estimated value" allowEmpty />
             </>
           )}
         </FormSection>
       )}
 
+      {step === 2 && (
+        <DonationPaymentFields form={paymentForm} canRecordManual={canRecordManual} />
+      )}
+
       {step === 0 ? (
         <FormActions
           onCancel={onCancel}
-          onNext={goNext}
+          onNext={goToDetails}
           isLastStep={false}
           submitLabel="Continue"
           isSubmitting={isSubmitting}
         />
-      ) : (
+      ) : step === 1 ? (
         <FormActions
           onCancel={() => setStep(0)}
           cancelLabel="Back"
+          onNext={goToPayment}
+          isLastStep={donationType === "IN_KIND"}
+          submitLabel={donationType === "IN_KIND" ? "Save donation" : "Continue to payment"}
           isSubmitting={isSubmitting}
-          submitLabel="Record donation"
+        />
+      ) : (
+        <FormActions
+          onCancel={() => setStep(1)}
+          cancelLabel="Back"
+          isSubmitting={isSubmitting}
+          submitLabel={skipPayment ? "Save as pending" : "Save donation"}
         />
       )}
     </FormContainer>

@@ -70,4 +70,16 @@ public class DonationController {
             @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(donationService.getById(principal, id)));
     }
+
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER')")
+    @Operation(
+            summary = "Cancel pending donation",
+            description = "Cancels a pending donation that was never paid. Completed gifts cannot be cancelled here.")
+    public ResponseEntity<ApiResponse<DonationDetailResponse>> cancel(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Unique donation identifier")
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Donation cancelled", donationService.cancel(principal, id)));
+    }
 }

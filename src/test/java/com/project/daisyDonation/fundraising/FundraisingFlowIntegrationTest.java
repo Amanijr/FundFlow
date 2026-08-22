@@ -140,4 +140,96 @@ class FundraisingFlowIntegrationTest {
                 .andExpect(jsonPath("$.data.lifetimeValue").value(250.00))
                 .andExpect(jsonPath("$.data.donationCount").value(1));
     }
+
+    @Test
+    void pendingDonationCanBePaidLaterOrCancelled() throws Exception {
+        long suffix = System.nanoTime();
+        String registerPayload = """
+                {
+                  "organization": {
+                    "name": "Later Pay Chapel",
+                    "slug": "later-pay-%d",
+                    "type": "CHURCH",
+                    "email": "admin@later-%d.org"
+                  },
+                  "email": "admin@later-%d.org",
+                  "password": "password123",
+                  "firstName": "Treasurer",
+                  "lastName": "Admin"
+                }
+                """.formatted(suffix, suffix, suffix);
+
+        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerPayload))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String token = com.jayway.jsonpath.JsonPath.read(
+                registerResult.getResponse().getContentAsString(), "$.data.accessToken");
+
+        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "firstName": "Jane",
+                                  "lastName": "Member",
+                                  "email": "jane-%d@example.com",
+                                  "phone": "+255712000001"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult pendingResult = mockMvc.perform(post("/api/v1/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "donorId": %d,
+                                  "amount": 100.00,
+                                  "donationType": "ONE_TIME"
+                                }
+                                """.formatted(donorId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.status").value("PENDING"))
+                .andReturn();
+        Long payableId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                pendingResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/donations/" + payableId + "/payments/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "paymentMethod": "CASH",
+                                  "receiptNumber": "RCP-CASH-1",
+                                  "collectionDate": "2026-08-17T10:00:00"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.donationStatus").value("COMPLETED"));
+
+        MvcResult cancelCreate = mockMvc.perform(post("/api/v1/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "donorId": %d,
+                                  "amount": 50.00,
+                                  "donationType": "ONE_TIME"
+                                }
+                                """.formatted(donorId)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long cancelId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                cancelCreate.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/donations/" + cancelId + "/cancel")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("CANCELLED"));
+    }
 }

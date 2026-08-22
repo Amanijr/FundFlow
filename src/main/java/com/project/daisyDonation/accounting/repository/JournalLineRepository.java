@@ -23,8 +23,8 @@ public interface JournalLineRepository extends JpaRepository<JournalLine, Long> 
               AND je.organization.id = :organizationId
               AND je.deleted = false
               AND jl.deleted = false
-              AND (:fromDate IS NULL OR je.entryDate >= :fromDate)
-              AND (:toDate IS NULL OR je.entryDate <= :toDate)
+              AND (CAST(:fromDate AS LocalDate) IS NULL OR je.entryDate >= CAST(:fromDate AS LocalDate))
+              AND (CAST(:toDate AS LocalDate) IS NULL OR je.entryDate <= CAST(:toDate AS LocalDate))
             ORDER BY je.entryDate ASC, jl.id ASC
             """)
     List<JournalLine> findLedgerLines(
@@ -69,9 +69,9 @@ public interface JournalLineRepository extends JpaRepository<JournalLine, Long> 
             WHERE je.organization.id = :organizationId
               AND je.deleted = false
               AND jl.deleted = false
-              AND (:fromDate IS NULL OR je.entryDate >= :fromDate)
-              AND (:toDate IS NULL OR je.entryDate <= :toDate)
-              AND (:fundId IS NULL OR jl.fund.id = :fundId)
+              AND (CAST(:fromDate AS LocalDate) IS NULL OR je.entryDate >= CAST(:fromDate AS LocalDate))
+              AND (CAST(:toDate AS LocalDate) IS NULL OR je.entryDate <= CAST(:toDate AS LocalDate))
+              AND (CAST(:fundId AS long) IS NULL OR jl.fund.id = :fundId)
             GROUP BY jl.account.id, jl.account.code, jl.account.name, jl.account.accountType
             ORDER BY jl.account.code
             """)

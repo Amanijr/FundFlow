@@ -1,7 +1,5 @@
-"use client";
-
-import { ReceiveGiftWizard } from "@/components/wizards/receive-gift-wizard";
+import { redirect } from "next/navigation";
 
 export default function ReceiveGiftPage() {
-  return <ReceiveGiftWizard />;
+  redirect("/donations/new");
 }

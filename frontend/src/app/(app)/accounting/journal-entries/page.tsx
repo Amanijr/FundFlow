@@ -14,6 +14,7 @@ import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { useAuth } from "@/hooks/use-auth";
 import { listJournalEntries } from "@/lib/api/accounting";
+import { journalPostingSummary } from "@/lib/accounting/journal-links";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDate } from "@/lib/utils/dates";
 import type { JournalEntryResponse } from "@/types/accounting";
@@ -30,12 +31,15 @@ export default function JournalEntriesPage() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return (entriesQuery.data ?? []).filter(
-      (e) =>
+    return (entriesQuery.data ?? []).filter((e) => {
+      const accounts = (e.lines ?? []).map((line) => `${line.accountName} ${line.accountCode}`).join(" ");
+      return (
         e.description.toLowerCase().includes(q) ||
         String(e.id).includes(q) ||
-        e.sourceType.toLowerCase().includes(q),
-    );
+        e.sourceType.toLowerCase().includes(q) ||
+        accounts.toLowerCase().includes(q)
+      );
+    });
   }, [entriesQuery.data, search]);
 
   const columns = useMemo<ColumnDef<JournalEntryResponse>[]>(
@@ -57,7 +61,12 @@ export default function JournalEntriesPage() {
         header: "Date",
         cell: ({ row }) => formatDate(row.original.entryDate),
       },
-      { accessorKey: "description", header: "Description" },
+      { accessorKey: "description", header: "What happened" },
+      {
+        id: "postedTo",
+        header: "Accounts",
+        cell: ({ row }) => journalPostingSummary(row.original) ?? "—",
+      },
       {
         accessorKey: "source",
         header: "Source",
@@ -85,7 +94,11 @@ export default function JournalEntriesPage() {
     <div className="space-y-4">
       <AccountingNav />
 
-      <PageHeader breadcrumbs={[{ label: "Accounting" }, { label: "Journal entries" }]} title="Journal entries" />
+      <PageHeader
+        breadcrumbs={[{ label: "Accounting" }, { label: "Journal entries" }]}
+        title="Journal entries"
+        description="Each gift or expense is posted to named accounts such as Lipa and Tithes."
+      />
 
       {entriesQuery.isError && <ErrorAlert message="Unable to load journal entries." />}
 

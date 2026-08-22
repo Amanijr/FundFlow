@@ -9,6 +9,7 @@ export const donationSchema = z
     donationType: z.enum(["ONE_TIME", "RECURRING", "PLEDGE", "IN_KIND", "COLLECTION"]),
     anonymous: z.boolean(),
     campaignId: z.string().optional(),
+    fundId: z.string().optional(),
     source: z.string().max(100).optional(),
     notes: z.string().max(1000).optional(),
     itemDescription: z.string().max(500).optional(),

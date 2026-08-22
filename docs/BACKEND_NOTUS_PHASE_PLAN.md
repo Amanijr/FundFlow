@@ -58,8 +58,8 @@ Demo org: **CrossLife Mission Network** (`slug=crosslife`, type `CHURCH`).
 # Terminal 1 — database
 docker compose up -d
 
-# Terminal 2 — backend with demo seed
-DEV_SEED_ENABLED=true ./mvnw spring-boot:run
+# Terminal 2 — backend with demo seed (dev profile)
+./mvnw spring-boot:run
 
 # Terminal 3 — Notus frontend (disable mock)
 cd frontend-notus
@@ -214,7 +214,7 @@ Church, school, grants, programs — APIs exist per Phase 8–9 docs.
 
 ## B-N12 — Production readiness
 
-- [ ] Disable `app.dev.seed-enabled` in production profiles
+- [x] Disable `app.dev.seed-enabled` in production profiles
 - [ ] Restrict CORS to deployed frontend origins
 - [ ] JWT secret rotation docs
 - [ ] Request logging correlation IDs for frontend error reporting

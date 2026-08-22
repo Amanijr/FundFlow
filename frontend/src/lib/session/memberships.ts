@@ -1,5 +1,7 @@
 import type { SessionUser } from "@/types/api";
+import type { OrganizationProfile } from "@/types/admin";
 import type { OrganizationMembership } from "@/types/session";
+import { isMockApiEnabled } from "@/lib/mock/config";
 
 const MEMBERSHIP_CATALOG: OrganizationMembership[] = [
   {
@@ -52,24 +54,52 @@ const MEMBERSHIP_CATALOG: OrganizationMembership[] = [
   },
 ];
 
-export function getMembershipsForUser(user: SessionUser | null): OrganizationMembership[] {
+export function getMembershipsForUser(
+  user: SessionUser | null,
+  organization?: OrganizationProfile | null,
+): OrganizationMembership[] {
   if (!user || user.role === "SUPER_ADMIN") {
     return [];
   }
 
-  if (user.role === "AUDITOR") {
-    return MEMBERSHIP_CATALOG.filter((item) => item.organizationId === 3).map((item) => ({
+  if (isMockApiEnabled()) {
+    if (user.role === "AUDITOR") {
+      return MEMBERSHIP_CATALOG.filter((item) => item.organizationId === 3).map((item) => ({
+        ...item,
+        role: user.role,
+      }));
+    }
+
+    return MEMBERSHIP_CATALOG.slice(0, 2).map((item) => ({
       ...item,
       role: user.role,
+      lastAccessedAt:
+        item.organizationId === user.organizationId ? new Date().toISOString() : item.lastAccessedAt,
     }));
   }
 
-  return MEMBERSHIP_CATALOG.slice(0, 2).map((item) => ({
-    ...item,
-    role: user.role,
-    lastAccessedAt:
-      item.organizationId === user.organizationId ? new Date().toISOString() : item.lastAccessedAt,
-  }));
+  if (user.organizationId == null) {
+    return [];
+  }
+
+  return [
+    {
+      organizationId: organization?.id ?? user.organizationId,
+      name: organization?.name ?? "Organization",
+      slug: organization?.slug ?? "",
+      type: organization?.type ?? user.organizationType ?? "NGO",
+      role: user.role,
+      plan: "PROFESSIONAL",
+      fiscalYear: new Date().getFullYear(),
+      active: organization?.active ?? true,
+      primaryCurrency: "TZS",
+      timezone: "Africa/Dar_es_Salaam",
+      address: organization?.address,
+      city: organization?.city,
+      country: organization?.country,
+      lastAccessedAt: new Date().toISOString(),
+    },
+  ];
 }
 
 export function getMembershipById(organizationId: number) {

@@ -174,4 +174,148 @@ class AccountingIntegrationTest {
                 .andExpect(jsonPath("$.data.totalDebits").value(1200.00))
                 .andExpect(jsonPath("$.data.totalCredits").value(1200.00));
     }
+
+    @Test
+    void churchInitializeSeedsChurchOrientedChartOfAccounts() throws Exception {
+        long suffix = System.nanoTime();
+        String registerPayload = """
+                {
+                  "organization": {
+                    "name": "Grace Chapel DSM",
+                    "slug": "grace-chapel-%d",
+                    "type": "CHURCH",
+                    "email": "treasurer@grace-%d.org",
+                    "city": "Dar es Salaam",
+                    "country": "Tanzania"
+                  },
+                  "email": "treasurer@grace-%d.org",
+                  "password": "password123",
+                  "firstName": "Church",
+                  "lastName": "Treasurer"
+                }
+                """.formatted(suffix, suffix, suffix);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerPayload))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String churchToken = com.jayway.jsonpath.JsonPath.read(
+                result.getResponse().getContentAsString(), "$.data.accessToken");
+
+        mockMvc.perform(post("/api/v1/accounting/initialize")
+                        .header("Authorization", "Bearer " + churchToken))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/accounting/chart-of-accounts")
+                        .header("Authorization", "Bearer " + churchToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[?(@.code == '1000')].name").value("Cash on Hand"))
+                .andExpect(jsonPath("$.data[?(@.code == '1020')].name").value("Mobile Money / Lipa"))
+                .andExpect(jsonPath("$.data[?(@.code == '4000')].name").value("Tithes, Offerings & Gifts"))
+                .andExpect(jsonPath("$.data[?(@.code == '4010')].name").value("Tithes"))
+                .andExpect(jsonPath("$.data[?(@.code == '5200')].name").value("Ministry & Programs"))
+                .andExpect(jsonPath("$.data[?(@.code == '5400')].name").value("Evangelism & Outreach"));
+    }
+
+    @Test
+    void churchLipaTithePostsToMobileMoneyAndTitheAccounts() throws Exception {
+        long suffix = System.nanoTime();
+        String registerPayload = """
+                {
+                  "organization": {
+                    "name": "Upendo Chapel",
+                    "slug": "upendo-%d",
+                    "type": "CHURCH",
+                    "email": "books@upendo-%d.org",
+                    "city": "Dar es Salaam",
+                    "country": "Tanzania"
+                  },
+                  "email": "books@upendo-%d.org",
+                  "password": "password123",
+                  "firstName": "Books",
+                  "lastName": "Elder"
+                }
+                """.formatted(suffix, suffix, suffix);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerPayload))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String token = com.jayway.jsonpath.JsonPath.read(
+                result.getResponse().getContentAsString(), "$.data.accessToken");
+
+        mockMvc.perform(post("/api/v1/accounting/initialize")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isCreated());
+
+        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "firstName": "Amina",
+                                  "lastName": "Member",
+                                  "email": "amina-%d@example.com",
+                                  "phone": "+255712000002"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult fundResult = mockMvc.perform(post("/api/v1/funds")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Zaka",
+                                  "code": "TITHE",
+                                  "type": "UNRESTRICTED",
+                                  "openingBalance": 0
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long fundId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                fundResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult donationResult = mockMvc.perform(post("/api/v1/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "donorId": %d,
+                                  "amount": 50000.00,
+                                  "donationType": "ONE_TIME",
+                                  "fundId": %d,
+                                  "source": "Zaka"
+                                }
+                                """.formatted(donorId, fundId)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long donationId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donationResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/donations/" + donationId + "/payments/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "paymentMethod": "MOBILE_MONEY",
+                                  "receiptNumber": "LIPA-1",
+                                  "collectionDate": "2026-08-17T10:00:00"
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/accounting/journal-entries")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].lines[?(@.accountCode == '1020')].debitAmount").value(50000.00))
+                .andExpect(jsonPath("$.data[0].lines[?(@.accountCode == '4010')].creditAmount").value(50000.00));
+    }
 }

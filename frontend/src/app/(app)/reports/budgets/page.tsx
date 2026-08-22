@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
+import { AccountLabel } from "@/components/accounting/account-label";
 import { ExportActions } from "@/components/reports/export-actions";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { ReportSummary } from "@/components/reports/report-summary";
@@ -34,8 +35,13 @@ export default function BudgetReportsPage() {
 
   const columns = useMemo<ColumnDef<BudgetReportLine>[]>(
     () => [
-      { accessorKey: "accountCode", header: "Code" },
-      { accessorKey: "accountName", header: "Account" },
+      {
+        accessorKey: "accountName",
+        header: "Account",
+        cell: ({ row }) => (
+          <AccountLabel name={row.original.accountName} code={row.original.accountCode} />
+        ),
+      },
       {
         accessorKey: "budgetAmount",
         header: "Budget",

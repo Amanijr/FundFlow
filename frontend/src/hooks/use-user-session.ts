@@ -7,6 +7,7 @@ import { useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useInboxCount } from "@/hooks/use-workflow";
 import { useUnreadNotificationCount } from "@/hooks/use-notifications";
+import { useOrganization } from "@/hooks/use-organization";
 import { formatRoleLabel } from "@/lib/session/labels";
 import { getMembershipsForUser } from "@/lib/session/memberships";
 import { useOrganizationContextStore } from "@/stores/organization-context-store";
@@ -33,6 +34,7 @@ function departmentForRole(role: OrganizationMembership["role"]) {
 
 export function useUserSession() {
   const { user } = useAuth();
+  const organizationQuery = useOrganization();
   const queryClient = useQueryClient();
   const inboxCountQuery = useInboxCount();
   const unreadQuery = useUnreadNotificationCount();
@@ -46,13 +48,19 @@ export function useUserSession() {
   const lastAccessedAt = useOrganizationContextStore((state) => state.lastAccessedAt);
   const setActiveOrganization = useOrganizationContextStore((state) => state.setActiveOrganization);
 
-  const memberships = useMemo(() => getMembershipsForUser(user), [user]);
+  const memberships = useMemo(
+    () => getMembershipsForUser(user, organizationQuery.data),
+    [organizationQuery.data, user],
+  );
 
   useEffect(() => {
-    if (user?.organizationId && activeOrganizationId == null) {
+    if (user?.role === "SUPER_ADMIN") {
+      return;
+    }
+    if (user?.organizationId != null && activeOrganizationId !== user.organizationId) {
       setActiveOrganization(user.organizationId);
     }
-  }, [activeOrganizationId, setActiveOrganization, user?.organizationId]);
+  }, [activeOrganizationId, setActiveOrganization, user?.organizationId, user?.role]);
 
   const activeMembership = useMemo(() => {
     const targetId = activeOrganizationId ?? user?.organizationId ?? memberships[0]?.organizationId;

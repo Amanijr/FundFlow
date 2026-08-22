@@ -77,6 +77,7 @@ export interface DonationCreateRequest {
   donationType: DonationType;
   anonymous?: boolean;
   campaignId?: number;
+  fundId?: number;
   pledgeId?: number;
   recurringDonationId?: number;
   source?: string;
@@ -108,6 +109,8 @@ export interface DonationDetailResponse {
   anonymous: boolean;
   campaignId?: number;
   campaignName?: string;
+  fundId?: number;
+  fundName?: string;
   pledgeId?: number;
   recurringDonationId?: number;
   collectionSessionId?: number;

@@ -18,6 +18,13 @@ export function createDonation(token: string, body: DonationCreateRequest) {
   return apiRequest<DonationDetailResponse>("/api/v1/donations", { method: "POST", token, body });
 }
 
+export function cancelDonation(token: string, id: number) {
+  return apiRequest<DonationDetailResponse>(`/api/v1/donations/${id}/cancel`, {
+    method: "POST",
+    token,
+  });
+}
+
 export function previewReceipt(token: string, donationId: number) {
   return apiRequest<ReceiptResponse>(`/api/v1/communications/receipts/${donationId}`, { token });
 }

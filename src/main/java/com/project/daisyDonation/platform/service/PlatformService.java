@@ -22,6 +22,7 @@ import com.project.daisyDonation.common.exception.ConflictException;
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
 import com.project.daisyDonation.common.exception.UnauthorizedException;
 import com.project.daisyDonation.common.security.JwtService;
+import com.project.daisyDonation.common.security.TokenType;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.common.service.PlatformAccess;
 import com.project.daisyDonation.organization.dto.OrganizationResponse;
@@ -275,10 +276,11 @@ public class PlatformService {
     }
 
     private AuthResponse buildAuthResponse(User user) {
-        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole(), null);
+        String token = jwtService.generatePlatformToken(user.getId(), user.getEmail(), user.getRole());
         return AuthResponse.builder()
                 .accessToken(token)
                 .tokenType("Bearer")
+                .tokenPlane(TokenType.PLATFORM.name())
                 .userId(user.getId())
                 .organizationId(null)
                 .role(user.getRole())

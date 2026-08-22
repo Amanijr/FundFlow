@@ -13,6 +13,11 @@ COPY . .
 # Server-side /api rewrites target the Compose service name.
 ARG API_URL=http://api:8080
 ENV API_URL=$API_URL
+
+# Baked into the Next.js client bundle (true = frontend mock data, no backend).
+ARG NEXT_PUBLIC_MOCK_API=false
+ENV NEXT_PUBLIC_MOCK_API=$NEXT_PUBLIC_MOCK_API
+
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build

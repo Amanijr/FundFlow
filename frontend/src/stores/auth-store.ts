@@ -24,6 +24,7 @@ function toSessionUser(auth: AuthResponse): SessionUser {
     lastName: auth.lastName,
     role: auth.role,
     organizationId: auth.organizationId,
+    organizationType: auth.organizationType ?? null,
   };
 }
 
