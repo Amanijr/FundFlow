@@ -1,5 +1,9 @@
 import type { ApiResponse, OrganizationType, Role } from "@/types/api";
 import { ApiError } from "@/types/api";
+import type {
+  CollectionSessionCountRequest,
+  CollectionSessionCreateRequest,
+} from "@/types/collection";
 import type { PlatformOrganization, PlatformUser, SystemLogResponse } from "@/types/platform";
 
 import { mockDelay } from "@/lib/mock/config";
@@ -30,6 +34,15 @@ import {
   getProgramDashboard,
   nextMockId,
 } from "@/lib/mock/fixtures";
+import {
+  countMockCollectionSession,
+  createMockCollectionSession,
+  depositMockCollectionSession,
+  getMockCollectionDashboard,
+  getMockCollectionSession,
+  listMockCollectionSessions,
+  verifyMockCollectionSession,
+} from "@/lib/mock/collection-store";
 import {
   getMockNotifications,
   markAllMockNotificationsRead,
@@ -372,6 +385,14 @@ export async function mockApiRequest<T>(
     }
   }
 
+  const donationCancelMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/cancel$/);
+  if (donationCancelMatch && method === "POST") {
+    const id = Number(donationCancelMatch[1]);
+    const detail = getDonationDetail(id);
+    if (!detail) throw new ApiError("Donation not found", 404);
+    return ok({ ...detail, status: "CANCELLED" }) as ApiResponse<T>;
+  }
+
   const paymentMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/payments\/(gateway|manual)$/);
   if (paymentMatch && method === "POST") {
     const donationId = Number(paymentMatch[1]);
@@ -546,6 +567,37 @@ export async function mockApiRequest<T>(
   if (beneficiaryId != null) {
     const b = MOCK_BENEFICIARIES.find((x) => x.id === beneficiaryId) ?? MOCK_BENEFICIARIES[0];
     return ok(b) as ApiResponse<T>;
+  }
+
+  if (pathname === "/api/v1/collection-sessions") {
+    if (method === "GET") return ok(listMockCollectionSessions()) as ApiResponse<T>;
+    if (method === "POST") {
+      return ok(createMockCollectionSession(body as CollectionSessionCreateRequest)) as ApiResponse<T>;
+    }
+  }
+  if (pathname === "/api/v1/collection-sessions/dashboard") {
+    return ok(getMockCollectionDashboard()) as ApiResponse<T>;
+  }
+  const collectionId = matchId(pathname, "/api/v1/collection-sessions");
+  if (collectionId != null) {
+    if (pathname.endsWith("/count") && method === "PUT") {
+      const counted = countMockCollectionSession(collectionId, body as CollectionSessionCountRequest);
+      if (!counted) throw new ApiError("Only draft sessions can be counted", 400);
+      return ok(counted) as ApiResponse<T>;
+    }
+    if (pathname.endsWith("/verify") && method === "POST") {
+      const verified = verifyMockCollectionSession(collectionId);
+      if (!verified) throw new ApiError("Only counted sessions can be verified", 400);
+      return ok(verified) as ApiResponse<T>;
+    }
+    if (pathname.endsWith("/deposit") && method === "POST") {
+      const deposited = depositMockCollectionSession(collectionId);
+      if (!deposited) throw new ApiError("Only verified sessions can be marked deposited", 400);
+      return ok(deposited) as ApiResponse<T>;
+    }
+    const session = getMockCollectionSession(collectionId);
+    if (!session) throw new ApiError("Collection session not found", 404);
+    return ok(session) as ApiResponse<T>;
   }
 
   if (pathname === "/api/v1/church/ministries") {

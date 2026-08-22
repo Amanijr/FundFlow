@@ -5,6 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { ChurchNav } from "@/components/church/church-nav";
 import { PageHeader } from "@/components/layout/page-header";
 import { PermissionGate } from "@/components/security/permission-gate";
 import { DataTable } from "@/components/tables/data-table";
@@ -70,10 +71,11 @@ export default function MinistriesPage() {
 
   return (
     <div className="space-y-4">
+      <ChurchNav />
       <PageHeader
-        breadcrumbs={[{ label: "Church", href: "/church/ministries" }, { label: "Ministries" }]}
+        breadcrumbs={[{ label: "Church", href: "/church" }, { label: "Ministries" }]}
         title="Ministries"
-        description="Church ministries and departments."
+        description="Youth, worship, cells, and other church departments."
         action={
           <PermissionGate roles={["ORG_ADMIN", "STAFF"]}>
             <Button asChild>

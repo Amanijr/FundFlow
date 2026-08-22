@@ -27,8 +27,9 @@ Beyond standard fundraising and finance, churches get:
    - General / Operations (unrestricted)  
    - Building Fund (restricted)  
    - Missions (restricted)  
-4. Invite **Finance Manager** (treasurer) and **Staff** (ushers, admin)  
-5. Set up **ministries** (see below)  
+4. **Initialize accounting** (`/accounting/chart-of-accounts`) — churches get a church-oriented chart (cash on hand, bank, mobile money / Lipa, tithes & offerings income, ministry expenses)  
+5. Invite **Finance Manager** (treasurer) and **Staff** (ushers, admin)  
+6. Set up **ministries** (see below)  
 
 ---
 
@@ -63,8 +64,10 @@ Use attendance summaries for leadership reports and participation trends.
 Standard donation workflow — see [Fundraising Guide](./fundraising.md):
 
 1. Add or select **donor** (member)  
-2. **Record donation** — assign to correct **fund** (tithes vs. offering vs. building)  
-3. **Record payment** — gateway or manual (treasurer for cash)  
+2. **Record donation** (`/donations/new`) — amount, then cash / Lipa now **or pay later**  
+3. If pending, open the donation and **Record payment** when the treasurer confirms cash  
+
+Do not use a separate gift wizard. `/receive-gift` opens the same donation sequence.  
 
 ---
 

@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ChurchNav } from "@/components/church/church-nav";
 import { DateInput } from "@/components/forms/date-input";
 import { EntitySelector } from "@/components/forms/entity-selector";
 import { FormField } from "@/components/forms/form-field";
@@ -127,13 +128,14 @@ export default function ChurchAttendancePage() {
 
   return (
     <div className="space-y-4">
+      <ChurchNav />
       <PageHeader
         breadcrumbs={[
-          { label: "Church", href: "/church/ministries" },
+          { label: "Church", href: "/church" },
           { label: "Attendance", href: "/church/attendance" },
         ]}
         title="Attendance"
-        description="Service and event attendance records."
+        description="Headcount for Sunday and midweek services."
         action={
           <Button onClick={() => setShowForm((v) => !v)}>
             {showForm ? "Cancel" : "Record attendance"}
