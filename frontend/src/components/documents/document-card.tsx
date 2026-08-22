@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { Lock, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { getDocumentCategoryLabel } from "@/lib/document-categories";
-import { formatBytes, formatMimeLabel, getDocumentIcon } from "@/lib/document-format";
+import { formatBytes, formatDocumentRelativeTime, formatMimeLabel, getDocumentIcon } from "@/lib/document-format";
 import type { Document } from "@/types/document";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +36,7 @@ export function DocumentCard({
   className,
 }: DocumentCardProps) {
   const Icon = getDocumentIcon(document.mimeType);
-  const relativeTime = formatDistanceToNow(new Date(document.uploadedAt), { addSuffix: true });
+  const relativeTime = formatDocumentRelativeTime(document.uploadedAt);
 
   return (
     <div
@@ -66,7 +65,8 @@ export function DocumentCard({
           </div>
           <p className="text-xs text-muted-foreground">
             {getDocumentCategoryLabel(document.category)} · {formatMimeLabel(document.mimeType)} ·{" "}
-            {formatBytes(document.sizeBytes)} · {relativeTime}
+            {formatBytes(document.sizeBytes)}
+            {relativeTime ? ` · ${relativeTime}` : ""}
           </p>
         </div>
       </button>

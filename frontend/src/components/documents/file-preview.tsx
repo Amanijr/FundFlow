@@ -5,6 +5,7 @@ import { Download, FileIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/feedback/loading-state";
+import { useDocumentPreviewUrl } from "@/hooks/use-document-preview";
 import { isPreviewableMime } from "@/lib/document-format";
 import type { Document } from "@/types/document";
 import { cn } from "@/lib/utils";
@@ -26,15 +27,17 @@ export function FilePreview({
   onDownload,
   className,
 }: FilePreviewProps) {
+  const authenticatedUrl = useDocumentPreviewUrl(document);
+  const url = previewUrl ?? authenticatedUrl;
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loadingText, setLoadingText] = useState(false);
-  const url = previewUrl ?? document.previewUrl;
 
   const isText =
     document.mimeType === "text/plain" || document.mimeType === "text/csv";
   const isImage = document.mimeType.startsWith("image/");
   const isPdf = document.mimeType === "application/pdf";
-  const canPreview = isPreviewableMime(document.mimeType) && url;
+  const canPreview = isPreviewableMime(document.mimeType);
+  const waitingForUrl = canPreview && !url;
 
   useEffect(() => {
     if (!isText || !url) {
@@ -49,7 +52,11 @@ export function FilePreview({
       .finally(() => setLoadingText(false));
   }, [isText, url]);
 
-  if (!canPreview) {
+  if (waitingForUrl) {
+    return <LoadingState />;
+  }
+
+  if (!canPreview || !url) {
     return (
       <div className={cn("flex flex-col items-center justify-center gap-4 p-8 text-center", className)}>
         <FileIcon className="h-12 w-12 text-muted-foreground" />

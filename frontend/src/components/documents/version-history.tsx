@@ -1,12 +1,13 @@
-import { format } from "date-fns";
 import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/feedback/loading-state";
-import { formatBytes } from "@/lib/document-format";
+import { formatBytes, formatDocumentDateTime } from "@/lib/document-format";
 import { useDocumentVersions } from "@/hooks/use-documents";
-import { getDocumentDownloadUrl } from "@/lib/api/documents";
+import { useApiContext } from "@/hooks/use-api-context";
+import { downloadDocumentFile } from "@/lib/api/documents";
 import type { Document } from "@/types/document";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface VersionHistoryProps {
@@ -15,6 +16,7 @@ interface VersionHistoryProps {
 }
 
 export function VersionHistory({ document, className }: VersionHistoryProps) {
+  const { token, organizationId } = useApiContext();
   const versionsQuery = useDocumentVersions(document.id);
 
   if (versionsQuery.isLoading) return <LoadingState />;
@@ -52,8 +54,10 @@ export function VersionHistory({ document, className }: VersionHistoryProps) {
                 className="h-7 w-7"
                 aria-label={`Download version ${version.version}`}
                 onClick={() => {
-                  const url = version.previewUrl ?? getDocumentDownloadUrl(document.id);
-                  window.open(url, "_blank", "noopener,noreferrer");
+                  if (!token) return;
+                  void downloadDocumentFile(token, document, organizationId).catch(() => {
+                    toast.error("Unable to download file");
+                  });
                 }}
               >
                 <Download className="h-3.5 w-3.5" />
@@ -61,7 +65,7 @@ export function VersionHistory({ document, className }: VersionHistoryProps) {
             </div>
             <p className="text-sm text-muted-foreground">{version.name}</p>
             <p className="text-xs text-muted-foreground">
-              {format(new Date(version.uploadedAt), "MMM d, yyyy h:mm a")} · {version.uploadedBy.name} ·{" "}
+              {formatDocumentDateTime(version.uploadedAt)} · {version.uploadedBy?.name ?? "Staff"} ·{" "}
               {formatBytes(version.sizeBytes)}
             </p>
             {version.changeNotes && (

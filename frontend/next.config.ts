@@ -4,6 +4,9 @@ const apiUrl = process.env.API_URL ?? "http://localhost:8080";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  experimental: {
+    middlewareClientMaxBodySize: "20mb",
+  },
   async rewrites() {
     return [
       {

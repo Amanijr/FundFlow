@@ -22,8 +22,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getDocumentDownloadUrl } from "@/lib/api/documents";
+import { useApiContext } from "@/hooks/use-api-context";
+import { downloadDocumentFile } from "@/lib/api/documents";
 import type { Document } from "@/types/document";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface DocumentViewerProps {
@@ -43,6 +45,7 @@ export function DocumentViewer({
   onIndexChange,
   showMetadata = true,
 }: DocumentViewerProps) {
+  const { token, organizationId } = useApiContext();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
 
@@ -50,10 +53,13 @@ export function DocumentViewer({
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < documents.length - 1;
 
-  function handleDownload() {
-    if (!current) return;
-    const url = current.previewUrl ?? getDocumentDownloadUrl(current.id);
-    window.open(url, "_blank", "noopener,noreferrer");
+  async function handleDownload() {
+    if (!current || !token) return;
+    try {
+      await downloadDocumentFile(token, current, organizationId);
+    } catch {
+      toast.error("Unable to download file");
+    }
   }
 
   function handleClose(nextOpen: boolean) {

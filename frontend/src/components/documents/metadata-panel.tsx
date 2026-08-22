@@ -1,7 +1,5 @@
-import { format } from "date-fns";
-
 import { getDocumentCategoryLabel } from "@/lib/document-categories";
-import { formatBytes, formatMimeLabel } from "@/lib/document-format";
+import { formatBytes, formatDocumentDateTime, formatMimeLabel } from "@/lib/document-format";
 import type { Document } from "@/types/document";
 import { cn } from "@/lib/utils";
 
@@ -19,13 +17,13 @@ export function MetadataPanel({ document, className }: MetadataPanelProps) {
     { label: "Category", value: getDocumentCategoryLabel(document.category) },
     {
       label: "Tags",
-      value: document.tags.length > 0 ? document.tags.join(", ") : "—",
+      value: (document.tags ?? []).length > 0 ? document.tags.join(", ") : "—",
     },
     { label: "Entity", value: `${document.entityType}${document.entityId != null ? ` #${document.entityId}` : ""}` },
     { label: "Uploaded by", value: document.uploadedBy.name },
     {
       label: "Uploaded at",
-      value: format(new Date(document.uploadedAt), "MMM d, yyyy h:mm a"),
+      value: formatDocumentDateTime(document.uploadedAt),
     },
   ];
 
