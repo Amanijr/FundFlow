@@ -17,7 +17,7 @@ import { SectionHeader } from "@/components/layout/section-header";
 import { AuditTrail } from "@/components/workflow/audit-trail";
 import { useAuth } from "@/hooks/use-auth";
 import { listJournalEntries } from "@/lib/api/accounting";
-import { findJournalEntriesForExpense } from "@/lib/accounting/journal-links";
+import { findJournalEntriesForExpense, journalPostingSummary } from "@/lib/accounting/journal-links";
 import {
   approveExpense,
   getExpense,
@@ -160,7 +160,7 @@ export default function ExpenseDetailPage() {
         title="Accounting"
         fields={[
           {
-            label: "Journal entries",
+            label: "Posted to the books",
             value:
               linkedJournalEntries.length > 0 ? (
                 <span className="flex flex-col gap-1">
@@ -170,7 +170,7 @@ export default function ExpenseDetailPage() {
                       href={`/accounting/journal-entries/${entry.id}`}
                       className="text-primary hover:underline"
                     >
-                      Journal entry #{entry.id}
+                      {journalPostingSummary(entry) ?? "View books entry"}
                     </Link>
                   ))}
                 </span>

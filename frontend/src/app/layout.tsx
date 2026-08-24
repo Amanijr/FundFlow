@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lato, Montserrat, Roboto } from "next/font/google";
+import { connection } from "next/server";
 
 import { AppProviders } from "@/components/providers/app-providers";
 
@@ -31,17 +32,21 @@ export const metadata: Metadata = {
   description: "Fundraising and finance management for nonprofit organizations",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
+  const mockApi =
+    process.env.MOCK_API === "true" || process.env.NEXT_PUBLIC_MOCK_API === "true";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${roboto.variable} ${lato.variable} ${montserrat.variable} min-h-screen antialiased`}
       >
-        <AppProviders>{children}</AppProviders>
+        <AppProviders mockApi={mockApi}>{children}</AppProviders>
       </body>
     </html>
   );

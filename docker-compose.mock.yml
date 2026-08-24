@@ -1,0 +1,28 @@
+# Frontend-only with built-in mock API/data. Does not start Postgres or the Spring API.
+#
+#   docker compose -f docker-compose.mock.yml up --build -d
+#   open http://localhost:3000
+#   Sign in with any email + password `demo`
+#
+# Stop: docker compose -f docker-compose.mock.yml down
+
+name: fundflow-mock
+
+services:
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MOCK_API: "true"
+        API_URL: http://localhost:8080
+    image: fundflow-web:mock
+    container_name: fundflow-web-mock
+    restart: unless-stopped
+    environment:
+      MOCK_API: "true"
+      NEXT_PUBLIC_MOCK_API: "true"
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "${WEB_PORT:-3000}:3000"

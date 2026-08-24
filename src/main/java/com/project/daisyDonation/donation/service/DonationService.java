@@ -22,6 +22,7 @@ import com.project.daisyDonation.donation.dto.DonationCreateRequest;
 import com.project.daisyDonation.donation.dto.DonationDetailResponse;
 import com.project.daisyDonation.donation.dto.DonationSummaryResponse;
 import com.project.daisyDonation.donor.service.DonorService;
+import com.project.daisyDonation.fund.service.FundService;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.pledge.entity.Pledge;
 import com.project.daisyDonation.pledge.entity.PledgeStatus;
@@ -43,6 +44,7 @@ public class DonationService {
     private final PledgeService pledgeService;
     private final RecurringDonationService recurringDonationService;
     private final AccountingPostingService accountingPostingService;
+    private final FundService fundService;
 
     @Transactional
     public DonationDetailResponse create(UserPrincipal principal, DonationCreateRequest request) {
@@ -70,6 +72,10 @@ public class DonationService {
         if (request.getCampaignId() != null) {
             Campaign campaign = campaignService.requireCampaign(principal, request.getCampaignId());
             donation.setCampaign(campaign);
+        }
+
+        if (request.getFundId() != null) {
+            donation.setFund(fundService.requireFund(principal, request.getFundId()));
         }
 
         if (request.getPledgeId() != null) {
@@ -132,6 +138,16 @@ public class DonationService {
     @Transactional(readOnly = true)
     public DonationDetailResponse getById(UserPrincipal principal, Long donationId) {
         return DonationMapper.toDetail(requireDonation(principal, donationId));
+    }
+
+    @Transactional
+    public DonationDetailResponse cancel(UserPrincipal principal, Long donationId) {
+        Donation donation = requireDonation(principal, donationId);
+        if (donation.getStatus() != DonationStatus.PENDING && donation.getStatus() != DonationStatus.FAILED) {
+            throw new BadRequestException("Only pending or failed donations can be cancelled");
+        }
+        donation.setStatus(DonationStatus.CANCELLED);
+        return DonationMapper.toDetail(donationRepository.save(donation));
     }
 
     public Donation requireDonation(UserPrincipal principal, Long donationId) {

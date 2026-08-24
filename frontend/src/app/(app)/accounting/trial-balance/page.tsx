@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 
+import { AccountLabel } from "@/components/accounting/account-label";
 import { AccountingNav } from "@/components/accounting/accounting-nav";
 import { formatEnumLabel } from "@/components/finance/finance-status-badge";
 import { PageHeader } from "@/components/layout/page-header";
@@ -28,8 +29,13 @@ export default function TrialBalancePage() {
 
   const columns = useMemo<ColumnDef<TrialBalanceLine>[]>(
     () => [
-      { accessorKey: "accountCode", header: "Code" },
-      { accessorKey: "accountName", header: "Account" },
+      {
+        accessorKey: "accountName",
+        header: "Account",
+        cell: ({ row }) => (
+          <AccountLabel name={row.original.accountName} code={row.original.accountCode} />
+        ),
+      },
       {
         accessorKey: "accountType",
         header: "Type",

@@ -17,7 +17,7 @@ interface QuickAction {
 }
 
 const quickActions: QuickAction[] = [
-  { id: "donation", label: "Record donation", href: "/receive-gift", roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"], icon: HandCoins },
+  { id: "donation", label: "Record donation", href: "/donations/new", roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"], icon: HandCoins },
   { id: "donor", label: "Add donor", href: "/donors/new", roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"], icon: UserPlus },
   { id: "campaign", label: "Create campaign", href: "/campaigns/new", roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"], icon: DollarSign },
   { id: "expense", label: "Spend money", href: "/spend-money", roles: ["ORG_ADMIN", "FINANCE_MANAGER", "ACCOUNTANT", "STAFF"], icon: Receipt },

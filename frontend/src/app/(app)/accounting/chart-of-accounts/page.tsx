@@ -5,6 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { AccountLabel } from "@/components/accounting/account-label";
 import { AccountingNav } from "@/components/accounting/accounting-nav";
 import { ChartOfAccountForm } from "@/components/accounting/chart-of-account-form";
 import { formatEnumLabel } from "@/components/finance/finance-status-badge";
@@ -23,13 +24,29 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useOrganization } from "@/hooks/use-organization";
 import { createChartOfAccount, initializeAccounting, listChartOfAccounts } from "@/lib/api/accounting";
 import { ApiError } from "@/types/api";
 import type { ChartOfAccountRequest, ChartOfAccountResponse } from "@/types/accounting";
 
+function initializeToastMessage(organizationType?: string) {
+  switch (organizationType) {
+    case "CHURCH":
+    case "RELIGIOUS_INSTITUTION":
+      return "Church chart of accounts initialized";
+    case "SCHOOL":
+      return "School chart of accounts initialized";
+    case "FOUNDATION":
+      return "Foundation chart of accounts initialized";
+    default:
+      return "Accounting initialized";
+  }
+}
+
 export default function ChartOfAccountsPage() {
   const queryClient = useQueryClient();
   const { accessToken } = useAuth();
+  const organizationQuery = useOrganization();
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -49,8 +66,11 @@ export default function ChartOfAccountsPage() {
 
   const columns = useMemo<ColumnDef<ChartOfAccountResponse>[]>(
     () => [
-      { accessorKey: "code", header: "Code" },
-      { accessorKey: "name", header: "Account name" },
+      {
+        accessorKey: "name",
+        header: "Account",
+        cell: ({ row }) => <AccountLabel name={row.original.name} code={row.original.code} />,
+      },
       {
         accessorKey: "accountType",
         header: "Type",
@@ -67,8 +87,8 @@ export default function ChartOfAccountsPage() {
       },
       {
         accessorKey: "systemAccount",
-        header: "System",
-        cell: ({ row }) => (row.original.systemAccount ? "Yes" : "—"),
+        header: "Required",
+        cell: ({ row }) => (row.original.systemAccount ? "Used by gifts & expenses" : "—"),
       },
     ],
     [],
@@ -77,7 +97,7 @@ export default function ChartOfAccountsPage() {
   async function handleInitialize() {
     try {
       await initializeAccounting(accessToken!);
-      toast.success("Accounting initialized");
+      toast.success(initializeToastMessage(organizationQuery.data?.type));
       await queryClient.invalidateQueries({ queryKey: ["accounting", "chart-of-accounts"] });
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Unable to initialize");
@@ -105,6 +125,7 @@ export default function ChartOfAccountsPage() {
       <PageHeader
         breadcrumbs={[{ label: "Accounting" }, { label: "Chart of accounts" }]}
         title="Chart of accounts"
+        description="These are the named buckets money moves through (cash, Lipa, tithes). The small numbers are only for the books."
         action={
           <div className="flex gap-2">
             <PermissionGate roles={["ORG_ADMIN", "FINANCE_MANAGER"]}>
@@ -124,7 +145,7 @@ export default function ChartOfAccountsPage() {
       <FilterBar
         searchValue={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Search by code or name..."
+        searchPlaceholder="Search accounts..."
         onReset={() => setSearch("")}
       />
 

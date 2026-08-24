@@ -10,8 +10,10 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDocumentViewer } from "@/hooks/use-document-viewer";
+import { useApiContext } from "@/hooks/use-api-context";
 import { useDocuments } from "@/hooks/use-documents";
-import { getDocumentDownloadUrl } from "@/lib/api/documents";
+import { downloadDocumentFile } from "@/lib/api/documents";
+import { toast } from "sonner";
 import { DOCUMENT_CATEGORIES } from "@/lib/document-categories";
 import type { Document, DocumentCategory, DocumentSearchFilters } from "@/types/document";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,7 @@ export default function DocumentsPage() {
   });
   const [search, setSearch] = useState("");
 
+  const { token, organizationId } = useApiContext();
   const documentsQuery = useDocuments({
     ...filters,
     q: search || filters.q,
@@ -36,9 +39,13 @@ export default function DocumentsPage() {
   const documents = documentsQuery.data?.items ?? [];
   const viewer = useDocumentViewer(documents);
 
-  function handleDownload(document: Document) {
-    const url = document.previewUrl ?? getDocumentDownloadUrl(document.id);
-    window.open(url, "_blank", "noopener,noreferrer");
+  async function handleDownload(document: Document) {
+    if (!token) return;
+    try {
+      await downloadDocumentFile(token, document, organizationId);
+    } catch {
+      toast.error("Unable to download file");
+    }
   }
 
   return (

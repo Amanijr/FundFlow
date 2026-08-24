@@ -7,12 +7,39 @@ export const DEFAULT_ALLOWED_MIME_TYPES = [
   "application/pdf",
   "image/png",
   "image/jpeg",
+  "image/jpg",
   "image/webp",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "text/csv",
   "text/plain",
 ];
+
+export const DEFAULT_ALLOWED_ACCEPT =
+  ".pdf,.png,.jpg,.jpeg,.webp,.xlsx,.docx,.csv,.txt," + DEFAULT_ALLOWED_MIME_TYPES.join(",");
+
+const EXTENSION_MIME: Record<string, string> = {
+  pdf: "application/pdf",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  csv: "text/csv",
+  txt: "text/plain",
+};
+
+function resolvedMimeType(file: File) {
+  if (file.type === "image/jpg") {
+    return "image/jpeg";
+  }
+  if (file.type) {
+    return file.type;
+  }
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return EXTENSION_MIME[extension] ?? "";
+}
 
 export interface UploadValidationConfig {
   maxSizeBytes?: number;
@@ -41,8 +68,11 @@ export function validateFiles(
 
   const existingNames = new Set(existing.map((doc) => doc.name.toLowerCase()));
 
+  const allowedSet = new Set(allowed.map((type) => (type === "image/jpg" ? "image/jpeg" : type)));
+
   for (const file of files) {
-    if (!allowed.includes(file.type) && file.type !== "") {
+    const mime = resolvedMimeType(file);
+    if (!mime || !allowedSet.has(mime)) {
       errors.push({
         fileName: file.name,
         message: `${file.name} is not a supported file type`,

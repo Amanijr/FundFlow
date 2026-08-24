@@ -23,6 +23,8 @@ public final class TokenTypeValidator {
         if (isPlatformPath(path)) {
             return actual == TokenType.PLATFORM;
         }
-        return actual == TokenType.TENANT || actual == TokenType.IMPERSONATION;
+        return actual == TokenType.TENANT
+                || actual == TokenType.IMPERSONATION
+                || actual == TokenType.PLATFORM;
     }
 }

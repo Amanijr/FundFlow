@@ -22,20 +22,26 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { listJournalEntries } from "@/lib/api/accounting";
-import { findJournalEntriesForDonation } from "@/lib/accounting/journal-links";
-import { getDonation, previewReceipt } from "@/lib/api/donations";
+import { findJournalEntriesForDonation, journalPostingSummary } from "@/lib/accounting/journal-links";
+import { cancelDonation, getDonation, previewReceipt } from "@/lib/api/donations";
+import { processGatewayPayment, recordManualPayment } from "@/lib/api/payments";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDateTime } from "@/lib/utils/dates";
 import { ApiError } from "@/types/api";
 import type { ReceiptResponse } from "@/types/fundraising";
+import { RecordDonationPaymentForm, type LaterPaymentPayload } from "@/components/donations/record-donation-payment-form";
+import { PermissionGate } from "@/components/security/permission-gate";
 
 export default function DonationDetailPage() {
   const params = useParams();
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
   const donationId = Number(params.id);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptResponse | null>(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const canRecordManual = user?.role === "ORG_ADMIN" || user?.role === "FINANCE_MANAGER";
 
   const donationQuery = useQuery({
     queryKey: ["donations", donationId],
@@ -56,6 +62,42 @@ export default function DonationDetailPage() {
     () => findJournalEntriesForDonation(journalQuery.data ?? [], donationId),
     [journalQuery.data, donationId],
   );
+
+  async function handleRecordPayment(values: LaterPaymentPayload) {
+    setPaymentError(null);
+    try {
+      if (values.channel === "MANUAL") {
+        await recordManualPayment(accessToken!, donationId, {
+          paymentMethod: values.paymentMethod,
+          receiptNumber: values.receiptNumber || `RCP-${Date.now()}`,
+          collectionDate: new Date().toISOString(),
+          paymentNotes: values.paymentNotes,
+        });
+      } else {
+        await processGatewayPayment(accessToken!, donationId, {
+          paymentMethod: values.paymentMethod,
+        });
+      }
+      toast.success("Payment recorded — donation is completed");
+      await donationQuery.refetch();
+      await journalQuery.refetch();
+    } catch (err) {
+      setPaymentError(err instanceof ApiError ? err.message : "Unable to record payment");
+    }
+  }
+
+  async function handleCancelDonation() {
+    setCancelling(true);
+    try {
+      await cancelDonation(accessToken!, donationId);
+      toast.success("Donation cancelled");
+      await donationQuery.refetch();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Unable to cancel donation");
+    } finally {
+      setCancelling(false);
+    }
+  }
 
   async function handlePreviewReceipt() {
     setReceiptLoading(true);
@@ -91,6 +133,13 @@ export default function DonationDetailPage() {
         description={formatDateTime(donation.donationTime)}
         action={
           <div className="flex gap-2">
+            {(donation.status === "PENDING" || donation.status === "FAILED") && (
+              <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER"]}>
+                <Button variant="outline" onClick={handleCancelDonation} disabled={cancelling}>
+                  {cancelling ? "Cancelling…" : "Cancel donation"}
+                </Button>
+              </PermissionGate>
+            )}
             <Button variant="outline" onClick={handlePreviewReceipt} disabled={receiptLoading}>
               View receipt
             </Button>
@@ -103,6 +152,23 @@ export default function DonationDetailPage() {
         <span className="text-sm text-muted-foreground">{formatDonationType(donation.donationType)}</span>
       </div>
 
+      {donation.status === "PENDING" && donation.donationType !== "IN_KIND" && (
+        <PermissionGate
+          roles={["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF"]}
+          fallback={
+            <p className="text-sm text-muted-foreground">
+              This gift is pending. A treasurer can record cash or Lipa on this page.
+            </p>
+          }
+        >
+          <RecordDonationPaymentForm
+            canRecordManual={canRecordManual}
+            serverError={paymentError}
+            onSubmit={handleRecordPayment}
+          />
+        </PermissionGate>
+      )}
+
       <div className="grid gap-4 lg:grid-cols-2">
         <DetailCard
           title="Gift details"
@@ -110,6 +176,7 @@ export default function DonationDetailPage() {
             { label: "Amount", value: formatCurrency(toNumber(donation.amount)) },
             { label: "Anonymous", value: donation.anonymous ? "Yes" : "No" },
             { label: "Source", value: donation.source ?? "—" },
+            { label: "Fund", value: donation.fundName ?? "—" },
             { label: "Notes", value: donation.notes ?? "—" },
           ]}
         />
@@ -150,7 +217,7 @@ export default function DonationDetailPage() {
         title="Accounting"
         fields={[
           {
-            label: "Journal entries",
+            label: "Posted to the books",
             value:
               linkedJournalEntries.length > 0 ? (
                 <span className="flex flex-col gap-1">
@@ -160,7 +227,7 @@ export default function DonationDetailPage() {
                       href={`/accounting/journal-entries/${entry.id}`}
                       className="text-primary hover:underline"
                     >
-                      Journal entry #{entry.id}
+                      {journalPostingSummary(entry) ?? "View books entry"}
                     </Link>
                   ))}
                 </span>

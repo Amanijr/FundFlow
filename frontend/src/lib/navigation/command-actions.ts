@@ -18,12 +18,20 @@ export function buildCommandActions(role?: Role, organizationType?: Organization
   const quickActions: CommandAction[] = [];
 
   if (role && ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"].includes(role)) {
+    if (organizationType === "CHURCH" || organizationType === "RELIGIOUS_INSTITUTION") {
+      quickActions.push({
+        id: "sunday-collection",
+        label: "Sunday collection",
+        group: "Quick actions",
+        href: "/church/collections/new",
+      });
+    }
     quickActions.push(
       {
         id: "record-donation",
-        label: "Receive a gift",
+        label: "Record donation",
         group: "Quick actions",
-        href: "/receive-gift",
+        href: "/donations/new",
       },
       {
         id: "add-donor",

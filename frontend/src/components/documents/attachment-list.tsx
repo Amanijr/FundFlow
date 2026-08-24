@@ -29,8 +29,8 @@ import {
   useEntityDocuments,
 } from "@/hooks/use-documents";
 import { useUploadQueue } from "@/hooks/use-upload-queue";
-import { getDocumentDownloadUrl, uploadDocumentVersion } from "@/lib/api/documents";
-import { DEFAULT_ALLOWED_MIME_TYPES } from "@/lib/document-validation";
+import { downloadDocumentFile, uploadDocumentVersion } from "@/lib/api/documents";
+import { DEFAULT_ALLOWED_ACCEPT, DEFAULT_ALLOWED_MIME_TYPES } from "@/lib/document-validation";
 import type { AttachableEntityType, Document, DocumentCategory } from "@/types/document";
 import { cn } from "@/lib/utils";
 
@@ -95,9 +95,13 @@ export function AttachmentList({
     }
   }
 
-  function handleDownload(document: Document) {
-    const url = document.previewUrl ?? getDocumentDownloadUrl(document.id);
-    window.open(url, "_blank", "noopener,noreferrer");
+  async function handleDownload(document: Document) {
+    if (!token) return;
+    try {
+      await downloadDocumentFile(token, document, organizationId);
+    } catch {
+      toast.error("Unable to download file");
+    }
   }
 
   return (
@@ -130,7 +134,7 @@ export function AttachmentList({
           type="file"
           className="hidden"
           multiple
-          accept={DEFAULT_ALLOWED_MIME_TYPES.join(",")}
+          accept={DEFAULT_ALLOWED_ACCEPT}
           onChange={(event) => {
             const files = event.target.files ? Array.from(event.target.files) : [];
             if (files.length > 0) uploadQueue.enqueue(files);
@@ -143,7 +147,7 @@ export function AttachmentList({
         <DragDropZone
           compact
           multiple
-          accept={DEFAULT_ALLOWED_MIME_TYPES.join(",")}
+          accept={DEFAULT_ALLOWED_ACCEPT}
           disabled={uploadQueue.isUploading}
           onFilesAccepted={uploadQueue.enqueue}
         />
@@ -226,7 +230,7 @@ export function AttachmentList({
               ref={versionInputRef}
               type="file"
               className="hidden"
-              accept={DEFAULT_ALLOWED_MIME_TYPES.join(",")}
+              accept={DEFAULT_ALLOWED_ACCEPT}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) void handleVersionUpload(file);

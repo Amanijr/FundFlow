@@ -111,7 +111,7 @@ export default function GeneralLedgerPage() {
               <option value="">Select account</option>
               {(accountsQuery.data ?? []).map((account) => (
                 <option key={account.id} value={account.id}>
-                  {account.code} — {account.name}
+                  {account.name}
                 </option>
               ))}
             </select>
@@ -131,8 +131,7 @@ export default function GeneralLedgerPage() {
             <DetailCard
               title="Account"
               fields={[
-                { label: "Code", value: ledger.accountCode },
-                { label: "Name", value: ledger.accountName },
+                { label: "Account", value: ledger.accountName },
               ]}
             />
             <DetailCard

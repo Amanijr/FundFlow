@@ -273,18 +273,35 @@ export const navigationGroups: NavGroup[] = [
     ],
   },
   {
-    id: "verticals",
-    label: "Verticals",
-    defaultCollapsed: true,
+    id: "church",
+    label: "Church",
     items: [
+      {
+        id: "church-home",
+        label: "Church",
+        href: "/church",
+        icon: Church,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+        priority: "primary",
+      },
+      {
+        id: "church-collections",
+        label: "Sunday collections",
+        href: "/church/collections",
+        icon: HandCoins,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+        priority: "primary",
+      },
       {
         id: "church-ministries",
         label: "Ministries",
         href: "/church/ministries",
-        icon: Church,
+        icon: Users,
         roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
         organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-        priority: "secondary",
+        priority: "primary",
       },
       {
         id: "church-attendance",
@@ -293,8 +310,15 @@ export const navigationGroups: NavGroup[] = [
         icon: ClipboardList,
         roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
         organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-        priority: "secondary",
+        priority: "primary",
       },
+    ],
+  },
+  {
+    id: "school",
+    label: "School",
+    defaultCollapsed: true,
+    items: [
       {
         id: "school",
         label: "Sponsorships",

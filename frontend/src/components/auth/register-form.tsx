@@ -55,7 +55,7 @@ interface RegisterFormProps {
 
 export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: RegisterFormProps) {
   const router = useRouter();
-  const { setSession } = useAuth();
+  const { clearSession } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -78,7 +78,7 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
   async function onSubmit(values: RegisterFormValues) {
     setError(null);
     try {
-      const response = await registerApi({
+      await registerApi({
         organization: {
           name: values.organizationName,
           type: values.organizationType,
@@ -89,8 +89,8 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
         firstName: values.firstName,
         lastName: values.lastName,
       });
-      setSession(response.data);
-      router.replace("/admin/setup");
+      clearSession();
+      router.replace("/login?registered=1");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Unable to register");
     }

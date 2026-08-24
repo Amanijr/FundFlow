@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.project.daisyDonation.common.dto.ApiResponse;
 import com.project.daisyDonation.common.security.UserPrincipal;
@@ -74,6 +77,18 @@ public class GlobalExceptionHandler {
                         .message("Validation failed")
                         .data(errors)
                         .build());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
+        logHandledException(ex, HttpStatus.BAD_REQUEST, "VALIDATION");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("File exceeds the 10 MB limit"));
+    }
+
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<ApiResponse<Void>> handleMissingResource(Exception ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Resource not found"));
     }
 
     @ExceptionHandler(Exception.class)

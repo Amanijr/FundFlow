@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ChurchNav } from "@/components/church/church-nav";
 import { MinistryForm } from "@/components/church/ministry-form";
 import { PageHeader } from "@/components/layout/page-header";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,9 +30,10 @@ export default function NewMinistryPage() {
 
   return (
     <div className="space-y-4">
+      <ChurchNav />
       <PageHeader
         breadcrumbs={[
-          { label: "Church", href: "/church/ministries" },
+          { label: "Church", href: "/church" },
           { label: "Ministries", href: "/church/ministries" },
           { label: "New ministry" },
         ]}

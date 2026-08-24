@@ -7,6 +7,7 @@ import com.project.daisyDonation.campaign.entity.Campaign;
 import com.project.daisyDonation.collection.entity.CollectionSession;
 import com.project.daisyDonation.common.entity.TenantEntity;
 import com.project.daisyDonation.donor.entity.Donor;
+import com.project.daisyDonation.fund.entity.Fund;
 import com.project.daisyDonation.pledge.entity.Pledge;
 import com.project.daisyDonation.recurring.entity.RecurringDonation;
 
@@ -67,6 +68,10 @@ public class Donation extends TenantEntity {
     @ManyToOne
     @JoinColumn(name = "collection_session_id")
     private CollectionSession collectionSession;
+
+    @ManyToOne
+    @JoinColumn(name = "fund_id")
+    private Fund fund;
 
     @Column(length = 100)
     private String source;

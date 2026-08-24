@@ -30,39 +30,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (TokenTypeValidator.isPublicPath(path)
+                || authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = authHeader.substring(7);
-            Claims claims = jwtService.parseClaims(token);
-            String email = claims.getSubject();
+            try {
+                String token = authHeader.substring(7);
+                Claims claims = jwtService.parseClaims(token);
+                String email = claims.getSubject();
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                if (jwtService.isTokenValid(token, email)) {
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (jwtService.isTokenValid(token, email)) {
+                        TokenType tokenType = jwtService.resolveTokenType(claims);
+                        if (!TokenTypeValidator.allows(tokenType, path)) {
+                            filterChain.doFilter(request, response);
+                            return;
+                        }
 
-                    Long organizationId = claims.get("organizationId", Long.class);
-                    if (organizationId != null) {
-                        TenantContext.setOrganizationId(organizationId);
-                    } else if (userDetails instanceof UserPrincipal principal
-                            && principal.getRole() == com.project.daisyDonation.auth.entity.Role.SUPER_ADMIN) {
-                        String orgHeader = request.getHeader("X-Organization-Id");
-                        if (orgHeader != null && !orgHeader.isBlank()) {
-                            TenantContext.setOrganizationId(Long.parseLong(orgHeader.trim()));
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                        Long organizationId = claims.get("organizationId", Long.class);
+                        if (organizationId != null) {
+                            TenantContext.setOrganizationId(organizationId);
+                        } else if (userDetails instanceof UserPrincipal principal
+                                && principal.getRole() == com.project.daisyDonation.auth.entity.Role.SUPER_ADMIN) {
+                            String orgHeader = request.getHeader("X-Organization-Id");
+                            if (orgHeader != null && !orgHeader.isBlank()) {
+                                TenantContext.setOrganizationId(Long.parseLong(orgHeader.trim()));
+                            }
                         }
                     }
                 }
+            } catch (Exception ignored) {
+                SecurityContextHolder.clearContext();
             }
 
             filterChain.doFilter(request, response);

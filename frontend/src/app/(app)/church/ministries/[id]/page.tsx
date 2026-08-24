@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ChurchNav } from "@/components/church/church-nav";
 import { MinistryForm } from "@/components/church/ministry-form";
 import { DetailCard } from "@/components/display/detail-card";
 import { ErrorAlert } from "@/components/feedback/error-alert";
@@ -53,9 +54,10 @@ export default function MinistryDetailPage() {
   if (editing) {
     return (
       <div className="space-y-4">
+        <ChurchNav />
         <PageHeader
           breadcrumbs={[
-            { label: "Church", href: "/church/ministries" },
+            { label: "Church", href: "/church" },
             { label: "Ministries", href: "/church/ministries" },
             { label: ministry.name, href: `/church/ministries/${ministry.id}` },
             { label: "Edit" },
@@ -81,9 +83,10 @@ export default function MinistryDetailPage() {
 
   return (
     <div className="space-y-4">
+      <ChurchNav />
       <PageHeader
         breadcrumbs={[
-          { label: "Church", href: "/church/ministries" },
+          { label: "Church", href: "/church" },
           { label: "Ministries", href: "/church/ministries" },
           { label: ministry.name },
         ]}

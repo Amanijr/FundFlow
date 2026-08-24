@@ -78,11 +78,14 @@ When the drive ends, close the campaign from its detail page and run **Reports �
 ## Guide 3 — Record a donation
 
 1. **Fundraising → Donations → Record donation** (`/donations/new`)  
-2. Select **donor** (or mark **anonymous**)  
-3. Enter **amount** and **date**  
-4. Select **fund** (required for proper accounting)  
-5. Optionally select **campaign**  
-6. **Save**  
+2. Enter **amount**, type, and **donor** (or anonymous)  
+3. Optional campaign / notes  
+4. **Payment:** record cash, Lipa, or bank now — or **Pay later**  
+5. Save — you land on the donation record  
+
+If you chose pay later, open the same donation (`/donations/[id]`) and **Record payment** when money arrives. That is what moves status from pending to completed.
+
+Do **not** use a separate “receive a gift” flow. `/receive-gift` redirects here.
 
 ![Record donation form](../assets/images/screenshots/record-donation.png){ width="720" }
 

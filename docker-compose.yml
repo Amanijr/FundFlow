@@ -1,15 +1,94 @@
+# FundFlow ERP — full stack (Postgres + API + web)
+#
+# Live API (default):
+#   docker compose build
+#   docker compose up -d
+#
+# Frontend mock data only (no API/DB):
+#   docker compose -f docker-compose.mock.yml up --build -d
+#
+# Live API + dummy CrossLife seed:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+
+name: fundflow
+
 services:
   postgres:
-    image: postgres:16-alpine
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    image: fundflow-db:local
     container_name: fundflow-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: fundflow
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-fundflow}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - fundflow_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fundflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fundflow-api:local
+    container_name: fundflow-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fundflow}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET}
+      PLATFORM_BOOTSTRAP_SECRET: ${PLATFORM_BOOTSTRAP_SECRET}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DEV_SEED_ENABLED: ${DEV_SEED_ENABLED:-false}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75.0}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q UP || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 240s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        API_URL: ${INTERNAL_API_URL:-http://api:8080}
+        NEXT_PUBLIC_MOCK_API: "false"
+    image: fundflow-web:local
+    container_name: fundflow-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_URL: ${INTERNAL_API_URL:-http://api:8080}
+      MOCK_API: "false"
+      NEXT_PUBLIC_MOCK_API: "false"
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "${WEB_PORT:-3000}:3000"
 
 volumes:
   fundflow_pg_data:

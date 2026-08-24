@@ -1,17 +1,46 @@
 import type { JournalSourceType } from "@/types/accounting";
 
+export function journalSourceLabel(sourceType: JournalSourceType) {
+  switch (sourceType) {
+    case "DONATION_PAYMENT":
+      return "Gift received";
+    case "COLLECTION_PAYMENT":
+      return "Collection";
+    case "IN_KIND_DONATION":
+      return "In-kind gift";
+    case "EXPENSE_PAYMENT":
+      return "Expense paid";
+    default:
+      return "Books entry";
+  }
+}
+
+export function journalPostingSummary(
+  entry: {
+    lines?: { accountName: string; debitAmount: number | string; creditAmount: number | string }[];
+  },
+) {
+  const lines = entry.lines ?? [];
+  const received = lines.filter((line) => Number(line.debitAmount) > 0).map((line) => line.accountName);
+  const recorded = lines.filter((line) => Number(line.creditAmount) > 0).map((line) => line.accountName);
+  if (received.length && recorded.length) {
+    return `${received.join(", ")} → ${recorded.join(", ")}`;
+  }
+  return [...received, ...recorded].join(", ") || null;
+}
+
 export function getJournalSourceLink(sourceType: JournalSourceType, sourceId: number) {
   switch (sourceType) {
     case "IN_KIND_DONATION":
-      return { href: `/donations/${sourceId}`, label: `Donation #${sourceId}` };
+      return { href: `/donations/${sourceId}`, label: "Open gift" };
     case "EXPENSE_PAYMENT":
-      return { href: `/expenses/${sourceId}`, label: `Expense #${sourceId}` };
+      return { href: `/expenses/${sourceId}`, label: "Open expense" };
     case "DONATION_PAYMENT":
-      return { href: null, label: `Payment #${sourceId}` };
+      return { href: null, label: "Payment recorded" };
     case "COLLECTION_PAYMENT":
-      return { href: null, label: `Collection payment #${sourceId}` };
+      return { href: null, label: "Collection recorded" };
     default:
-      return { href: null, label: `Source #${sourceId}` };
+      return { href: null, label: "Recorded" };
   }
 }
 

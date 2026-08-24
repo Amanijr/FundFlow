@@ -171,6 +171,52 @@ export function getDocumentDownloadUrl(id: string): string {
   return `${API_BASE}/api/v1/documents/${id}/download`;
 }
 
+export async function fetchDocumentBlob(
+  token: string,
+  id: string,
+  organizationId?: number,
+): Promise<Blob> {
+  if (isMockApiEnabled()) {
+    const preview = getPreviewUrl(id);
+    if (preview) {
+      const response = await fetch(preview);
+      if (!response.ok) throw new ApiError("Unable to download", response.status);
+      return response.blob();
+    }
+    throw new ApiError("File is not available to preview", 404);
+  }
+
+  const headers = new Headers();
+  headers.set("Authorization", `Bearer ${token}`);
+  if (organizationId != null) {
+    headers.set("X-Organization-Id", String(organizationId));
+  }
+
+  const response = await fetch(`${API_BASE}/api/v1/documents/${id}/download`, { headers });
+  if (!response.ok) {
+    throw new ApiError("Unable to download file", response.status);
+  }
+  return response.blob();
+}
+
+export async function downloadDocumentFile(
+  token: string,
+  document: Document,
+  organizationId?: number,
+) {
+  if (isMockApiEnabled() && document.previewUrl) {
+    window.open(document.previewUrl, "_blank", "noopener,noreferrer");
+    return;
+  }
+  const blob = await fetchDocumentBlob(token, document.id, organizationId);
+  const url = URL.createObjectURL(blob);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = document.name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 function uploadWithProgress<T>(
   url: string,
   formData: FormData,
@@ -202,7 +248,13 @@ function uploadWithProgress<T>(
         }
         resolve(payload);
       } catch {
-        reject(new ApiError("Invalid upload response", xhr.status));
+        const hint =
+          xhr.status === 404
+            ? "Document upload is not available on this server. Rebuild and restart the API."
+            : xhr.status >= 500
+              ? "The server could not store this file. Try again or use a smaller PDF or image."
+              : "Upload failed";
+        reject(new ApiError(hint, xhr.status));
       }
     };
 

@@ -33,6 +33,8 @@ public class DonationCreateRequest {
     private boolean anonymous;
     @Schema(description = "campaign id")
     private Long campaignId;
+    @Schema(description = "fund id")
+    private Long fundId;
     @Schema(description = "pledge id")
     private Long pledgeId;
     @Schema(description = "recurring donation id")

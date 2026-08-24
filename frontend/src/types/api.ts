@@ -119,6 +119,7 @@ export interface SessionUser {
   lastName: string;
   role: Role;
   organizationId: number | null;
+  organizationType: OrganizationType | null;
 }
 
 export class ApiError extends Error {

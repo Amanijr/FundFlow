@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useInboxCount } from "@/hooks/use-workflow";
+import { useOrganization } from "@/hooks/use-organization";
 import {
   checklistForRole,
   homeGreeting,
@@ -232,6 +233,7 @@ function TaskGrid({
 
 export function TaskHome() {
   const { user } = useAuth();
+  const organizationQuery = useOrganization();
   const inboxQuery = useInboxCount();
 
   if (!user) {
@@ -239,7 +241,7 @@ export function TaskHome() {
   }
 
   const layout = homeLayoutForRole(user.role);
-  const tasks = tasksForRole(user.role);
+  const tasks = tasksForRole(user.role, organizationQuery.data?.type);
   const checklist = checklistForRole(user.role);
   const primaryTasks = tasks.filter((task) => task.emphasis === "primary");
   const secondaryTasks = tasks.filter((task) => task.emphasis !== "primary");
@@ -263,7 +265,7 @@ export function TaskHome() {
       <PageHeader
         title={`Hello, ${user.firstName}`}
         description={homeGreeting(user.role)}
-        actions={
+        action={
           <Button variant="ghost" size="sm" asChild>
             <Link href={overviewPath}>
               <LayoutDashboard className="mr-1.5 h-4 w-4" />

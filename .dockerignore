@@ -1,0 +1,28 @@
+# Build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.git
+.github
+.idea
+.vscode
+.cursor
+*.iml
+.DS_Store
+.java-version
+
+# Frontend (built separately)
+frontend/
+docs/
+site/
+.venv-docs/
+requirements-docs.txt
+mkdocs.yml
+
+# Local / secrets
+.env
+.env.*
+!.env.example
+
+# Misc
+HELP.md
+**/node_modules/

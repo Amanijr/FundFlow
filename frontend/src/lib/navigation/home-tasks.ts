@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
+  CalendarDays,
   ClipboardCheck,
   HandCoins,
   Megaphone,
@@ -10,7 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-import type { Role } from "@/types/api";
+import type { OrganizationType, Role } from "@/types/api";
 
 export type HomeLayout =
   | "finance"
@@ -28,6 +29,7 @@ export interface HomeTask {
   roles: Role[];
   emphasis?: "primary" | "secondary";
   icon: LucideIcon;
+  organizationTypes?: OrganizationType[];
 }
 
 export interface HomeChecklistItem {
@@ -39,10 +41,30 @@ export interface HomeChecklistItem {
 
 export const homeTasks: HomeTask[] = [
   {
+    id: "sunday-collection",
+    title: "Sunday collection",
+    description: "Count the offering, then treasurer verifies",
+    href: "/church/collections/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
+    emphasis: "primary",
+    icon: CalendarDays,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "verify-collections",
+    title: "Verify offerings",
+    description: "Confirm Sunday counts so they post to the books",
+    href: "/church/collections",
+    roles: ["ORG_ADMIN", "FINANCE_MANAGER"],
+    emphasis: "primary",
+    icon: ClipboardCheck,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
     id: "record-donation",
-    title: "Receive a gift",
-    description: "Guided flow ending with payment",
-    href: "/receive-gift",
+    title: "Record donation",
+    description: "Gift details, then cash / Lipa or pay later",
+    href: "/donations/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "primary",
     icon: HandCoins,
@@ -130,8 +152,8 @@ export const homeChecklist: HomeChecklistItem[] = [
   },
   {
     id: "donation",
-    label: "Receive a gift",
-    href: "/receive-gift",
+    label: "Record a donation",
+    href: "/donations/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
   },
   {
@@ -164,8 +186,18 @@ export function homeLayoutForRole(role: Role): HomeLayout {
   }
 }
 
-export function tasksForRole(role: Role) {
-  return homeTasks.filter((task) => task.roles.includes(role));
+function matchesOrganization(task: { organizationTypes?: OrganizationType[] }, organizationType?: OrganizationType) {
+  if (!task.organizationTypes) {
+    return true;
+  }
+  if (!organizationType) {
+    return false;
+  }
+  return task.organizationTypes.includes(organizationType);
+}
+
+export function tasksForRole(role: Role, organizationType?: OrganizationType) {
+  return homeTasks.filter((task) => task.roles.includes(role) && matchesOrganization(task, organizationType));
 }
 
 export function checklistForRole(role: Role) {

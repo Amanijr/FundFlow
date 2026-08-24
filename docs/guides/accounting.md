@@ -50,11 +50,23 @@ Do this once after funds are set up.
 
 1. Go to **Finance → Accounting** (chart of accounts)  
 2. Click **Initialize**  
-3. Confirm — default accounts are created (assets, liabilities, equity, revenue, expenses)  
+3. Confirm — default accounts are created for **your organization type**  
+   (church, NGO, school, foundation, etc.)  
 
 **Who can initialize:** Finance Manager, Org Admin  
 
 **Who can add accounts:** Finance Manager, Org Admin, Accountant  
+
+### Default chart by organization type
+
+| Org type | Focus of default accounts |
+|----------|---------------------------|
+| **Church / Religious institution** | Cash on hand, bank, mobile money / Lipa; tithes, offerings & gifts; ministry & evangelism expenses |
+| **NGO / Charity / Community** | Cash, bank, mobile money; donation revenue; operations / program / fundraising expenses |
+| **School** | Cash, bank, mobile money; fees, sponsorships & gifts; student programs |
+| **Foundation** | Cash, bank; grants & contributions; grant/program expenses |
+
+Automatic posting still uses the same system codes (e.g. cash `1000`, contribution income `4000`). Extra detail accounts (tithes `4010`, offerings `4020`, Lipa `1020`) are available for church treasurers to use with funds or later splits.
 
 ---
 
@@ -62,7 +74,7 @@ Do this once after funds are set up.
 
 | Business event | Typical ledger effect |
 |----------------|----------------------|
-| Donation paid | Debit Cash · Credit Donation Revenue |
+| Donation paid | Debit Cash / Bank / Lipa (from how it was paid) · Credit tithe, offering, or gift income (from fund or source) |
 | Expense paid | Debit Expense Account · Credit Cash |
 | Fund transfer | Debit/Credit between fund accounts |
 

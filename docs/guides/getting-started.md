@@ -13,19 +13,25 @@ FundFlow ERP helps nonprofits manage **donations**, **expenses**, **funds**, **a
 
 ## Quick start (local evaluation)
 
+Local Maven uses the **dev** profile (dummy CrossLife org, `admin@demo.local` / `demo`). Docker Compose defaults to **prod** (no dummy data).
+
 ### 1. Start the database
 
 ```bash
-docker compose up -d
+docker compose up -d postgres
 ```
 
-### 2. Start the backend
+### 2. Start the backend (dev / dummy data)
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
 API: http://localhost:8080
+
+Demo logins (password `demo`): `admin@demo.local`, `finance@demo.local`, `fundraising@demo.local`, `super@demo.local`.
+
+**Production-ready API (no dummy seed):** set real secrets in `.env`, then `docker compose up --build`. See [DOCKER.md](../DOCKER.md).
 
 ### 3. Start the frontend
 
@@ -43,6 +49,8 @@ App: http://localhost:3000
 *Figure: Sign-in page. Demo mode: `admin@demo.local` / `demo`.*
 
 **UI-only demo:** Set `NEXT_PUBLIC_MOCK_API=true` in `frontend/.env.local` to explore without the backend.
+
+**Docker mock UI:** `docker compose -f docker-compose.mock.yml up --build -d` — frontend only, mock data, no API or database.
 
 ---
 

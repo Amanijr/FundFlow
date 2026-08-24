@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import { EmailField, PasswordField } from "@/components/forms";
 import { ErrorAlert } from "@/components/feedback/error-alert";
+import { SuccessAlert } from "@/components/feedback/success-alert";
 import { WarningAlert } from "@/components/feedback/warning-alert";
 import { login } from "@/lib/api/auth";
 import { mapAuthError } from "@/lib/auth/error-messages";
@@ -102,6 +103,9 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
     <form onSubmit={handleSubmit(onSubmit)} className={cn(variant === "panel" ? "space-y-3" : "space-y-4")}>
       {reason === "session_expired" && (
         <WarningAlert message="Your session has expired. Sign in to continue." />
+      )}
+      {searchParams.get("registered") === "1" && (
+        <SuccessAlert message="Account created. Sign in with your email and password." />
       )}
       {error && <ErrorAlert message={error} />}
 

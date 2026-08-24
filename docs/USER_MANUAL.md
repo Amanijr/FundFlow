@@ -135,7 +135,7 @@ This section is for **first-time setup** of the application on a computer (local
 From the project root:
 
 ```bash
-docker compose up -d
+docker compose up -d postgres
 ```
 
 This starts PostgreSQL on port `5432` with database name `fundflow`, user `postgres`, password `postgres`.
@@ -146,7 +146,9 @@ This starts PostgreSQL on port `5432` with database name `fundflow`, user `postg
 ./mvnw spring-boot:run
 ```
 
-The API runs at **http://localhost:8080**.
+This uses the **dev** profile and seeds dummy demo users (`admin@demo.local` / `demo`). The API runs at **http://localhost:8080**.
+
+For a production-ready API with **no dummy data**, use Docker Compose (`SPRING_PROFILES_ACTIVE=prod`). See [DOCKER.md](./DOCKER.md).
 
 - **Swagger UI** (API explorer): http://localhost:8080/swagger-ui.html  
 - **Health check**: http://localhost:8080/actuator/health  
