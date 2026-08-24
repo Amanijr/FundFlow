@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Lato, Montserrat, Roboto } from "next/font/google";
 import { connection } from "next/server";
 
 import { AppProviders } from "@/components/providers/app-providers";
 
+import "@fontsource/roboto/latin-400.css";
+import "@fontsource/roboto/latin-500.css";
+import "@fontsource/roboto/latin-600.css";
+import "@fontsource/roboto/latin-700.css";
+import "@fontsource/lato/latin-400.css";
+import "@fontsource/lato/latin-700.css";
+import "@fontsource/lato/latin-900.css";
+import "@fontsource/montserrat/latin-400.css";
+import "@fontsource/montserrat/latin-500.css";
+import "@fontsource/montserrat/latin-600.css";
+import "@fontsource/montserrat/latin-700.css";
 import "./globals.css";
-
-const roboto = Roboto({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const lato = Lato({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-});
-
-const montserrat = Montserrat({
-  variable: "--font-nav",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -43,9 +35,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${roboto.variable} ${lato.variable} ${montserrat.variable} min-h-screen antialiased`}
-      >
+      <body className="min-h-screen antialiased">
         <AppProviders mockApi={mockApi}>{children}</AppProviders>
       </body>
     </html>

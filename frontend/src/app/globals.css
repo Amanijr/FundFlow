@@ -25,6 +25,10 @@
   --ring: #000000;
   --radius: 0.75rem;
 
+  --font-sans: "Roboto";
+  --font-heading: "Lato";
+  --font-nav: "Montserrat";
+
   --color-success: #22c55e;
   --color-warning: #eab308;
   --color-danger: #ef4444;
