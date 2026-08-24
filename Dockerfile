@@ -8,11 +8,13 @@ COPY src ./src
 RUN mvn -B -DskipTests package \
   && cp target/*.jar /workspace/app.jar
 
-FROM eclipse-temurin:17-jre-alpine AS runtime
+FROM eclipse-temurin:17-jre AS runtime
 WORKDIR /app
 
-RUN apk add --no-cache wget \
-  && addgroup -S fundflow && adduser -S fundflow -G fundflow
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends wget \
+  && rm -rf /var/lib/apt/lists/* \
+  && groupadd -r fundflow && useradd -r -g fundflow fundflow
 USER fundflow
 
 COPY --from=build /workspace/app.jar /app/app.jar

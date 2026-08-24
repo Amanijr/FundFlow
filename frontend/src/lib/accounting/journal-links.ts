@@ -44,19 +44,17 @@ export function getJournalSourceLink(sourceType: JournalSourceType, sourceId: nu
   }
 }
 
-export function findJournalEntriesForDonation(
-  entries: { id: number; sourceType: JournalSourceType; sourceId: number }[],
-  donationId: number,
-) {
+export function findJournalEntriesForDonation<
+  T extends { sourceType: JournalSourceType; sourceId: number },
+>(entries: T[], donationId: number) {
   return entries.filter(
     (entry) => entry.sourceType === "IN_KIND_DONATION" && entry.sourceId === donationId,
   );
 }
 
-export function findJournalEntriesForExpense(
-  entries: { id: number; sourceType: JournalSourceType; sourceId: number }[],
-  expenseId: number,
-) {
+export function findJournalEntriesForExpense<
+  T extends { sourceType: JournalSourceType; sourceId: number },
+>(entries: T[], expenseId: number) {
   return entries.filter(
     (entry) => entry.sourceType === "EXPENSE_PAYMENT" && entry.sourceId === expenseId,
   );
