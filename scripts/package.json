@@ -1,0 +1,8 @@
+{
+  "name": "fundflow-docs-screenshots",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "playwright": "^1.51.0"
+  }
+}
