@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { ChurchNav } from "@/components/church/church-nav";
 import { MinistryForm } from "@/components/church/ministry-form";
+import { MinistryMembersPanel } from "@/components/church/ministry-members-panel";
 import { DetailCard } from "@/components/display/detail-card";
 import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
@@ -107,15 +108,22 @@ export default function MinistryDetailPage() {
         title="Ministry details"
         fields={[
           { label: "Leader", value: ministry.leaderName ?? "—" },
+          { label: "Members", value: String(ministry.memberCount ?? 0) },
           { label: "Description", value: ministry.description ?? "—" },
           { label: "Created", value: formatDateTime(ministry.createdAt) },
         ]}
       />
 
+      {accessToken ? <MinistryMembersPanel ministryId={ministry.id} accessToken={accessToken} /> : null}
+
       <p className="text-sm text-muted-foreground">
-        Record attendance from{" "}
+        Record attendance from the{" "}
+        <Link href="/church/services" className="text-primary hover:underline">
+          service
+        </Link>{" "}
+        or the{" "}
         <Link href="/church/attendance" className="text-primary hover:underline">
-          Attendance
+          attendance log
         </Link>
         .
       </p>

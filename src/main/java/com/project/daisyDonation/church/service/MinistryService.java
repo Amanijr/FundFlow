@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.daisyDonation.church.dto.MinistryRequest;
 import com.project.daisyDonation.church.dto.MinistryResponse;
+import com.project.daisyDonation.church.entity.MemberMinistryStatus;
 import com.project.daisyDonation.church.entity.Ministry;
+import com.project.daisyDonation.church.repository.MemberMinistryRepository;
 import com.project.daisyDonation.church.repository.MinistryRepository;
 import com.project.daisyDonation.common.exception.ConflictException;
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class MinistryService {
 
     private final MinistryRepository ministryRepository;
+    private final MemberMinistryRepository memberMinistryRepository;
     private final TenantSupport tenantSupport;
 
     @Transactional
@@ -94,6 +97,8 @@ public class MinistryService {
                 .description(ministry.getDescription())
                 .leaderName(ministry.getLeaderName())
                 .active(ministry.isActive())
+                .memberCount(memberMinistryRepository.countByMinistry_IdAndOrganizationIdAndStatusAndDeletedFalse(
+                        ministry.getId(), ministry.getOrganization().getId(), MemberMinistryStatus.ACTIVE))
                 .createdAt(ministry.getCreatedAt())
                 .build();
     }

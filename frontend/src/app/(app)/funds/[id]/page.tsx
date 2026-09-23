@@ -95,6 +95,7 @@ export default function FundDetailPage() {
       <div className="flex gap-2">
         <Badge variant={fund.active ? "success" : "secondary"}>{fund.active ? "Active" : "Inactive"}</Badge>
         <Badge variant="outline">{formatEnumLabel(fund.type)}</Badge>
+        {fund.defaultForCollections ? <Badge variant="secondary">Sunday offering</Badge> : null}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -112,6 +113,12 @@ export default function FundDetailPage() {
           title="Details"
           fields={[
             { label: "Description", value: fund.description ?? "—" },
+            {
+              label: "Sunday collections",
+              value: fund.defaultForCollections
+                ? "Used when a collection does not name another fund"
+                : "Not the default offering fund",
+            },
             { label: "Created", value: formatDateTime(fund.createdAt) },
           ]}
         />

@@ -50,6 +50,11 @@ export default function MinistriesPage() {
       { accessorKey: "code", header: "Code" },
       { accessorKey: "leaderName", header: "Leader", cell: ({ row }) => row.original.leaderName ?? "—" },
       {
+        accessorKey: "memberCount",
+        header: "Members",
+        cell: ({ row }) => row.original.memberCount ?? 0,
+      },
+      {
         accessorKey: "active",
         header: "Status",
         cell: ({ row }) => (

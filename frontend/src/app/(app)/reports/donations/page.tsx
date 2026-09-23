@@ -16,13 +16,17 @@ import { DataTable } from "@/components/tables/data-table";
 import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { useAuth } from "@/hooks/use-auth";
+import { useOrganization } from "@/hooks/use-organization";
 import { getExecutiveDashboard, getTrendAnalysis } from "@/lib/api/analytics";
+import { isChurchOrganization } from "@/lib/organization/verticals";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDate, toApiDate } from "@/lib/utils/dates";
 import type { SourceBreakdown } from "@/types/analytics";
 
 export default function DonationReportsPage() {
   const { accessToken } = useAuth();
+  const organizationQuery = useOrganization();
+  const church = isChurchOrganization(organizationQuery.data?.type);
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
   const [appliedFrom, setAppliedFrom] = useState<string | undefined>();
@@ -78,8 +82,8 @@ export default function DonationReportsPage() {
       <ReportsNav />
 
       <PageHeader
-        breadcrumbs={[{ label: "Donation reports" }]}
-        title="Donation reports"
+        breadcrumbs={[{ label: church ? "Giving" : "Donation reports" }]}
+        title={church ? "Giving" : "Donation reports"}
         action={
           <ExportActions
             filename="donation-sources.csv"
@@ -113,8 +117,8 @@ export default function DonationReportsPage() {
       {dashboard && (
         <ReportSummary
           metrics={[
-            { label: "Total donations", value: formatCurrency(toNumber(dashboard.totalDonations)) },
-            { label: "Donors", value: String(dashboard.donorCount) },
+            { label: church ? "Total giving" : "Total donations", value: formatCurrency(toNumber(dashboard.totalDonations)) },
+            { label: church ? "Givers" : "Donors", value: String(dashboard.donorCount) },
             { label: "Average gift", value: formatCurrency(toNumber(dashboard.averageDonation)) },
             {
               label: "Period",

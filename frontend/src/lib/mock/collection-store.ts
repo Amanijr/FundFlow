@@ -53,6 +53,8 @@ export function createMockCollectionSession(body: CollectionSessionCreateRequest
     description: body.description,
     location: body.location,
     notes: body.notes,
+    fundId: body.fundId,
+    fundName: body.fundId === 1 ? "General Fund" : body.fundId === 2 ? "Building Project" : undefined,
     status: "DRAFT",
     createdAt: new Date().toISOString(),
   };
@@ -73,6 +75,13 @@ export function countMockCollectionSession(
     paymentMethod: body.paymentMethod,
     collectedAt: body.collectedAt,
     notes: body.notes ?? session.notes,
+    fundId: body.fundId ?? session.fundId,
+    fundName:
+      body.fundId === 1
+        ? "General Fund"
+        : body.fundId === 2
+          ? "Building Project"
+          : session.fundName,
     status: "COUNTED",
   });
   return session;
@@ -85,6 +94,10 @@ export function verifyMockCollectionSession(id: number): CollectionSessionRespon
   }
   session.status = "VERIFIED";
   session.donationId = nextMockId();
+  if (!session.fundId) {
+    session.fundId = 1;
+    session.fundName = "General Fund";
+  }
   return session;
 }
 

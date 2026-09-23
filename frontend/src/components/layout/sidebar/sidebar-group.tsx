@@ -20,6 +20,7 @@ export interface SidebarGroupProps {
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   collapsible?: boolean;
+  hideLabel?: boolean;
   onNavigate?: () => void;
   className?: string;
 }
@@ -30,15 +31,17 @@ export function SidebarGroup({
   collapsed = false,
   defaultCollapsed = false,
   collapsible = false,
+  hideLabel = false,
   onNavigate,
   className,
 }: SidebarGroupProps) {
   const [open, setOpen] = useState(!defaultCollapsed);
   const showItems = !collapsible || open || collapsed;
+  const showHeading = !collapsed && !hideLabel;
 
   return (
     <div className={className}>
-      {!collapsed && (
+      {showHeading && (
         <div className="mb-1 flex items-center justify-between gap-2 px-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             {label}

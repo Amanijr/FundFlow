@@ -26,6 +26,9 @@ public interface CollectionSessionRepository extends JpaRepository<CollectionSes
     List<CollectionSession> findByOrganizationIdAndStatusAndDeletedFalse(
             Long organizationId, CollectionSessionStatus status);
 
+    long countByOrganizationIdAndStatusInAndDeletedFalse(
+            Long organizationId, java.util.Collection<CollectionSessionStatus> statuses);
+
     @Query("""
             SELECT COALESCE(SUM(cs.totalAmount), 0) FROM CollectionSession cs
             WHERE cs.organization.id = :organizationId

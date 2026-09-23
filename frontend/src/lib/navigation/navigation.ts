@@ -3,12 +3,13 @@ import {
   Bell,
   BookOpen,
   Building2,
-  Church,
+  CalendarDays,
   ClipboardCheck,
   ClipboardList,
   FileText,
   Files,
   GraduationCap,
+  CircleDollarSign,
   HandCoins,
   Heart,
   History,
@@ -24,12 +25,15 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { CHURCH_ORGANIZATION_TYPES } from "@/lib/organization/verticals";
+
 import type { NavGroup } from "@/types/navigation";
 
 export const navigationGroups: NavGroup[] = [
   {
     id: "main",
     label: "Main",
+    hideLabel: true,
     items: [
       {
         id: "home",
@@ -84,6 +88,7 @@ export const navigationGroups: NavGroup[] = [
         href: "/donors",
         icon: Heart,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
+        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -92,6 +97,7 @@ export const navigationGroups: NavGroup[] = [
         href: "/campaigns",
         icon: Target,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
+        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -100,6 +106,7 @@ export const navigationGroups: NavGroup[] = [
         href: "/donations",
         icon: PiggyBank,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
+        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
     ],
@@ -109,19 +116,19 @@ export const navigationGroups: NavGroup[] = [
     label: "Finance",
     items: [
       {
-        id: "expenses",
-        label: "Expenses",
-        href: "/expenses",
-        icon: Receipt,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
-        priority: "primary",
-      },
-      {
         id: "funds",
         label: "Funds",
         href: "/funds",
         icon: Landmark,
         roles: ["ORG_ADMIN", "FINANCE_MANAGER", "ACCOUNTANT", "STAFF"],
+        priority: "primary",
+      },
+      {
+        id: "expenses",
+        label: "Expenses",
+        href: "/expenses",
+        icon: Receipt,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
         priority: "primary",
       },
       {
@@ -144,7 +151,7 @@ export const navigationGroups: NavGroup[] = [
   },
   {
     id: "workflow",
-    label: "Workflow",
+    label: "Review",
     items: [
       {
         id: "approvals",
@@ -159,7 +166,7 @@ export const navigationGroups: NavGroup[] = [
           "STAFF",
           "ACCOUNTANT",
         ],
-        priority: "primary",
+        priority: "secondary",
       },
       {
         id: "reports",
@@ -273,25 +280,16 @@ export const navigationGroups: NavGroup[] = [
     ],
   },
   {
-    id: "church",
-    label: "Church",
+    id: "congregation",
+    label: "Congregation",
     items: [
       {
-        id: "church-home",
-        label: "Church",
-        href: "/church",
-        icon: Church,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-        priority: "primary",
-      },
-      {
-        id: "church-collections",
-        label: "Sunday collections",
-        href: "/church/collections",
-        icon: HandCoins,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+        id: "members",
+        label: "Members",
+        href: "/members",
+        icon: Heart,
+        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -299,8 +297,17 @@ export const navigationGroups: NavGroup[] = [
         label: "Ministries",
         href: "/church/ministries",
         icon: Users,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
-        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
+        priority: "primary",
+      },
+      {
+        id: "church-services",
+        label: "Services",
+        href: "/church/services",
+        icon: CalendarDays,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -308,8 +315,41 @@ export const navigationGroups: NavGroup[] = [
         label: "Attendance",
         href: "/church/attendance",
         icon: ClipboardList,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
-        organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
+        priority: "primary",
+      },
+    ],
+  },
+  {
+    id: "giving",
+    label: "Giving",
+    items: [
+      {
+        id: "church-collections",
+        label: "Sunday collections",
+        href: "/church/collections",
+        icon: HandCoins,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
+        priority: "primary",
+      },
+      {
+        id: "church-partnerships",
+        label: "Partnerships",
+        href: "/church/partnerships",
+        icon: CircleDollarSign,
+        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
+        priority: "primary",
+      },
+      {
+        id: "church-giving",
+        label: "Gifts",
+        href: "/donations",
+        icon: PiggyBank,
+        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
+        organizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
     ],
@@ -340,7 +380,7 @@ export const navigationGroups: NavGroup[] = [
         href: "/admin/users",
         icon: Users,
         roles: ["ORG_ADMIN"],
-        priority: "primary",
+        priority: "secondary",
       },
       {
         id: "settings",

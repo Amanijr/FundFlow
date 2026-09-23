@@ -1,31 +1,41 @@
 export type CampaignStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 
-export type DonationStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED" | "REFUNDED";
+export type DonationStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED" | "REFUNDED" | "VOIDED";
 
 export type DonationType = "ONE_TIME" | "RECURRING" | "PLEDGE" | "IN_KIND" | "COLLECTION";
+
+export type MembershipStatus = "ACTIVE" | "INACTIVE" | "VISITOR";
 
 export interface DonorRequest {
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
+  memberNumber?: string;
+  email?: string;
+  phone?: string;
   address?: string;
   city?: string;
   state?: string;
   country?: string;
+  membershipStatus?: MembershipStatus;
+  joinedAt?: string;
+  notes?: string;
 }
 
 export interface DonorResponse {
   id: number;
   organizationId: number;
+  memberNumber?: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   address?: string;
   city?: string;
   state?: string;
   country?: string;
+  membershipStatus?: MembershipStatus;
+  joinedAt?: string;
+  notes?: string;
   createdAt: string;
 }
 
@@ -73,6 +83,7 @@ export interface CampaignDashboardResponse {
 
 export interface DonationCreateRequest {
   donorId?: number;
+  memberId?: number;
   amount: number;
   donationType: DonationType;
   anonymous?: boolean;
@@ -80,6 +91,8 @@ export interface DonationCreateRequest {
   fundId?: number;
   pledgeId?: number;
   recurringDonationId?: number;
+  partnershipId?: number;
+  partnershipMonth?: string;
   source?: string;
   notes?: string;
   itemDescription?: string;
@@ -102,6 +115,7 @@ export interface DonationDetailResponse {
   organizationId: number;
   donorId?: number;
   donorName?: string;
+  memberId?: number;
   amount: number;
   donationTime: string;
   status: DonationStatus;
@@ -119,6 +133,19 @@ export interface DonationDetailResponse {
   notes?: string;
   itemDescription?: string;
   estimatedValue?: number;
+  paymentId?: number;
+  partnershipId?: number;
+  partnershipMonth?: string;
+}
+
+export interface DonationAuditEventResponse {
+  id: number;
+  actorUserId?: number;
+  action: string;
+  entityType: string;
+  entityId: number;
+  details?: string;
+  createdAt: string;
 }
 
 export interface ReceiptResponse {

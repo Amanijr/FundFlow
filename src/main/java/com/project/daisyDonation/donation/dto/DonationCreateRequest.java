@@ -3,6 +3,7 @@ package com.project.daisyDonation.donation.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.project.daisyDonation.donation.entity.DonationType;
 
@@ -22,6 +23,8 @@ import lombok.NoArgsConstructor;
 public class DonationCreateRequest {
     @Schema(description = "donor id")
     private Long donorId;
+    @Schema(description = "church member id")
+    private Long memberId;
     @Schema(description = "amount")
     @NotNull
     @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
@@ -39,6 +42,10 @@ public class DonationCreateRequest {
     private Long pledgeId;
     @Schema(description = "recurring donation id")
     private Long recurringDonationId;
+    @Schema(description = "church partnership id")
+    private Long partnershipId;
+    @Schema(description = "calendar month this gift counts toward, first of month")
+    private LocalDate partnershipMonth;
     @Schema(description = "source")
     @Size(max = 100)
     private String source;

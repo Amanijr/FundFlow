@@ -2,7 +2,10 @@ package com.project.daisyDonation.donor.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.project.daisyDonation.donor.entity.MembershipStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +29,8 @@ public class DonorResponse {
     private String city;
     private String state;
     private String country;
+    private MembershipStatus membershipStatus;
+    private LocalDate joinedAt;
+    private String notes;
     private LocalDateTime createdAt;
 }

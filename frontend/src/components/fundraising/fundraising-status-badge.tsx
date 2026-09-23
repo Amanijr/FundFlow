@@ -11,6 +11,7 @@ const donationStatusConfig: Record<
   FAILED: { label: "Failed", variant: "danger" },
   CANCELLED: { label: "Cancelled", variant: "outline" },
   REFUNDED: { label: "Refunded", variant: "secondary" },
+  VOIDED: { label: "Voided", variant: "outline" },
 };
 
 const campaignStatusConfig: Record<

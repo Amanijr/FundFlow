@@ -19,8 +19,10 @@ import type {
   GrantResponse,
   GrantUtilizationResponse,
   MinistryResponse,
+  PartnershipResponse,
   ProgramDashboardResponse,
   ProgramResponse,
+  ServiceEventResponse,
   StudentSponsorshipResponse,
 } from "@/types/verticals";
 
@@ -129,31 +131,37 @@ export const MOCK_DONORS: DonorResponse[] = [
     organizationId: 1,
     firstName: "James",
     lastName: "Mbeki",
+    memberNumber: "M-0001",
     email: "james.mbeki@example.org",
     phone: "+255 712 345 678",
     city: "Dar es Salaam",
     country: "Tanzania",
     createdAt: "2025-11-10T10:00:00Z",
+    membershipStatus: "ACTIVE",
   },
   {
     id: 2,
     organizationId: 1,
     firstName: "Hope",
     lastName: "Foundation",
+    memberNumber: "M-0002",
     email: "giving@hopefoundation.org",
     phone: "+255 754 111 222",
     city: "Arusha",
     country: "Tanzania",
     createdAt: "2025-12-01T14:30:00Z",
+    membershipStatus: "ACTIVE",
   },
   {
     id: 3,
     organizationId: 1,
     firstName: "Anonymous",
     lastName: "Donor",
+    memberNumber: "M-0003",
     email: "anonymous@example.org",
     phone: "",
     createdAt: "2026-01-20T09:15:00Z",
+    membershipStatus: "VISITOR",
   },
 ];
 
@@ -224,6 +232,7 @@ export const MOCK_FUNDS: FundResponse[] = [
     type: "UNRESTRICTED",
     currentBalance: 8450000,
     active: true,
+    defaultForCollections: true,
     createdAt: "2024-01-15T08:00:00Z",
   },
   {
@@ -353,6 +362,7 @@ export const MOCK_MINISTRIES: MinistryResponse[] = [
     description: "Weekly worship gatherings",
     leaderName: "Minister of Music",
     active: true,
+    memberCount: 1,
     createdAt: "2024-06-01T08:00:00Z",
   },
   {
@@ -362,7 +372,59 @@ export const MOCK_MINISTRIES: MinistryResponse[] = [
     description: "Prayer and life community",
     leaderName: "Prayer Coordinator",
     active: true,
+    memberCount: 0,
     createdAt: "2024-06-01T08:00:00Z",
+  },
+];
+
+export const MOCK_PARTNERSHIPS: PartnershipResponse[] = [
+  {
+    id: 1,
+    memberId: 1,
+    memberName: "Asha Mwanga",
+    memberNumber: "M-0001",
+    monthlyAmount: 50000,
+    startDate: "2026-01-01",
+    status: "ACTIVE",
+    createdAt: "2026-01-01T08:00:00Z",
+    thisMonthExpected: 50000,
+    thisMonthReceived: 20000,
+    thisMonthStatus: "PARTIAL",
+    thisYearExpected: 450000,
+    thisYearReceived: 220000,
+    months: [
+      {
+        year: 2026,
+        month: 9,
+        yearMonth: "2026-09",
+        expected: 50000,
+        received: 20000,
+        status: "PARTIAL",
+      },
+    ],
+  },
+];
+
+export const MOCK_SERVICES: ServiceEventResponse[] = [
+  {
+    id: 1,
+    name: "Sunday service",
+    serviceDate: "2026-09-14",
+    startsAt: "09:00:00",
+    location: "Main sanctuary",
+    ministryId: 1,
+    ministryName: "Worship & Chants",
+    attendanceCount: 248,
+    attendanceId: 11,
+    createdAt: "2026-09-14T06:00:00Z",
+  },
+  {
+    id: 2,
+    name: "Midweek prayer",
+    serviceDate: "2026-09-17",
+    startsAt: "18:30:00",
+    attendanceCount: null,
+    createdAt: "2026-09-15T08:00:00Z",
   },
 ];
 

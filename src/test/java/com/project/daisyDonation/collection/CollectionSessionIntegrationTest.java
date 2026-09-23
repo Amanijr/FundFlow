@@ -106,8 +106,125 @@ class CollectionSessionIntegrationTest {
     }
 
     @Test
+    void sundayCollectionUsesDefaultFundUnlessOverridden() throws Exception {
+        MvcResult generalResult = mockMvc.perform(post("/api/v1/funds")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "General offering",
+                                  "code": "GEN",
+                                  "type": "UNRESTRICTED",
+                                  "openingBalance": 1000.00,
+                                  "defaultForCollections": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.defaultForCollections").value(true))
+                .andReturn();
+        Long generalFundId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                generalResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult buildingResult = mockMvc.perform(post("/api/v1/funds")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Building",
+                                  "code": "BLD",
+                                  "type": "RESTRICTED",
+                                  "openingBalance": 200.00
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long buildingFundId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                buildingResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult defaultSession = mockMvc.perform(post("/api/v1/collection-sessions")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "collectionType": "SERVICE_OFFERING",
+                                  "title": "Sunday offering"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long defaultSessionId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                defaultSession.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(put("/api/v1/collection-sessions/" + defaultSessionId + "/count")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "totalAmount": 250.00,
+                                  "paymentMethod": "CASH",
+                                  "collectedAt": "%s"
+                                }
+                                """.formatted(LocalDateTime.now())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/collection-sessions/" + defaultSessionId + "/verify")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.fundId").value(generalFundId.intValue()))
+                .andExpect(jsonPath("$.data.fundName").value("General offering"));
+
+        mockMvc.perform(get("/api/v1/funds/" + generalFundId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.currentBalance").value(1250.00));
+
+        MvcResult overrideSession = mockMvc.perform(post("/api/v1/collection-sessions")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "collectionType": "SPECIAL_APPEAL",
+                                  "title": "Building appeal",
+                                  "fundId": %d
+                                }
+                                """.formatted(buildingFundId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.fundId").value(buildingFundId.intValue()))
+                .andReturn();
+        Long overrideSessionId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                overrideSession.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(put("/api/v1/collection-sessions/" + overrideSessionId + "/count")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "totalAmount": 80.00,
+                                  "paymentMethod": "CASH",
+                                  "collectedAt": "%s"
+                                }
+                                """.formatted(LocalDateTime.now())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/collection-sessions/" + overrideSessionId + "/verify")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.fundId").value(buildingFundId.intValue()));
+
+        mockMvc.perform(get("/api/v1/funds/" + buildingFundId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.currentBalance").value(280.00));
+
+        mockMvc.perform(get("/api/v1/funds/" + generalFundId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.currentBalance").value(1250.00));
+    }
+
+    @Test
     void manualCashPaymentForIndividualDonation() throws Exception {
-        String donorPayload = """
+        String memberPayload = """
                 {
                   "firstName": "John",
                   "lastName": "Cash",
@@ -116,24 +233,24 @@ class CollectionSessionIntegrationTest {
                 }
                 """;
 
-        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
+        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(donorPayload))
+                        .content(memberPayload))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
-                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
 
         String donationPayload = """
                 {
-                  "donorId": %d,
+                  "memberId": %d,
                   "amount": 100.00,
                   "donationType": "ONE_TIME",
                   "source": "IN_PERSON"
                 }
-                """.formatted(donorId);
+                """.formatted(memberId);
 
         MvcResult donationResult = mockMvc.perform(post("/api/v1/donations")
                         .header("Authorization", "Bearer " + accessToken)

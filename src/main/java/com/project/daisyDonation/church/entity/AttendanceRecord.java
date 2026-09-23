@@ -26,6 +26,10 @@ public class AttendanceRecord extends TenantEntity {
     @JoinColumn(name = "ministry_id")
     private Ministry ministry;
 
+    @ManyToOne
+    @JoinColumn(name = "service_event_id")
+    private ServiceEvent serviceEvent;
+
     @Column(name = "service_date", nullable = false)
     private LocalDate serviceDate;
 

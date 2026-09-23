@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { CommandPalette } from "@/components/navigation/command-palette";
 import { BannerStack } from "@/components/notifications/banner-stack";
 import { TenantContextBanner } from "@/components/platform/tenant-context-banner";
+import { VerticalRouteGuard } from "@/components/security/vertical-route-guard";
 import { useAuth } from "@/hooks/use-auth";
 import { useOrganization } from "@/hooks/use-organization";
 import { buildCommandActions } from "@/lib/navigation/command-actions";
@@ -23,9 +24,10 @@ export function AppShell({ children }: AppShellProps) {
   const { user } = useAuth();
   const organizationQuery = useOrganization();
 
+  const organizationType = organizationQuery.data?.type ?? user?.organizationType ?? undefined;
   const commandActions = useMemo(
-    () => buildCommandActions(user?.role, organizationQuery.data?.type),
-    [organizationQuery.data?.type, user?.role],
+    () => buildCommandActions(user?.role, organizationType),
+    [organizationType, user?.role],
   );
 
   return (
@@ -43,7 +45,9 @@ export function AppShell({ children }: AppShellProps) {
         <BannerStack />
         <Header />
         <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-auto">
-          <ContentContainer className="flex-1">{children}</ContentContainer>
+          <ContentContainer className="flex-1">
+            <VerticalRouteGuard>{children}</VerticalRouteGuard>
+          </ContentContainer>
           <Footer />
         </main>
       </div>

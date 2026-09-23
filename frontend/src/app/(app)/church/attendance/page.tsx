@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { ChurchNav } from "@/components/church/church-nav";
-import { DateInput } from "@/components/forms/date-input";
 import { EntitySelector } from "@/components/forms/entity-selector";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -21,16 +21,13 @@ import { DataTable } from "@/components/tables/data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
-import { getAttendanceSummary, listAttendance, listMinistries, recordAttendance } from "@/lib/api/church";
-import { toApiDate } from "@/lib/utils/dates";
+import { getAttendanceSummary, listAttendance, listServices, recordAttendance } from "@/lib/api/church";
 import { formatDate, formatDateTime } from "@/lib/utils/dates";
 import { ApiError } from "@/types/api";
 import type { AttendanceRecordResponse } from "@/types/verticals";
 
 const attendanceSchema = z.object({
-  ministryId: z.string().optional(),
-  serviceDate: z.date({ message: "Service date is required" }),
-  eventName: z.string().min(1, "Event name is required").max(255),
+  serviceEventId: z.string().min(1, "Choose a service"),
   attendanceCount: z.number().min(0),
   notes: z.string().max(1000).optional(),
 });
@@ -43,9 +40,9 @@ export default function ChurchAttendancePage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const ministriesQuery = useQuery({
-    queryKey: ["church", "ministries"],
-    queryFn: async () => (await listMinistries(accessToken!)).data,
+  const servicesQuery = useQuery({
+    queryKey: ["church", "services"],
+    queryFn: async () => (await listServices(accessToken!)).data,
     enabled: Boolean(accessToken),
   });
 
@@ -61,9 +58,19 @@ export default function ChurchAttendancePage() {
     enabled: Boolean(accessToken),
   });
 
-  const ministryOptions = useMemo(
-    () => (ministriesQuery.data ?? []).map((m) => ({ id: String(m.id), label: m.name, description: m.code })),
-    [ministriesQuery.data],
+  const openServices = useMemo(
+    () => (servicesQuery.data ?? []).filter((service) => service.attendanceCount == null),
+    [servicesQuery.data],
+  );
+
+  const serviceOptions = useMemo(
+    () =>
+      openServices.map((service) => ({
+        id: String(service.id),
+        label: `${service.name} · ${formatDate(service.serviceDate)}`,
+        description: service.ministryName,
+      })),
+    [openServices],
   );
 
   const {
@@ -75,8 +82,7 @@ export default function ChurchAttendancePage() {
   } = useForm<AttendanceFormValues>({
     resolver: zodResolver(attendanceSchema),
     defaultValues: {
-      ministryId: "",
-      eventName: "",
+      serviceEventId: "",
       attendanceCount: 0,
       notes: "",
     },
@@ -89,7 +95,21 @@ export default function ChurchAttendancePage() {
         header: "Date",
         cell: ({ row }) => formatDate(row.original.serviceDate),
       },
-      { accessorKey: "eventName", header: "Event" },
+      {
+        accessorKey: "eventName",
+        header: "Service",
+        cell: ({ row }) =>
+          row.original.serviceEventId ? (
+            <Link
+              href={`/church/services/${row.original.serviceEventId}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {row.original.eventName}
+            </Link>
+          ) : (
+            row.original.eventName
+          ),
+      },
       { accessorKey: "ministryName", header: "Ministry", cell: ({ row }) => row.original.ministryName ?? "—" },
       { accessorKey: "attendanceCount", header: "Count" },
       { accessorKey: "notes", header: "Notes", cell: ({ row }) => row.original.notes ?? "—" },
@@ -106,9 +126,7 @@ export default function ChurchAttendancePage() {
     setServerError(null);
     try {
       await recordAttendance(accessToken!, {
-        ministryId: values.ministryId ? Number(values.ministryId) : undefined,
-        serviceDate: toApiDate(values.serviceDate)!,
-        eventName: values.eventName,
+        serviceEventId: Number(values.serviceEventId),
         attendanceCount: values.attendanceCount,
         notes: values.notes || undefined,
       });
@@ -116,13 +134,13 @@ export default function ChurchAttendancePage() {
       reset();
       setShowForm(false);
       await queryClient.invalidateQueries({ queryKey: ["church", "attendance"] });
-      await queryClient.invalidateQueries({ queryKey: ["church", "attendance", "summary"] });
+      await queryClient.invalidateQueries({ queryKey: ["church", "services"] });
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : "Unable to record attendance");
     }
   }
 
-  if (ministriesQuery.isLoading || attendanceQuery.isLoading) return <LoadingState />;
+  if (servicesQuery.isLoading || attendanceQuery.isLoading) return <LoadingState />;
 
   const summary = summaryQuery.data;
 
@@ -135,11 +153,14 @@ export default function ChurchAttendancePage() {
           { label: "Attendance", href: "/church/attendance" },
         ]}
         title="Attendance"
-        description="Headcount for Sunday and midweek services."
+        description="Headcount against a service. Named check-in comes later."
         action={
-          <Button onClick={() => setShowForm((v) => !v)}>
-            {showForm ? "Cancel" : "Record attendance"}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/church/services/new">Add service</Link>
+            </Button>
+            <Button onClick={() => setShowForm((v) => !v)}>{showForm ? "Cancel" : "Record attendance"}</Button>
+          </div>
         }
       />
 
@@ -159,43 +180,45 @@ export default function ChurchAttendancePage() {
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-lg border border-border bg-surface p-6">
           {serverError && <ErrorAlert message={serverError} />}
-          <FormSection title="New attendance record" description="Log headcount for a service or event">
-            <FormField label="Ministry" className="sm:col-span-2">
-              <Controller
-                control={control}
-                name="ministryId"
-                render={({ field }) => (
-                  <EntitySelector
-                    options={ministryOptions}
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    placeholder="Select ministry (optional)"
-                  />
-                )}
-              />
-            </FormField>
-            <FormField label="Service date" error={errors.serviceDate?.message}>
-              <Controller
-                control={control}
-                name="serviceDate"
-                render={({ field }) => <DateInput value={field.value ?? null} onChange={field.onChange} />}
-              />
-            </FormField>
-            <FormField label="Attendance count" error={errors.attendanceCount?.message}>
-              <Input type="number" min={0} {...register("attendanceCount", { valueAsNumber: true })} />
-            </FormField>
-            <FormField label="Event name" error={errors.eventName?.message} className="sm:col-span-2">
-              <Input {...register("eventName")} />
-            </FormField>
-            <FormField label="Notes" className="sm:col-span-2">
-              <Input {...register("notes")} />
-            </FormField>
-          </FormSection>
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isSubmitting}>
-              Save record
-            </Button>
-          </div>
+          {openServices.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Every listed service already has a headcount.{" "}
+              <Link href="/church/services/new" className="text-primary hover:underline">
+                Add a service
+              </Link>{" "}
+              first.
+            </p>
+          ) : (
+            <FormSection title="New attendance record" description="Count people at a service already on the calendar.">
+              <FormField label="Service" error={errors.serviceEventId?.message} className="sm:col-span-2">
+                <Controller
+                  control={control}
+                  name="serviceEventId"
+                  render={({ field }) => (
+                    <EntitySelector
+                      options={serviceOptions}
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="Select a service"
+                    />
+                  )}
+                />
+              </FormField>
+              <FormField label="Attendance count" error={errors.attendanceCount?.message}>
+                <Input type="number" min={0} {...register("attendanceCount", { valueAsNumber: true })} />
+              </FormField>
+              <FormField label="Notes" className="sm:col-span-2">
+                <Input {...register("notes")} />
+              </FormField>
+            </FormSection>
+          )}
+          {openServices.length > 0 && (
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isSubmitting}>
+                Save record
+              </Button>
+            </div>
+          )}
         </form>
       )}
 

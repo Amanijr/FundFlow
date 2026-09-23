@@ -18,6 +18,13 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
 
     Optional<AttendanceRecord> findByIdAndOrganizationIdAndDeletedFalse(Long id, Long organizationId);
 
+    Optional<AttendanceRecord> findFirstByOrganizationIdAndDeletedFalseOrderByServiceDateDescIdDesc(
+            Long organizationId);
+
+    Optional<AttendanceRecord> findByServiceEvent_IdAndDeletedFalse(Long serviceEventId);
+
+    boolean existsByServiceEvent_IdAndDeletedFalse(Long serviceEventId);
+
     @Query("""
             SELECT COALESCE(SUM(a.attendanceCount), 0) FROM AttendanceRecord a
             WHERE a.organization.id = :organizationId

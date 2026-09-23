@@ -3,6 +3,7 @@ package com.project.daisyDonation.donation.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.project.daisyDonation.donation.entity.DonationStatus;
@@ -25,6 +26,7 @@ public class DonationDetailResponse {
     private Long organizationId;
     private Long donorId;
     private String donorName;
+    private Long memberId;
     private BigDecimal amount;
     private LocalDateTime donationTime;
     private DonationStatus status;
@@ -42,4 +44,7 @@ public class DonationDetailResponse {
     private String notes;
     private String itemDescription;
     private BigDecimal estimatedValue;
+    private Long paymentId;
+    private Long partnershipId;
+    private LocalDate partnershipMonth;
 }

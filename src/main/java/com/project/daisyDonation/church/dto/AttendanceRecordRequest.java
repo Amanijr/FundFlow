@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,13 +17,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @Schema(description = "Request payload for attendance record")
 public class AttendanceRecordRequest {
+    @Schema(description = "Existing service/event. Preferred parent for the headcount.")
+    private Long serviceEventId;
     @Schema(description = "ministry id")
     private Long ministryId;
-    @Schema(description = "service date")
-    @NotNull
+    @Schema(description = "service date — required when serviceEventId is omitted")
     private LocalDate serviceDate;
-    @Schema(description = "event name")
-    @NotBlank
+    @Schema(description = "event name — required when serviceEventId is omitted")
     @Size(max = 255)
     private String eventName;
     @Schema(description = "attendance count")

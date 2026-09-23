@@ -168,6 +168,16 @@ export default function ChurchCollectionDetailPage() {
           { label: "How it was received", value: churchPaymentLabel(session.paymentMethod) },
           { label: "Service date", value: formatDate(session.collectedAt ?? session.createdAt) },
           { label: "Where", value: session.location ?? "—" },
+          {
+            label: "Fund",
+            value: session.fundId ? (
+              <Link href={`/funds/${session.fundId}`} className="text-primary hover:underline">
+                {session.fundName ?? `Fund #${session.fundId}`}
+              </Link>
+            ) : (
+              "Sunday offering fund, if one is marked — otherwise none"
+            ),
+          },
           { label: "Notes", value: session.notes ?? "—" },
           { label: "Started", value: formatDateTime(session.createdAt) },
           {
@@ -233,7 +243,9 @@ export default function ChurchCollectionDetailPage() {
           <div className="rounded-lg border border-border bg-surface p-4">
             <p className="text-sm font-medium text-foreground">Verify this offering</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Confirm the count. FundFlow then posts it as a gift (offerings) on the books.
+              Confirm the count. FundFlow then posts it as a gift
+              {session.fundName ? ` to ${session.fundName}` : ""}. If no fund is chosen and none is
+              marked for Sunday offering, remaining will not change.
             </p>
             <Button
               className="mt-3"

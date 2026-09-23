@@ -22,6 +22,7 @@ const fundSchema = z.object({
   description: z.string().max(1000).optional(),
   openingBalance: z.number().min(0, "Cannot be negative").optional(),
   active: z.boolean(),
+  defaultForCollections: z.boolean(),
 });
 
 export type FundFormValues = z.infer<typeof fundSchema>;
@@ -49,6 +50,7 @@ export function FundForm({ defaultValues, submitLabel, serverError, onSubmit, on
       description: "",
       openingBalance: 0,
       active: true,
+      defaultForCollections: false,
       ...defaultValues,
     },
   });
@@ -61,6 +63,7 @@ export function FundForm({ defaultValues, submitLabel, serverError, onSubmit, on
       description: values.description || undefined,
       openingBalance: values.openingBalance,
       active: values.active,
+      defaultForCollections: values.defaultForCollections,
     });
   }
 
@@ -100,6 +103,16 @@ export function FundForm({ defaultValues, submitLabel, serverError, onSubmit, on
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" className="h-4 w-4 rounded border-input" {...register("active")} />
             Fund is active
+          </label>
+        </FormField>
+        <FormField label="Sunday offering" className="sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-input"
+              {...register("defaultForCollections")}
+            />
+            Use for Sunday collections unless another fund is chosen
           </label>
         </FormField>
       </FormSection>

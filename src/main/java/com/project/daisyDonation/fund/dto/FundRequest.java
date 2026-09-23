@@ -39,4 +39,5 @@ public class FundRequest {
     @DecimalMin(value = "0.00", message = "Opening balance cannot be negative")
     private BigDecimal openingBalance;
     private boolean active = true;
+    private boolean defaultForCollections;
 }

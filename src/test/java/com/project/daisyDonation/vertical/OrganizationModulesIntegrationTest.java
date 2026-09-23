@@ -60,6 +60,189 @@ class OrganizationModulesIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.totalAttendance").value(120));
+
+        MvcResult serviceResult = mockMvc.perform(post("/api/v1/church/services")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Midweek Prayer",
+                                  "serviceDate": "%s",
+                                  "ministryId": %d
+                                }
+                                """.formatted(LocalDate.now(), ministryId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.name").value("Midweek Prayer"))
+                .andReturn();
+
+        Long serviceId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                serviceResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/church/attendance")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "serviceEventId": %d,
+                                  "attendanceCount": 45
+                                }
+                                """.formatted(serviceId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.serviceEventId").value(serviceId.intValue()))
+                .andExpect(jsonPath("$.data.eventName").value("Midweek Prayer"));
+
+        mockMvc.perform(post("/api/v1/church/attendance")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "serviceEventId": %d,
+                                  "attendanceCount": 50
+                                }
+                                """.formatted(serviceId)))
+                .andExpect(status().isConflict());
+
+        mockMvc.perform(get("/api/v1/church/services/" + serviceId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.attendanceCount").value(45));
+
+        mockMvc.perform(get("/api/v1/church/attendance/summary")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalAttendance").value(165));
+
+        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "firstName": "Asha",
+                                  "lastName": "Mwanga",
+                                  "membershipStatus": "ACTIVE"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/church/ministries/" + ministryId + "/members")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "memberId": %d,
+                                  "role": "Volunteer"
+                                }
+                                """.formatted(memberId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.memberName").value("Asha Mwanga"))
+                .andExpect(jsonPath("$.data.ministryName").value("Youth Ministry"))
+                .andExpect(jsonPath("$.data.status").value("ACTIVE"));
+
+        mockMvc.perform(post("/api/v1/church/ministries/" + ministryId + "/members")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "memberId": %d
+                                }
+                                """.formatted(memberId)))
+                .andExpect(status().isConflict());
+
+        mockMvc.perform(get("/api/v1/church/ministries/" + ministryId + "/members")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1));
+
+        mockMvc.perform(get("/api/v1/members/" + memberId + "/ministries")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].ministryId").value(ministryId.intValue()))
+                .andExpect(jsonPath("$.data[0].role").value("Volunteer"));
+
+        mockMvc.perform(get("/api/v1/church/ministries")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].memberCount").value(1));
+
+        mockMvc.perform(get("/api/v1/church/dashboard")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.memberCount").value(1))
+                .andExpect(jsonPath("$.data.activeMemberCount").value(1))
+                .andExpect(jsonPath("$.data.attendanceThisYear").value(165))
+                .andExpect(jsonPath("$.data.lastAttendanceCount").value(45));
+
+        mockMvc.perform(get("/api/v1/church/reports/membership")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.active").value(1));
+
+        MvcResult partnershipResult = mockMvc.perform(post("/api/v1/church/partnerships")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "memberId": %d,
+                                  "monthlyAmount": 50000.00,
+                                  "startDate": "%s",
+                                  "status": "ACTIVE"
+                                }
+                                """.formatted(memberId, LocalDate.now().withDayOfMonth(1))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.memberName").value("Asha Mwanga"))
+                .andExpect(jsonPath("$.data.thisMonthStatus").value("MISSING"))
+                .andReturn();
+
+        Long partnershipId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                partnershipResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult giftResult = mockMvc.perform(post("/api/v1/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "memberId": %d,
+                                  "partnershipId": %d,
+                                  "amount": 20000.00,
+                                  "donationType": "ONE_TIME"
+                                }
+                                """.formatted(memberId, partnershipId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.partnershipId").value(partnershipId.intValue()))
+                .andReturn();
+
+        Long giftId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                giftResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/donations/" + giftId + "/payments/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "paymentMethod": "CASH",
+                                  "receiptNumber": "RCP-PARTNER-1",
+                                  "collectionDate": "%sT10:00:00"
+                                }
+                                """.formatted(LocalDate.now())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/church/partnerships/" + partnershipId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.thisMonthReceived").value(20000.00))
+                .andExpect(jsonPath("$.data.thisMonthExpected").value(50000.00))
+                .andExpect(jsonPath("$.data.thisMonthStatus").value("PARTIAL"));
+
+        mockMvc.perform(get("/api/v1/members/" + memberId + "/partnerships")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].thisMonthStatus").value("PARTIAL"));
     }
 
     @Test

@@ -42,6 +42,12 @@ public final class VerticalAccess {
         }
     }
 
+    public static void requireNotChurch(Organization organization) {
+        if (CHURCH_TYPES.contains(organization.getType())) {
+            throw new BadRequestException("Church organizations use members, not donors");
+        }
+    }
+
     public static void requireNgo(Organization organization) {
         if (!NGO_TYPES.contains(organization.getType())) {
             throw new BadRequestException("This feature is only available for NGO organizations");

@@ -48,6 +48,7 @@ public class FundService {
         if (request.getOpeningBalance() != null) {
             fund.setOpeningBalance(request.getOpeningBalance());
         }
+        assignCollectionDefault(fund, request.isDefaultForCollections());
 
         return toResponse(fundRepository.save(fund));
     }
@@ -80,6 +81,7 @@ public class FundService {
         if (request.getOpeningBalance() != null) {
             fund.setOpeningBalance(request.getOpeningBalance());
         }
+        assignCollectionDefault(fund, request.isDefaultForCollections());
 
         return toResponse(fundRepository.save(fund));
     }
@@ -124,6 +126,26 @@ public class FundService {
                 .orElseThrow(() -> new ResourceNotFoundException("Fund not found"));
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<Fund> findDefaultCollectionFund(Long organizationId) {
+        return fundRepository.findByOrganizationIdAndDefaultForCollectionsTrueAndDeletedFalse(organizationId)
+                .filter(Fund::isActive);
+    }
+
+    private void assignCollectionDefault(Fund fund, boolean makeDefault) {
+        if (makeDefault) {
+            fundRepository
+                    .findByOrganizationIdAndDefaultForCollectionsTrueAndDeletedFalse(fund.getOrganization().getId())
+                    .ifPresent(existing -> {
+                        if (!java.util.Objects.equals(existing.getId(), fund.getId())) {
+                            existing.setDefaultForCollections(false);
+                            fundRepository.save(existing);
+                        }
+                    });
+        }
+        fund.setDefaultForCollections(makeDefault);
+    }
+
     private void applyRequest(Fund fund, FundRequest request) {
         fund.setName(request.getName());
         fund.setCode(request.getCode());
@@ -146,6 +168,7 @@ public class FundService {
                 .openingBalance(fund.getOpeningBalance())
                 .currentBalance(currentBalance)
                 .active(fund.isActive())
+                .defaultForCollections(fund.isDefaultForCollections())
                 .createdAt(fund.getCreatedAt())
                 .build();
     }

@@ -58,7 +58,13 @@ public class ReceiptService {
     }
 
     private String resolveDonorName(Donation donation) {
-        if (donation.isAnonymous() || donation.getDonor() == null) {
+        if (donation.isAnonymous()) {
+            return "Anonymous Donor";
+        }
+        if (donation.getMember() != null) {
+            return donation.getMember().getFirstName() + " " + donation.getMember().getLastName();
+        }
+        if (donation.getDonor() == null) {
             return "Anonymous Donor";
         }
         return donation.getDonor().getFirstName() + " " + donation.getDonor().getLastName();

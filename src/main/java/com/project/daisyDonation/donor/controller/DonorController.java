@@ -33,9 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/donors")
 @RequiredArgsConstructor
-@Tag(
-        name = "Donors",
-        description = "Donor lifecycle management and donor detail endpoints")
+@Tag(name = "Donors", description = "Fundraising donors. Church congregations use /api/v1/members instead.")
 @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
 public class DonorController {
 
@@ -43,9 +41,7 @@ public class DonorController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
-    @Operation(
-            summary = "Create donor",
-            description = "Creates a new donor record for the authenticated organization.")
+    @Operation(summary = "Create donor", description = "Creates a new donor record for the authenticated organization.")
     public ResponseEntity<ApiResponse<DonorResponse>> create(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody DonorRequest request) {
@@ -54,18 +50,14 @@ public class DonorController {
     }
 
     @GetMapping
-    @Operation(
-            summary = "List donors",
-            description = "Returns all donors belonging to the authenticated organization.")
+    @Operation(summary = "List donors", description = "Returns all donors belonging to the authenticated organization.")
     public ResponseEntity<ApiResponse<List<DonorResponse>>> list(
             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(ApiResponse.ok(donorService.list(principal)));
     }
 
     @GetMapping("/{id}")
-    @Operation(
-            summary = "Get donor by id",
-            description = "Returns donor details for the provided donor identifier.")
+    @Operation(summary = "Get donor by id")
     public ResponseEntity<ApiResponse<DonorDetailResponse>> getById(
             @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Unique donor identifier")
@@ -75,12 +67,9 @@ public class DonorController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
-    @Operation(
-            summary = "Update donor",
-            description = "Updates donor information for the provided donor identifier.")
+    @Operation(summary = "Update donor")
     public ResponseEntity<ApiResponse<DonorResponse>> update(
             @AuthenticationPrincipal UserPrincipal principal,
-            @Parameter(description = "Unique donor identifier")
             @PathVariable Long id,
             @Valid @RequestBody DonorRequest request) {
         return ResponseEntity.ok(ApiResponse.ok("Donor updated", donorService.update(principal, id, request)));
@@ -88,12 +77,9 @@ public class DonorController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER')")
-    @Operation(
-            summary = "Delete donor",
-            description = "Deletes the donor record identified by the provided donor identifier.")
+    @Operation(summary = "Delete donor")
     public ResponseEntity<ApiResponse<Void>> delete(
             @AuthenticationPrincipal UserPrincipal principal,
-            @Parameter(description = "Unique donor identifier")
             @PathVariable Long id) {
         donorService.delete(principal, id);
         return ResponseEntity.ok(ApiResponse.ok("Donor deleted", null));

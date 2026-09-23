@@ -7,9 +7,12 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/church", label: "Overview", exact: true },
-  { href: "/church/collections", label: "Sunday collections" },
+  { href: "/members", label: "Members" },
   { href: "/church/ministries", label: "Ministries" },
+  { href: "/church/services", label: "Services" },
   { href: "/church/attendance", label: "Attendance" },
+  { href: "/church/partnerships", label: "Partnerships" },
+  { href: "/church/collections", label: "Sunday collections" },
 ];
 
 export function ChurchNav() {

@@ -125,6 +125,74 @@ public class AccountingPostingService {
                         line(creditAccountCode, BigDecimal.ZERO, expense.getAmount(), fund, "Paid from till / bank / Lipa")));
     }
 
+    @Transactional
+    public void reversePostedGift(Organization organization, Long userId, Donation donation, Payment payment, String reason) {
+        String description = "Void gift #" + donation.getId() + " - " + reason;
+        if (payment != null) {
+            reverseOriginal(
+                    organization,
+                    userId,
+                    JournalSourceType.DONATION_PAYMENT,
+                    payment.getId(),
+                    JournalSourceType.DONATION_VOID,
+                    description);
+            reverseOriginal(
+                    organization,
+                    userId,
+                    JournalSourceType.COLLECTION_PAYMENT,
+                    payment.getId(),
+                    JournalSourceType.COLLECTION_VOID,
+                    description);
+        }
+        reverseOriginal(
+                organization,
+                userId,
+                JournalSourceType.IN_KIND_DONATION,
+                donation.getId(),
+                JournalSourceType.IN_KIND_VOID,
+                description);
+    }
+
+    private void reverseOriginal(
+            Organization organization,
+            Long userId,
+            JournalSourceType originalType,
+            Long sourceId,
+            JournalSourceType voidType,
+            String description) {
+        if (journalEntryRepository.existsByOrganizationIdAndSourceTypeAndSourceIdAndDeletedFalse(
+                organization.getId(), voidType, sourceId)) {
+            return;
+        }
+
+        journalEntryRepository
+                .findByOrganizationIdAndSourceTypeAndSourceIdAndDeletedFalse(
+                        organization.getId(), originalType, sourceId)
+                .ifPresent(original -> {
+                    List<PostingLine> reversed = journalLineRepository
+                            .findByJournalEntryIdAndDeletedFalse(original.getId())
+                            .stream()
+                            .map(line -> line(
+                                    line.getAccount().getCode(),
+                                    line.getCreditAmount() != null ? line.getCreditAmount() : BigDecimal.ZERO,
+                                    line.getDebitAmount() != null ? line.getDebitAmount() : BigDecimal.ZERO,
+                                    line.getFund(),
+                                    "Void: " + (line.getLineDescription() != null ? line.getLineDescription() : "")))
+                            .toList();
+                    if (reversed.isEmpty()) {
+                        return;
+                    }
+                    postBalancedEntry(
+                            organization,
+                            userId,
+                            original.getEntryDate(),
+                            voidType,
+                            sourceId,
+                            description,
+                            reversed);
+                });
+    }
+
     private void postBalancedEntry(
             Organization organization,
             Long userId,

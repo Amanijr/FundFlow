@@ -64,6 +64,7 @@ export default function EditFundPage() {
           description: fund.description ?? "",
           openingBalance: fund.openingBalance != null ? toNumber(fund.openingBalance) : 0,
           active: fund.active,
+          defaultForCollections: Boolean(fund.defaultForCollections),
         }}
         onSubmit={handleSubmit}
         onCancel={() => router.push(`/funds/${fundId}`)}

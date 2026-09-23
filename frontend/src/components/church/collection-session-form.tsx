@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { COLLECTION_TYPE_LABELS } from "@/lib/church/labels";
 import type { CollectionSessionCreateRequest, CollectionType } from "@/types/collection";
+import type { FundResponse } from "@/types/finance";
 
 const collectionTypes = Object.keys(COLLECTION_TYPE_LABELS) as CollectionType[];
 
@@ -25,17 +26,25 @@ const schema = z.object({
   title: z.string().min(1, "Give this collection a name").max(255),
   location: z.string().max(255).optional(),
   notes: z.string().max(1000).optional(),
+  fundId: z.string().optional(),
 });
 
 export type CollectionSessionFormValues = z.infer<typeof schema>;
 
 interface CollectionSessionFormProps {
+  funds?: FundResponse[];
   serverError?: string | null;
   onSubmit: (values: CollectionSessionCreateRequest) => Promise<void>;
   onCancel?: () => void;
 }
 
-export function CollectionSessionForm({ serverError, onSubmit, onCancel }: CollectionSessionFormProps) {
+export function CollectionSessionForm({
+  funds = [],
+  serverError,
+  onSubmit,
+  onCancel,
+}: CollectionSessionFormProps) {
+  const defaultFund = funds.find((fund) => fund.defaultForCollections && fund.active);
   const {
     register,
     handleSubmit,
@@ -47,6 +56,7 @@ export function CollectionSessionForm({ serverError, onSubmit, onCancel }: Colle
       title: "Sunday offering",
       location: "",
       notes: "",
+      fundId: "",
     },
   });
 
@@ -58,6 +68,7 @@ export function CollectionSessionForm({ serverError, onSubmit, onCancel }: Colle
           title: values.title,
           location: values.location || undefined,
           notes: values.notes || undefined,
+          fundId: values.fundId ? Number(values.fundId) : undefined,
         }),
       )}
       className="space-y-4"
@@ -81,6 +92,31 @@ export function CollectionSessionForm({ serverError, onSubmit, onCancel }: Colle
         </FormField>
         <FormField label="Name" error={errors.title?.message}>
           <Input {...register("title")} placeholder="e.g. Sunday 1st service" />
+        </FormField>
+        <FormField
+          label="Fund"
+          className="sm:col-span-2"
+          description={
+            defaultFund
+              ? "Leave on Sunday offering unless this count belongs in another pot."
+              : "Mark a fund as the Sunday offering fund under Funds if plates should increase remaining."
+          }
+        >
+          <select className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm" {...register("fundId")}>
+            <option value="">
+              {defaultFund
+                ? `Sunday offering — ${defaultFund.name}`
+                : "No fund (won't change fund remaining)"}
+            </option>
+            {funds
+              .filter((fund) => fund.active)
+              .map((fund) => (
+                <option key={fund.id} value={String(fund.id)}>
+                  {fund.name}
+                  {fund.defaultForCollections ? " (Sunday offering)" : ""}
+                </option>
+              ))}
+          </select>
         </FormField>
         <FormField label="Where" error={errors.location?.message} className="sm:col-span-2">
           <Input {...register("location")} placeholder="e.g. Main sanctuary, Kinondoni" />
