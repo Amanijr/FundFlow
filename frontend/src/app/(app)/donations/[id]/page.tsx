@@ -17,14 +17,21 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import { useOrganization } from "@/hooks/use-organization";
 import { listJournalEntries } from "@/lib/api/accounting";
 import { findJournalEntriesForDonation, journalPostingSummary } from "@/lib/accounting/journal-links";
-import { cancelDonation, getDonation, previewReceipt } from "@/lib/api/donations";
+import { cancelDonation, getDonation, listDonationAuditEvents, previewReceipt, voidDonation } from "@/lib/api/donations";
 import { processGatewayPayment, recordManualPayment } from "@/lib/api/payments";
+import { peopleCopyForOrganization } from "@/lib/people/copy";
+import { peopleModuleForOrganization, personPath } from "@/lib/people/module";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDateTime } from "@/lib/utils/dates";
 import { ApiError } from "@/types/api";
@@ -35,12 +42,18 @@ import { PermissionGate } from "@/components/security/permission-gate";
 export default function DonationDetailPage() {
   const params = useParams();
   const { accessToken, user } = useAuth();
+  const organizationQuery = useOrganization();
+  const copy = peopleCopyForOrganization(organizationQuery.data?.type ?? user?.organizationType);
+  const peopleModule = peopleModuleForOrganization(organizationQuery.data?.type ?? user?.organizationType);
   const donationId = Number(params.id);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptResponse | null>(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [voidOpen, setVoidOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState("");
+  const [voiding, setVoiding] = useState(false);
   const canRecordManual = user?.role === "ORG_ADMIN" || user?.role === "FINANCE_MANAGER";
 
   const donationQuery = useQuery({
@@ -58,9 +71,20 @@ export default function DonationDetailPage() {
     enabled: Boolean(accessToken),
   });
 
+  const auditQuery = useQuery({
+    queryKey: ["donations", donationId, "audit-events"],
+    queryFn: async () => (await listDonationAuditEvents(accessToken!, donationId)).data,
+    enabled: Boolean(accessToken) && !Number.isNaN(donationId),
+  });
+
   const linkedJournalEntries = useMemo(
-    () => findJournalEntriesForDonation(journalQuery.data ?? [], donationId),
-    [journalQuery.data, donationId],
+    () =>
+      findJournalEntriesForDonation(
+        journalQuery.data ?? [],
+        donationId,
+        donationQuery.data?.paymentId,
+      ),
+    [journalQuery.data, donationId, donationQuery.data?.paymentId],
   );
 
   async function handleRecordPayment(values: LaterPaymentPayload) {
@@ -90,12 +114,34 @@ export default function DonationDetailPage() {
     setCancelling(true);
     try {
       await cancelDonation(accessToken!, donationId);
-      toast.success("Donation cancelled");
+      toast.success(copy.cancelledToast);
       await donationQuery.refetch();
+      await auditQuery.refetch();
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Unable to cancel donation");
     } finally {
       setCancelling(false);
+    }
+  }
+
+  async function handleVoidDonation() {
+    if (!voidReason.trim()) {
+      toast.error("Enter a reason");
+      return;
+    }
+    setVoiding(true);
+    try {
+      await voidDonation(accessToken!, donationId, voidReason.trim());
+      toast.success(copy.voidedToast);
+      setVoidOpen(false);
+      setVoidReason("");
+      await donationQuery.refetch();
+      await journalQuery.refetch();
+      await auditQuery.refetch();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Unable to void gift");
+    } finally {
+      setVoiding(false);
     }
   }
 
@@ -126,17 +172,24 @@ export default function DonationDetailPage() {
     <div className="space-y-4">
       <PageHeader
         breadcrumbs={[
-          { label: "Donations", href: "/donations" },
-          { label: `Donation #${donation.id}` },
+          { label: copy.church ? "Giving" : "Donations", href: "/donations" },
+          { label: copy.church ? `Gift #${donation.id}` : `Donation #${donation.id}` },
         ]}
-        title={`Donation #${donation.id}`}
+        title={copy.church ? `Gift #${donation.id}` : `Donation #${donation.id}`}
         description={formatDateTime(donation.donationTime)}
         action={
           <div className="flex gap-2">
             {(donation.status === "PENDING" || donation.status === "FAILED") && (
               <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER"]}>
                 <Button variant="outline" onClick={handleCancelDonation} disabled={cancelling}>
-                  {cancelling ? "Cancelling…" : "Cancel donation"}
+                  {cancelling ? "Cancelling…" : copy.church ? "Cancel gift" : "Cancel donation"}
+                </Button>
+              </PermissionGate>
+            )}
+            {donation.status === "COMPLETED" && (
+              <PermissionGate roles={["ORG_ADMIN", "FINANCE_MANAGER"]}>
+                <Button variant="outline" onClick={() => setVoidOpen(true)}>
+                  {copy.voidLabel}
                 </Button>
               </PermissionGate>
             )}
@@ -184,10 +237,10 @@ export default function DonationDetailPage() {
           title="Relationships"
           fields={[
             {
-              label: "Donor",
+              label: copy.church ? "Member" : "Donor",
               value: donation.donorId ? (
-                <Link href={`/donors/${donation.donorId}`} className="text-primary hover:underline">
-                  {donation.donorName ?? `Donor #${donation.donorId}`}
+                <Link href={personPath(peopleModule, donation.donorId)} className="text-primary hover:underline">
+                  {donation.donorName ?? `${copy.church ? "Member" : "Donor"} #${donation.donorId}`}
                 </Link>
               ) : (
                 "Anonymous"
@@ -243,10 +296,47 @@ export default function DonationDetailPage() {
         ]}
       />
 
+      {auditQuery.data && auditQuery.data.length > 0 && (
+        <DetailCard
+          title="History"
+          fields={auditQuery.data.map((event) => ({
+            label: `${event.action.replaceAll("_", " ")} #${event.id}`,
+            value: [event.details, formatDateTime(event.createdAt)].filter(Boolean).join(" · "),
+          }))}
+        />
+      )}
+
       <section className="space-y-4">
         <SectionHeader title="Attachments" description="Receipt scans and correspondence" />
         <AttachmentList entityType="donation" entityId={donationId} category="receipt" />
       </section>
+
+      <Dialog open={voidOpen} onOpenChange={setVoidOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{copy.voidLabel}</DialogTitle>
+            <DialogDescription>{copy.voidDescription}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="void-reason">Reason</Label>
+            <Textarea
+              id="void-reason"
+              value={voidReason}
+              onChange={(event) => setVoidReason(event.target.value)}
+              maxLength={500}
+              placeholder="Wrong member, duplicate entry, …"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVoidOpen(false)}>
+              {copy.keepGiftLabel}
+            </Button>
+            <Button onClick={handleVoidDonation} disabled={voiding || !voidReason.trim()}>
+              {voiding ? "Voiding…" : copy.voidLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={receiptOpen} onOpenChange={setReceiptOpen}>
         <DialogContent className="max-w-lg">

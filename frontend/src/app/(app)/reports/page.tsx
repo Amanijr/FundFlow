@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { ReportsNav } from "@/components/reports/reports-nav";
 import { PageHeader } from "@/components/layout/page-header";
+import { useOrganization } from "@/hooks/use-organization";
+import { isChurchOrganization } from "@/lib/organization/verticals";
 import {
   Table,
   TableBody,
@@ -12,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const categories = [
+const ngoCategories = [
   {
     href: "/reports/financial",
     title: "Financial reports",
@@ -35,10 +39,44 @@ const categories = [
   },
 ];
 
+const churchCategories = [
+  {
+    href: "/reports/donations",
+    title: "Giving",
+    description: "Completed gifts this year and by source",
+  },
+  {
+    href: "/reports/members",
+    title: "Members",
+    description: "Active, inactive, and visitor counts",
+  },
+  {
+    href: "/reports/attendance",
+    title: "Attendance",
+    description: "Headcount by service",
+  },
+  {
+    href: "/reports/financial",
+    title: "Funds and books",
+    description: "Fund remaining, income and spend — treasurer view",
+  },
+];
+
 export default function ReportsHubPage() {
+  const organizationQuery = useOrganization();
+  const church = isChurchOrganization(organizationQuery.data?.type);
+  const categories = church ? churchCategories : ngoCategories;
+
   return (
     <div className="space-y-4">
-      <PageHeader title="Reports" description="Financial, fundraising, and budget reporting." />
+      <PageHeader
+        title="Reports"
+        description={
+          church
+            ? "Giving, members, attendance, and funds — for council, not three ERP boards."
+            : "Financial, fundraising, and budget reporting."
+        }
+      />
       <ReportsNav />
 
       <div className="overflow-hidden rounded-md border border-border bg-surface">
@@ -69,10 +107,6 @@ export default function ReportsHubPage() {
           </TableBody>
         </Table>
       </div>
-
-      <p className="text-xs text-muted-foreground">
-        Use date filters on each report, then export to CSV for board packs and audits.
-      </p>
     </div>
   );
 }

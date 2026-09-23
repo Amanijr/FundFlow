@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.daisyDonation.church.dto.AttendanceRecordRequest;
 import com.project.daisyDonation.church.dto.AttendanceRecordResponse;
 import com.project.daisyDonation.church.dto.AttendanceSummaryResponse;
+import com.project.daisyDonation.church.dto.ChurchDashboardResponse;
+import com.project.daisyDonation.church.dto.MemberMinistryRequest;
+import com.project.daisyDonation.church.dto.MemberMinistryResponse;
+import com.project.daisyDonation.church.dto.MembershipReportResponse;
 import com.project.daisyDonation.church.dto.MinistryRequest;
 import com.project.daisyDonation.church.dto.MinistryResponse;
+import com.project.daisyDonation.church.dto.ServiceEventRequest;
+import com.project.daisyDonation.church.dto.ServiceEventResponse;
 import com.project.daisyDonation.church.service.AttendanceService;
+import com.project.daisyDonation.church.service.ChurchDashboardService;
+import com.project.daisyDonation.church.service.MemberMinistryService;
 import com.project.daisyDonation.church.service.MinistryService;
+import com.project.daisyDonation.church.service.ServiceEventService;
 import com.project.daisyDonation.common.config.OpenApiConfig;
 import com.project.daisyDonation.common.dto.ApiResponse;
 import com.project.daisyDonation.common.security.UserPrincipal;
@@ -46,7 +56,10 @@ import lombok.RequiredArgsConstructor;
 public class ChurchController {
 
     private final MinistryService ministryService;
+    private final MemberMinistryService memberMinistryService;
+    private final ServiceEventService serviceEventService;
     private final AttendanceService attendanceService;
+    private final ChurchDashboardService churchDashboardService;
 
     @PostMapping("/ministries")
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FINANCE_MANAGER','STAFF')")
@@ -147,6 +160,72 @@ public class ChurchController {
         return ResponseEntity.ok(ApiResponse.ok("Ministry updated", ministryService.update(principal, id, request)));
     }
 
+    @GetMapping("/ministries/{id}/members")
+    @Operation(summary = "List ministry members", description = "People assigned to this ministry.")
+    public ResponseEntity<ApiResponse<List<MemberMinistryResponse>>> listMinistryMembers(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(memberMinistryService.listForMinistry(principal, id)));
+    }
+
+    @PostMapping("/ministries/{id}/members")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
+    @Operation(summary = "Assign member to ministry")
+    public ResponseEntity<ApiResponse<MemberMinistryResponse>> assignMinistryMember(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody MemberMinistryRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Member assigned", memberMinistryService.assign(principal, id, request)));
+    }
+
+    @DeleteMapping("/ministries/{id}/members/{assignmentId}")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
+    @Operation(summary = "Remove member from ministry", description = "Marks the assignment inactive.")
+    public ResponseEntity<ApiResponse<MemberMinistryResponse>> removeMinistryMember(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @PathVariable Long assignmentId) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "Member removed from ministry",
+                memberMinistryService.deactivate(principal, id, assignmentId)));
+    }
+
+    @PostMapping("/services")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
+    @Operation(summary = "Create service", description = "Creates a church service or event that attendance can attach to.")
+    public ResponseEntity<ApiResponse<ServiceEventResponse>> createService(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody ServiceEventRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Service created", serviceEventService.create(principal, request)));
+    }
+
+    @GetMapping("/services")
+    @Operation(summary = "List services")
+    public ResponseEntity<ApiResponse<List<ServiceEventResponse>>> listServices(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(serviceEventService.list(principal)));
+    }
+
+    @GetMapping("/services/{id}")
+    @Operation(summary = "Get service")
+    public ResponseEntity<ApiResponse<ServiceEventResponse>> getService(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(serviceEventService.getById(principal, id)));
+    }
+
+    @PutMapping("/services/{id}")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','FINANCE_MANAGER','STAFF')")
+    @Operation(summary = "Update service")
+    public ResponseEntity<ApiResponse<ServiceEventResponse>> updateService(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody ServiceEventRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok("Service updated", serviceEventService.update(principal, id, request)));
+    }
+
     @PostMapping("/attendance")
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FINANCE_MANAGER','STAFF')")
     @Operation(
@@ -212,5 +291,19 @@ public class ChurchController {
             @Parameter(description = "Period end date (ISO-8601). Optional.")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return ResponseEntity.ok(ApiResponse.ok(attendanceService.summary(principal, from, to)));
+    }
+
+    @GetMapping("/dashboard")
+    @Operation(summary = "Church home snapshot", description = "Members, funds remaining, giving, collections, and latest attendance.")
+    public ResponseEntity<ApiResponse<ChurchDashboardResponse>> dashboard(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(churchDashboardService.dashboard(principal)));
+    }
+
+    @GetMapping("/reports/membership")
+    @Operation(summary = "Membership report")
+    public ResponseEntity<ApiResponse<MembershipReportResponse>> membershipReport(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(churchDashboardService.membership(principal)));
     }
 }

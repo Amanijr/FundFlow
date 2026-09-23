@@ -35,6 +35,8 @@ public class CollectionSessionResponse {
     private CollectionSessionStatus status;
     private Long campaignId;
     private String campaignName;
+    private Long fundId;
+    private String fundName;
     private Long donationId;
     private String notes;
     private LocalDateTime createdAt;

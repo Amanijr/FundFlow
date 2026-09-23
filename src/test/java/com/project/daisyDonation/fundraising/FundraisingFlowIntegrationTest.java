@@ -25,20 +25,21 @@ class FundraisingFlowIntegrationTest {
 
     @BeforeEach
     void registerOrganization() throws Exception {
+        long suffix = System.nanoTime();
         String registerPayload = """
                 {
                   "organization": {
                     "name": "Hope Foundation",
-                    "slug": "hope-foundation",
+                    "slug": "hope-foundation-%d",
                     "type": "NGO",
-                    "email": "admin@hope.org"
+                    "email": "admin@hope-%d.org"
                   },
-                  "email": "admin@hope.org",
+                  "email": "admin@hope-%d.org",
                   "password": "password123",
                   "firstName": "Alex",
                   "lastName": "Admin"
                 }
-                """;
+                """.formatted(suffix, suffix, suffix);
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -167,7 +168,7 @@ class FundraisingFlowIntegrationTest {
         String token = com.jayway.jsonpath.JsonPath.read(
                 registerResult.getResponse().getContentAsString(), "$.data.accessToken");
 
-        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
+        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -180,19 +181,19 @@ class FundraisingFlowIntegrationTest {
                                 """.formatted(suffix)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
-                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
 
         MvcResult pendingResult = mockMvc.perform(post("/api/v1/donations")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "donorId": %d,
+                                  "memberId": %d,
                                   "amount": 100.00,
                                   "donationType": "ONE_TIME"
                                 }
-                                """.formatted(donorId)))
+                                """.formatted(memberId)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.status").value("PENDING"))
                 .andReturn();
@@ -217,11 +218,11 @@ class FundraisingFlowIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "donorId": %d,
+                                  "memberId": %d,
                                   "amount": 50.00,
                                   "donationType": "ONE_TIME"
                                 }
-                                """.formatted(donorId)))
+                                """.formatted(memberId)))
                 .andExpect(status().isCreated())
                 .andReturn();
         Long cancelId = ((Number) com.jayway.jsonpath.JsonPath.read(
@@ -231,5 +232,146 @@ class FundraisingFlowIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("CANCELLED"));
+    }
+
+    @Test
+    void memberCanBeCreatedWithoutContactAndGivingIncreasesFundBalance() throws Exception {
+        long suffix = System.nanoTime();
+        String registerPayload = """
+                {
+                  "organization": {
+                    "name": "Calvary Chapel",
+                    "slug": "calvary-%d",
+                    "type": "CHURCH",
+                    "email": "admin@calvary-%d.org"
+                  },
+                  "email": "admin@calvary-%d.org",
+                  "password": "password123",
+                  "firstName": "Pastor",
+                  "lastName": "Admin"
+                }
+                """.formatted(suffix, suffix, suffix);
+
+        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerPayload))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String token = com.jayway.jsonpath.JsonPath.read(
+                registerResult.getResponse().getContentAsString(), "$.data.accessToken");
+
+        mockMvc.perform(post("/api/v1/members")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "firstName": "Asha",
+                                  "lastName": "Mwangi",
+                                  "membershipStatus": "VISITOR"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.firstName").value("Asha"))
+                .andExpect(jsonPath("$.data.membershipStatus").value("VISITOR"))
+                .andExpect(jsonPath("$.data.memberNumber").value("M-0001"))
+                .andExpect(jsonPath("$.data.email").value(org.hamcrest.Matchers.nullValue()));
+
+        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "firstName": "John",
+                                  "lastName": "Tithe",
+                                  "membershipStatus": "ACTIVE"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(get("/api/v1/members")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(2));
+
+        MvcResult fundResult = mockMvc.perform(post("/api/v1/funds")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "General Fund",
+                                  "code": "GEN",
+                                  "type": "UNRESTRICTED",
+                                  "openingBalance": 1000.00
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.currentBalance").value(1000.00))
+                .andReturn();
+        Long fundId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                fundResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        MvcResult donationResult = mockMvc.perform(post("/api/v1/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "memberId": %d,
+                                  "fundId": %d,
+                                  "amount": 250.00,
+                                  "donationType": "ONE_TIME"
+                                }
+                                """.formatted(memberId, fundId)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long donationId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donationResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+        mockMvc.perform(post("/api/v1/donations/" + donationId + "/payments/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "paymentMethod": "CASH",
+                                  "receiptNumber": "RCP-TITHE-1",
+                                  "collectionDate": "2026-09-14T10:00:00"
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/funds/" + fundId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.currentBalance").value(1250.00));
+
+        mockMvc.perform(post("/api/v1/donations/" + donationId + "/void")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Entered against the wrong member"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("VOIDED"));
+
+        mockMvc.perform(get("/api/v1/funds/" + fundId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.currentBalance").value(1000.00));
+
+        mockMvc.perform(get("/api/v1/accounting/journal-entries")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[*].sourceType", org.hamcrest.Matchers.hasItems(
+                        "DONATION_PAYMENT", "DONATION_VOID")));
+
+        mockMvc.perform(get("/api/v1/donations/" + donationId + "/audit-events")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].action").value("DONATION_VOIDED"))
+                .andExpect(jsonPath("$.data[0].details").value("Entered against the wrong member"));
     }
 }

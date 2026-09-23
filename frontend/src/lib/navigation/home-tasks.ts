@@ -3,6 +3,7 @@ import {
   BarChart3,
   CalendarDays,
   ClipboardCheck,
+  CircleDollarSign,
   HandCoins,
   Megaphone,
   Receipt,
@@ -30,6 +31,7 @@ export interface HomeTask {
   emphasis?: "primary" | "secondary";
   icon: LucideIcon;
   organizationTypes?: OrganizationType[];
+  excludeOrganizationTypes?: OrganizationType[];
 }
 
 export interface HomeChecklistItem {
@@ -37,6 +39,8 @@ export interface HomeChecklistItem {
   label: string;
   href: string;
   roles: Role[];
+  organizationTypes?: OrganizationType[];
+  excludeOrganizationTypes?: OrganizationType[];
 }
 
 export const homeTasks: HomeTask[] = [
@@ -61,6 +65,36 @@ export const homeTasks: HomeTask[] = [
     organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
+    id: "record-attendance",
+    title: "Record attendance",
+    description: "Headcount for a Sunday or midweek service",
+    href: "/church/attendance",
+    roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
+    emphasis: "secondary",
+    icon: ClipboardCheck,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "add-partnership",
+    title: "Add a partnership",
+    description: "Monthly amount a member promised, then track gifts against it",
+    href: "/church/partnerships/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
+    emphasis: "secondary",
+    icon: CircleDollarSign,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "record-donation",
+    title: "Record a member gift",
+    description: "Zaka, sadaka, or a named gift — cash, Lipa, or pay later",
+    href: "/donations/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
+    emphasis: "primary",
+    icon: HandCoins,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
     id: "record-donation",
     title: "Record donation",
     description: "Gift details, then cash / Lipa or pay later",
@@ -68,6 +102,17 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "primary",
     icon: HandCoins,
+    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "add-donor",
+    title: "Add a member",
+    description: "Create a giver profile before recording gifts",
+    href: "/members/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
+    emphasis: "secondary",
+    icon: Users,
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "add-donor",
@@ -77,6 +122,7 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "secondary",
     icon: Users,
+    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "submit-expense",
@@ -104,6 +150,7 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
     emphasis: "secondary",
     icon: Megaphone,
+    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "view-funds",
@@ -145,16 +192,39 @@ export const homeTasks: HomeTask[] = [
 /** Short onboarding list — admin / fundraising only. */
 export const homeChecklist: HomeChecklistItem[] = [
   {
+    id: "collection",
+    label: "Record a Sunday collection",
+    href: "/church/collections/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "donor",
+    label: "Add a member",
+    href: "/members/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "donation",
+    label: "Record a member gift",
+    href: "/donations/new",
+    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
+    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
     id: "donor",
     label: "Add a donor",
     href: "/donors/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
+    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "donation",
     label: "Record a donation",
     href: "/donations/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
+    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "fund",
@@ -186,7 +256,15 @@ export function homeLayoutForRole(role: Role): HomeLayout {
   }
 }
 
-function matchesOrganization(task: { organizationTypes?: OrganizationType[] }, organizationType?: OrganizationType) {
+function matchesOrganization(
+  task: { organizationTypes?: OrganizationType[]; excludeOrganizationTypes?: OrganizationType[] },
+  organizationType?: OrganizationType,
+) {
+  if (task.excludeOrganizationTypes?.length) {
+    if (organizationType && task.excludeOrganizationTypes.includes(organizationType)) {
+      return false;
+    }
+  }
   if (!task.organizationTypes) {
     return true;
   }
@@ -200,11 +278,25 @@ export function tasksForRole(role: Role, organizationType?: OrganizationType) {
   return homeTasks.filter((task) => task.roles.includes(role) && matchesOrganization(task, organizationType));
 }
 
-export function checklistForRole(role: Role) {
-  return homeChecklist.filter((item) => item.roles.includes(role));
+export function checklistForRole(role: Role, organizationType?: OrganizationType) {
+  return homeChecklist.filter((item) => item.roles.includes(role) && matchesOrganization(item, organizationType));
 }
 
-export function homeGreeting(role: Role) {
+export function homeGreeting(role: Role, organizationType?: OrganizationType) {
+  if (organizationType && ["CHURCH", "RELIGIOUS_INSTITUTION"].includes(organizationType)) {
+    switch (role) {
+      case "FINANCE_MANAGER":
+      case "ACCOUNTANT":
+        return "Offerings to verify, then funds and spend.";
+      case "FUNDRAISING_MANAGER":
+        return "Members, gifts, and Sunday collection.";
+      case "STAFF":
+      case "VOLUNTEER":
+        return "Count the offering and the people.";
+      default:
+        return "Today’s collections, attendance, and cash position.";
+    }
+  }
   switch (role) {
     case "FINANCE_MANAGER":
     case "ACCOUNTANT":

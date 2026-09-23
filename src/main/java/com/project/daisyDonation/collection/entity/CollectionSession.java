@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import com.project.daisyDonation.donation.entity.Donation;
 import com.project.daisyDonation.common.entity.TenantEntity;
 import com.project.daisyDonation.campaign.entity.Campaign;
+import com.project.daisyDonation.fund.entity.Fund;
 import com.project.daisyDonation.payment.entity.PaymentMethod;
 
 import jakarta.persistence.Column;
@@ -65,6 +66,10 @@ public class CollectionSession extends TenantEntity {
     @ManyToOne
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
+
+    @ManyToOne
+    @JoinColumn(name = "fund_id")
+    private Fund fund;
 
     @OneToOne
     @JoinColumn(name = "donation_id")

@@ -24,7 +24,6 @@ import com.project.daisyDonation.communication.repository.CommunicationLogReposi
 import com.project.daisyDonation.communication.service.provider.ChannelSenderRegistry;
 import com.project.daisyDonation.donation.entity.Donation;
 import com.project.daisyDonation.donation.repository.DonationRepository;
-import com.project.daisyDonation.donor.entity.Donor;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.payment.entity.Payment;
 import com.project.daisyDonation.payment.repository.PaymentRepository;
@@ -119,7 +118,7 @@ public class CommunicationService {
             return;
         }
 
-        if (donation.isAnonymous() || donation.getDonor() == null) {
+        if (donation.isAnonymous() || (donation.getDonor() == null && donation.getMember() == null)) {
             return;
         }
 
@@ -182,15 +181,19 @@ public class CommunicationService {
             return override;
         }
 
-        Donor donor = donation.getDonor();
-        if (donor == null) {
-            throw new BadRequestException("No donor contact available for this donation");
+        if (donation.getDonor() != null) {
+            return switch (channel) {
+                case EMAIL -> donation.getDonor().getEmail();
+                case SMS, WHATSAPP -> donation.getDonor().getPhone();
+            };
         }
-
-        return switch (channel) {
-            case EMAIL -> donor.getEmail();
-            case SMS, WHATSAPP -> donor.getPhone();
-        };
+        if (donation.getMember() != null) {
+            return switch (channel) {
+                case EMAIL -> donation.getMember().getEmail();
+                case SMS, WHATSAPP -> donation.getMember().getPhone();
+            };
+        }
+        throw new BadRequestException("No contact available for this donation");
     }
 
     private Donation requireDonation(Long organizationId, Long donationId) {

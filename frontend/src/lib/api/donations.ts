@@ -3,6 +3,7 @@ import type {
   DonationCreateRequest,
   DonationDetailResponse,
   DonationSummaryResponse,
+  DonationAuditEventResponse,
   ReceiptResponse,
 } from "@/types/fundraising";
 
@@ -23,6 +24,18 @@ export function cancelDonation(token: string, id: number) {
     method: "POST",
     token,
   });
+}
+
+export function voidDonation(token: string, id: number, reason: string) {
+  return apiRequest<DonationDetailResponse>(`/api/v1/donations/${id}/void`, {
+    method: "POST",
+    token,
+    body: { reason },
+  });
+}
+
+export function listDonationAuditEvents(token: string, id: number) {
+  return apiRequest<DonationAuditEventResponse[]>(`/api/v1/donations/${id}/audit-events`, { token });
 }
 
 export function previewReceipt(token: string, donationId: number) {

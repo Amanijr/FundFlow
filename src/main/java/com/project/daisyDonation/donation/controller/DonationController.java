@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.daisyDonation.audit.dto.DomainAuditEventResponse;
 import com.project.daisyDonation.common.config.OpenApiConfig;
 import com.project.daisyDonation.common.dto.ApiResponse;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.donation.dto.DonationCreateRequest;
 import com.project.daisyDonation.donation.dto.DonationDetailResponse;
 import com.project.daisyDonation.donation.dto.DonationSummaryResponse;
+import com.project.daisyDonation.donation.dto.DonationVoidRequest;
 import com.project.daisyDonation.donation.service.DonationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,5 +83,29 @@ public class DonationController {
             @Parameter(description = "Unique donation identifier")
             @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok("Donation cancelled", donationService.cancel(principal, id)));
+    }
+
+    @PostMapping("/{id}/void")
+    @PreAuthorize("hasAnyRole('ORG_ADMIN','FINANCE_MANAGER')")
+    @Operation(
+            summary = "Void a completed gift",
+            description = "Marks a completed gift as voided and posts a reversing journal. Pending gifts should be cancelled instead.")
+    public ResponseEntity<ApiResponse<DonationDetailResponse>> voidCompleted(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Unique donation identifier")
+            @PathVariable Long id,
+            @Valid @RequestBody DonationVoidRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok("Gift voided", donationService.voidCompleted(principal, id, request)));
+    }
+
+    @GetMapping("/{id}/audit-events")
+    @Operation(
+            summary = "List donation audit events",
+            description = "Returns domain audit events for this gift, including voids.")
+    public ResponseEntity<ApiResponse<List<DomainAuditEventResponse>>> listAudit(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Unique donation identifier")
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(donationService.listAudit(principal, id)));
     }
 }

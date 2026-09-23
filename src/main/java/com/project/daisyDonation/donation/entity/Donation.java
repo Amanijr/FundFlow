@@ -1,10 +1,13 @@
 package com.project.daisyDonation.donation.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.project.daisyDonation.campaign.entity.Campaign;
 import com.project.daisyDonation.collection.entity.CollectionSession;
+import com.project.daisyDonation.church.entity.Member;
+import com.project.daisyDonation.church.entity.Partnership;
 import com.project.daisyDonation.common.entity.TenantEntity;
 import com.project.daisyDonation.donor.entity.Donor;
 import com.project.daisyDonation.fund.entity.Fund;
@@ -36,6 +39,10 @@ public class Donation extends TenantEntity {
     @ManyToOne
     @JoinColumn(name = "donor_id")
     private Donor donor;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
@@ -72,6 +79,13 @@ public class Donation extends TenantEntity {
     @ManyToOne
     @JoinColumn(name = "fund_id")
     private Fund fund;
+
+    @ManyToOne
+    @JoinColumn(name = "partnership_id")
+    private Partnership partnership;
+
+    @Column(name = "partnership_month")
+    private LocalDate partnershipMonth;
 
     @Column(length = 100)
     private String source;

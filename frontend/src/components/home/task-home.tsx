@@ -1,13 +1,17 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowRight, Check, LayoutDashboard } from "lucide-react";
 
+import { ChurchHomeSnapshot } from "@/components/home/church-home-snapshot";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useInboxCount } from "@/hooks/use-workflow";
 import { useOrganization } from "@/hooks/use-organization";
+import { getChurchDashboard } from "@/lib/api/church";
+import { isChurchOrganization } from "@/lib/organization/verticals";
 import {
   checklistForRole,
   homeGreeting,
@@ -232,20 +236,27 @@ function TaskGrid({
 }
 
 export function TaskHome() {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const organizationQuery = useOrganization();
   const inboxQuery = useInboxCount();
+  const church = isChurchOrganization(organizationQuery.data?.type ?? user?.organizationType);
+  const dashboardQuery = useQuery({
+    queryKey: ["church", "dashboard"],
+    queryFn: async () => (await getChurchDashboard(accessToken!)).data,
+    enabled: Boolean(accessToken) && church,
+  });
 
   if (!user) {
     return null;
   }
 
+  const organizationType = organizationQuery.data?.type ?? user.organizationType ?? undefined;
   const layout = homeLayoutForRole(user.role);
-  const tasks = tasksForRole(user.role, organizationQuery.data?.type);
-  const checklist = checklistForRole(user.role);
+  const tasks = tasksForRole(user.role, organizationType);
+  const checklist = checklistForRole(user.role, organizationType);
   const primaryTasks = tasks.filter((task) => task.emphasis === "primary");
   const secondaryTasks = tasks.filter((task) => task.emphasis !== "primary");
-  const overviewPath = getRoleOverviewPath(user.role);
+  const overviewPath = getRoleOverviewPath(user.role, organizationQuery.data?.type ?? user.organizationType);
   const pendingApprovals = inboxQuery.data ?? 0;
   const showApprovalsCallout =
     pendingApprovals > 0 &&
@@ -264,16 +275,18 @@ export function TaskHome() {
     <div className="mx-auto max-w-3xl space-y-8">
       <PageHeader
         title={`Hello, ${user.firstName}`}
-        description={homeGreeting(user.role)}
+        description={homeGreeting(user.role, organizationQuery.data?.type ?? user.organizationType ?? undefined)}
         action={
           <Button variant="ghost" size="sm" asChild>
             <Link href={overviewPath}>
               <LayoutDashboard className="mr-1.5 h-4 w-4" />
-              Full overview
+              {church ? "Church overview" : "Full overview"}
             </Link>
           </Button>
         }
       />
+
+      {church && dashboardQuery.data ? <ChurchHomeSnapshot data={dashboardQuery.data} /> : null}
 
       {showApprovalsCallout && <ApprovalsCallout count={pendingApprovals} />}
 

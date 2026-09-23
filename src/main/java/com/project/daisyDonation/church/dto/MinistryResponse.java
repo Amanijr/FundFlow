@@ -22,5 +22,6 @@ public class MinistryResponse {
     private String description;
     private String leaderName;
     private boolean active;
+    private long memberCount;
     private LocalDateTime createdAt;
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
+import com.project.daisyDonation.donation.repository.DonationRepository;
 import com.project.daisyDonation.expense.repository.ExpenseRepository;
 import com.project.daisyDonation.fund.entity.Fund;
 import com.project.daisyDonation.fund.repository.FundRepository;
@@ -20,6 +21,7 @@ public class FundBalanceService {
     private final FundRepository fundRepository;
     private final FundTransferRepository fundTransferRepository;
     private final ExpenseRepository expenseRepository;
+    private final DonationRepository donationRepository;
 
     @Transactional(readOnly = true)
     public BigDecimal calculateBalance(Long fundId, Long organizationId) {
@@ -28,10 +30,12 @@ public class FundBalanceService {
 
         BigDecimal incoming = fundTransferRepository.sumIncomingTransfers(fundId, organizationId);
         BigDecimal outgoing = fundTransferRepository.sumOutgoingTransfers(fundId, organizationId);
+        BigDecimal giving = donationRepository.sumCompletedAmountByFund(fundId, organizationId);
         BigDecimal expenses = expenseRepository.sumPaidAmountByFund(fundId, organizationId);
 
         return fund.getOpeningBalance()
                 .add(incoming)
+                .add(giving)
                 .subtract(outgoing)
                 .subtract(expenses);
     }

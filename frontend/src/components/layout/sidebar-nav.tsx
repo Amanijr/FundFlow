@@ -12,9 +12,9 @@ import { useNavigation } from "@/hooks/use-navigation";
 import { getDefaultDashboardPath } from "@/lib/navigation/permissions";
 import type { NavGroup } from "@/types/navigation";
 
-function isNavActive(pathname: string, href: string) {
-  if (href === "/") {
-    return pathname === "/";
+function isNavActive(pathname: string, href: string, match?: "prefix" | "exact") {
+  if (href === "/" || match === "exact") {
+    return pathname === href;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -24,7 +24,7 @@ function mapGroupItems(group: NavGroup, pathname: string) {
     href: item.href,
     label: item.label,
     icon: item.icon,
-    active: isNavActive(pathname, item.href),
+    active: isNavActive(pathname, item.href, item.match),
   }));
 }
 
@@ -41,14 +41,14 @@ export function SidebarNav({ collapsed = false, onNavigate, className }: Sidebar
   const homeHref = user ? getDefaultDashboardPath(user.role) : "/";
   const [moreOpen, setMoreOpen] = useState(() =>
     secondaryGroups.some((group) =>
-      group.items.some((item) => isNavActive(pathname, item.href)),
+      group.items.some((item) => isNavActive(pathname, item.href, item.match)),
     ),
   );
 
   const secondaryHasActive = useMemo(
     () =>
       secondaryGroups.some((group) =>
-        group.items.some((item) => isNavActive(pathname, item.href)),
+        group.items.some((item) => isNavActive(pathname, item.href, item.match)),
       ),
     [pathname, secondaryGroups],
   );
@@ -58,13 +58,14 @@ export function SidebarNav({ collapsed = false, onNavigate, className }: Sidebar
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <nav
-        className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 scrollbar-thin"
+        className="flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 scrollbar-thin"
         aria-label="Main navigation"
       >
         {primaryGroups.map((group) => (
           <SidebarGroup
             key={group.id}
             label={group.label}
+            hideLabel={group.hideLabel}
             collapsed={collapsed}
             onNavigate={onNavigate}
             items={mapGroupItems(group, pathname)}

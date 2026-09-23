@@ -34,4 +34,6 @@ public class CollectionSessionCountRequest {
     @Schema(description = "notes")
     @Size(max = 1000)
     private String notes;
+    @Schema(description = "fund id")
+    private Long fundId;
 }

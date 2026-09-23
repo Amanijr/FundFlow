@@ -18,4 +18,9 @@ public interface DonorRepository extends JpaRepository<Donor, Long> {
     boolean existsByOrganizationIdAndEmailAndDeletedFalse(Long organizationId, String email);
 
     boolean existsByOrganizationIdAndPhoneAndDeletedFalse(Long organizationId, String phone);
+
+    long countByOrganizationIdAndDeletedFalse(Long organizationId);
+
+    long countByOrganizationIdAndMembershipStatusAndDeletedFalse(
+            Long organizationId, com.project.daisyDonation.donor.entity.MembershipStatus membershipStatus);
 }

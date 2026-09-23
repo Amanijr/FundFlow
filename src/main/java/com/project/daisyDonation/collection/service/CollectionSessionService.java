@@ -32,6 +32,8 @@ import com.project.daisyDonation.common.service.TenantSupport;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.payment.entity.PaymentChannel;
 import com.project.daisyDonation.donation.repository.DonationRepository;
+import com.project.daisyDonation.fund.entity.Fund;
+import com.project.daisyDonation.fund.service.FundService;
 import com.project.daisyDonation.payment.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ public class CollectionSessionService {
     private final TenantSupport tenantSupport;
     private final CampaignService campaignService;
     private final AccountingPostingService accountingPostingService;
+    private final FundService fundService;
 
     @Transactional
     public CollectionSessionResponse create(UserPrincipal principal, CollectionSessionCreateRequest request) {
@@ -65,6 +68,7 @@ public class CollectionSessionService {
             Campaign campaign = campaignService.requireCampaign(principal, request.getCampaignId());
             session.setCampaign(campaign);
         }
+        applyFund(principal, session, request.getFundId());
 
         return toResponse(collectionSessionRepository.save(session));
     }
@@ -86,6 +90,7 @@ public class CollectionSessionService {
         }
         session.setCollectedByUserId(principal.getId());
         session.setStatus(CollectionSessionStatus.COUNTED);
+        applyFund(principal, session, request.getFundId());
 
         return toResponse(collectionSessionRepository.save(session));
     }
@@ -106,6 +111,11 @@ public class CollectionSessionService {
                 ? session.getCollectedAt()
                 : LocalDateTime.now();
 
+        Fund fund = resolveFundForPosting(session);
+        if (fund != null) {
+            session.setFund(fund);
+        }
+
         Donation donation = new Donation();
         donation.setOrganization(session.getOrganization());
         donation.setAmount(session.getTotalAmount());
@@ -113,6 +123,7 @@ public class CollectionSessionService {
         donation.setDonationType(DonationType.COLLECTION);
         donation.setCollectionSession(session);
         donation.setCampaign(session.getCampaign());
+        donation.setFund(fund);
         donation.setSource(session.getCollectionType().name());
         donation.setStatus(DonationStatus.COMPLETED);
         donation.setDonationTime(donationTime);
@@ -217,6 +228,20 @@ public class CollectionSessionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Collection session not found"));
     }
 
+    private void applyFund(UserPrincipal principal, CollectionSession session, Long fundId) {
+        if (fundId == null) {
+            return;
+        }
+        session.setFund(fundService.requireFund(principal, fundId));
+    }
+
+    private Fund resolveFundForPosting(CollectionSession session) {
+        if (session.getFund() != null) {
+            return session.getFund();
+        }
+        return fundService.findDefaultCollectionFund(session.getOrganization().getId()).orElse(null);
+    }
+
     private CollectionSessionResponse toResponse(CollectionSession session) {
         return CollectionSessionResponse.builder()
                 .id(session.getId())
@@ -233,6 +258,8 @@ public class CollectionSessionService {
                 .status(session.getStatus())
                 .campaignId(session.getCampaign() != null ? session.getCampaign().getId() : null)
                 .campaignName(session.getCampaign() != null ? session.getCampaign().getName() : null)
+                .fundId(session.getFund() != null ? session.getFund().getId() : null)
+                .fundName(session.getFund() != null ? session.getFund().getName() : null)
                 .donationId(session.getDonation() != null ? session.getDonation().getId() : null)
                 .notes(session.getNotes())
                 .createdAt(session.getCreatedAt())

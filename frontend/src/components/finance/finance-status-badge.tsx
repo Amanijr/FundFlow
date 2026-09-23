@@ -27,8 +27,8 @@ const budgetStatusConfig: Record<
 export function ExpenseStatusBadge({ status, className }: { status: ExpenseStatus; className?: string }) {
   const config = expenseStatusConfig[status];
   return (
-    <Badge variant={config.variant} className={cn(className)}>
-      {config.label}
+    <Badge variant={config?.variant ?? "secondary"} className={cn(className)}>
+      {config?.label ?? formatEnumLabel(status)}
     </Badge>
   );
 }
@@ -36,13 +36,16 @@ export function ExpenseStatusBadge({ status, className }: { status: ExpenseStatu
 export function BudgetStatusBadge({ status, className }: { status: BudgetStatus; className?: string }) {
   const config = budgetStatusConfig[status];
   return (
-    <Badge variant={config.variant} className={cn(className)}>
-      {config.label}
+    <Badge variant={config?.variant ?? "secondary"} className={cn(className)}>
+      {config?.label ?? formatEnumLabel(status)}
     </Badge>
   );
 }
 
-export function formatEnumLabel(value: string) {
+export function formatEnumLabel(value?: string | null) {
+  if (!value) {
+    return "—";
+  }
   return value
     .replaceAll("_", " ")
     .toLowerCase()

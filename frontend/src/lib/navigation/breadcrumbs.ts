@@ -19,7 +19,11 @@ const SEGMENT_LABELS: Record<string, string> = {
   church: "Church",
   collections: "Sunday collections",
   ministries: "Ministries",
+  services: "Services",
   attendance: "Attendance",
+  members: "Members",
+  partnerships: "Partnerships",
+  donors: "Donors",
 };
 
 function titleCaseSegment(segment: string): string {

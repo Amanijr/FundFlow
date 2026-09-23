@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Church, ClipboardList, HandCoins, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, CircleDollarSign, ClipboardList, HandCoins, Users } from "lucide-react";
 
 import { ChurchNav } from "@/components/church/church-nav";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,16 +10,28 @@ import { Button } from "@/components/ui/button";
 
 const churchWork = [
   {
+    href: "/members",
+    title: "Members",
+    description: "People in the congregation — contact is optional.",
+    icon: Users,
+  },
+  {
+    href: "/church/partnerships",
+    title: "Partnerships",
+    description: "Monthly amounts members promised, and progress as gifts come in.",
+    icon: CircleDollarSign,
+  },
+  {
     href: "/church/collections",
     title: "Sunday collections",
     description: "Count the offering, then the treasurer verifies it onto the books.",
     icon: HandCoins,
   },
   {
-    href: "/donations/new",
-    title: "Record a member gift",
-    description: "Zaka, sadaka, or a named gift — cash, Lipa, or pay later.",
-    icon: Church,
+    href: "/church/services",
+    title: "Services",
+    description: "Sunday and midweek gatherings, then record headcount.",
+    icon: CalendarDays,
   },
   {
     href: "/church/attendance",
@@ -42,7 +54,7 @@ export default function ChurchHomePage() {
       <PageHeader
         breadcrumbs={[{ label: "Church" }]}
         title="Church"
-        description="Sunday offering, member gifts, ministries, and attendance."
+        description="Sunday offering, ministries, and attendance."
         action={
           <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"]}>
             <Button asChild>

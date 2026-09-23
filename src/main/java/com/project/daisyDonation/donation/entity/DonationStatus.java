@@ -6,5 +6,6 @@ public enum DonationStatus {
     COMPLETED,
     FAILED,
     CANCELLED,
-    REFUNDED
+    REFUNDED,
+    VOIDED
 }

@@ -21,6 +21,7 @@ export interface FundRequest {
   description?: string;
   openingBalance?: number;
   active?: boolean;
+  defaultForCollections?: boolean;
 }
 
 export interface FundResponse {
@@ -33,6 +34,7 @@ export interface FundResponse {
   openingBalance?: number;
   currentBalance: number;
   active: boolean;
+  defaultForCollections?: boolean;
   createdAt: string;
 }
 

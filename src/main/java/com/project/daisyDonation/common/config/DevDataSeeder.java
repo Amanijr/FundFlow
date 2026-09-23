@@ -17,12 +17,12 @@ import com.project.daisyDonation.auth.repository.UserRepository;
 import com.project.daisyDonation.campaign.dto.CampaignRequest;
 import com.project.daisyDonation.campaign.entity.CampaignStatus;
 import com.project.daisyDonation.campaign.service.CampaignService;
+import com.project.daisyDonation.church.dto.MemberRequest;
+import com.project.daisyDonation.church.service.MemberService;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.donation.dto.DonationCreateRequest;
 import com.project.daisyDonation.donation.entity.DonationType;
 import com.project.daisyDonation.donation.service.DonationService;
-import com.project.daisyDonation.donor.dto.DonorRequest;
-import com.project.daisyDonation.donor.service.DonorService;
 import com.project.daisyDonation.expense.dto.ExpensePaymentRequest;
 import com.project.daisyDonation.expense.dto.ExpenseRequest;
 import com.project.daisyDonation.expense.entity.ExpenseCategory;
@@ -54,7 +54,7 @@ public class DevDataSeeder implements ApplicationRunner {
     private final OrganizationService organizationService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final DonorService donorService;
+    private final MemberService memberService;
     private final CampaignService campaignService;
     private final DonationService donationService;
     private final PaymentProcessingService paymentProcessingService;
@@ -100,7 +100,7 @@ public class DevDataSeeder implements ApplicationRunner {
 
         accountingService.initialize(principal);
 
-        var donorMary = donorService.create(principal, DonorRequest.builder()
+        var memberMary = memberService.create(principal, MemberRequest.builder()
                 .firstName("Mary")
                 .lastName("Mbeki")
                 .email("mary.mbeki@example.com")
@@ -109,7 +109,7 @@ public class DevDataSeeder implements ApplicationRunner {
                 .country("Tanzania")
                 .build());
 
-        var donorJohn = donorService.create(principal, DonorRequest.builder()
+        var memberJohn = memberService.create(principal, MemberRequest.builder()
                 .firstName("John")
                 .lastName("Okello")
                 .email("john.okello@example.com")
@@ -118,7 +118,7 @@ public class DevDataSeeder implements ApplicationRunner {
                 .country("Tanzania")
                 .build());
 
-        var donorGrace = donorService.create(principal, DonorRequest.builder()
+        var memberGrace = memberService.create(principal, MemberRequest.builder()
                 .firstName("Grace")
                 .lastName("Kimaro")
                 .email("grace.kimaro@example.com")
@@ -141,10 +141,10 @@ public class DevDataSeeder implements ApplicationRunner {
                 .status(CampaignStatus.ACTIVE)
                 .build());
 
-        recordDonation(principal, donorMary.getId(), buildingFund.getId(), "2500.00", "WEB");
-        recordDonation(principal, donorJohn.getId(), buildingFund.getId(), "1200.00", "MOBILE");
-        recordDonation(principal, donorGrace.getId(), youthOutreach.getId(), "500.00", "EVENT");
-        recordDonation(principal, donorMary.getId(), youthOutreach.getId(), "750.00", "WEB");
+        recordDonation(principal, memberMary.getId(), buildingFund.getId(), "2500.00", "WEB");
+        recordDonation(principal, memberJohn.getId(), buildingFund.getId(), "1200.00", "MOBILE");
+        recordDonation(principal, memberGrace.getId(), youthOutreach.getId(), "500.00", "EVENT");
+        recordDonation(principal, memberMary.getId(), youthOutreach.getId(), "750.00", "WEB");
 
         var expense = expenseService.create(principal, ExpenseRequest.builder()
                 .title("Office supplies")
@@ -187,7 +187,7 @@ public class DevDataSeeder implements ApplicationRunner {
             String amount,
             String source) {
         var donation = donationService.create(principal, DonationCreateRequest.builder()
-                .donorId(donorId)
+                .memberId(donorId)
                 .campaignId(campaignId)
                 .amount(new BigDecimal(amount))
                 .donationType(DonationType.ONE_TIME)

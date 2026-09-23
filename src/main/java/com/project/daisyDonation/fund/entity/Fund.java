@@ -43,4 +43,7 @@ public class Fund extends TenantEntity {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(name = "default_for_collections", nullable = false)
+    private boolean defaultForCollections = false;
 }

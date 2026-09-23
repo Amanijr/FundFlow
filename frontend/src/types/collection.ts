@@ -16,6 +16,7 @@ export interface CollectionSessionCreateRequest {
   campaignId?: number;
   location?: string;
   notes?: string;
+  fundId?: number;
 }
 
 export interface CollectionSessionCountRequest {
@@ -23,6 +24,7 @@ export interface CollectionSessionCountRequest {
   paymentMethod: PaymentMethod;
   collectedAt: string;
   notes?: string;
+  fundId?: number;
 }
 
 export interface CollectionSessionResponse {
@@ -40,6 +42,8 @@ export interface CollectionSessionResponse {
   status: CollectionSessionStatus;
   campaignId?: number;
   campaignName?: string;
+  fundId?: number;
+  fundName?: string;
   donationId?: number;
   notes?: string;
   createdAt: string;

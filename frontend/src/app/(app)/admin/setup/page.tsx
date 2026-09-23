@@ -16,6 +16,7 @@ import { inviteUser } from "@/lib/api/users";
 import { updateCurrentOrganization } from "@/lib/api/organization";
 import { setOnboardingComplete } from "@/lib/onboarding";
 import { getDefaultDashboardPath } from "@/lib/navigation/permissions";
+import { isChurchOrganization } from "@/lib/organization/verticals";
 import { ApiError } from "@/types/api";
 import type { CreateUserRequest } from "@/lib/api/users";
 import type { OrganizationUpdateRequest } from "@/types/admin";
@@ -23,10 +24,18 @@ import { cn } from "@/lib/utils";
 
 const steps = ["Profile", "Invite team", "Get started"] as const;
 
-const modules = [
+const foModules = [
   { href: "/donors", label: "Add donors", description: "Build your donor database" },
   { href: "/campaigns", label: "Create a campaign", description: "Set fundraising goals" },
   { href: "/funds", label: "Set up funds", description: "Configure fund accounting" },
+  { href: "/accounting/chart-of-accounts", label: "Initialize accounting", description: "Chart of accounts" },
+];
+
+const churchModules = [
+  { href: "/members", label: "Add members", description: "Congregation records" },
+  { href: "/church/partnerships", label: "Partnerships", description: "Monthly amounts members promised" },
+  { href: "/church/collections", label: "Sunday collections", description: "Count and verify the offering" },
+  { href: "/funds", label: "Set up funds", description: "Zaka, sadaka, and building funds" },
   { href: "/accounting/chart-of-accounts", label: "Initialize accounting", description: "Chart of accounts" },
 ];
 
@@ -66,6 +75,7 @@ export default function AdminSetupPage() {
   }
 
   const org = organizationQuery.data;
+  const modules = isChurchOrganization(org?.type ?? user?.organizationType) ? churchModules : foModules;
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">

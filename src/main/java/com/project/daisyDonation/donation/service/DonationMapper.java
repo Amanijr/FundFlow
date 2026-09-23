@@ -23,9 +23,18 @@ public final class DonationMapper {
     }
 
     public static DonationDetailResponse toDetail(Donation donation) {
+        return toDetail(donation, null);
+    }
+
+    public static DonationDetailResponse toDetail(Donation donation, Long paymentId) {
         String donorName = null;
         Long donorId = null;
-        if (!donation.isAnonymous() && donation.getDonor() != null) {
+        Long memberId = null;
+        if (!donation.isAnonymous() && donation.getMember() != null) {
+            memberId = donation.getMember().getId();
+            donorId = memberId;
+            donorName = donation.getMember().getFirstName() + " " + donation.getMember().getLastName();
+        } else if (!donation.isAnonymous() && donation.getDonor() != null) {
             donorId = donation.getDonor().getId();
             donorName = donation.getDonor().getFirstName() + " " + donation.getDonor().getLastName();
         }
@@ -35,6 +44,7 @@ public final class DonationMapper {
                 .organizationId(donation.getOrganization().getId())
                 .donorId(donorId)
                 .donorName(donorName)
+                .memberId(memberId)
                 .amount(donation.getAmount())
                 .donationTime(donation.getDonationTime())
                 .status(donation.getStatus())
@@ -56,6 +66,9 @@ public final class DonationMapper {
                 .notes(donation.getNotes())
                 .itemDescription(donation.getItemDescription())
                 .estimatedValue(donation.getEstimatedValue())
+                .paymentId(paymentId)
+                .partnershipId(donation.getPartnership() != null ? donation.getPartnership().getId() : null)
+                .partnershipMonth(donation.getPartnershipMonth())
                 .build();
     }
 }

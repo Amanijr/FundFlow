@@ -1,6 +1,7 @@
 package com.project.daisyDonation.donation.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     List<Donation> findByStatusAndOrganizationIdAndDeletedFalse(DonationStatus status, Long organizationId);
 
     List<Donation> findByDonorIdAndOrganizationIdAndDeletedFalse(Long donorId, Long organizationId);
+
+    List<Donation> findByMemberIdAndOrganizationIdAndDeletedFalse(Long memberId, Long organizationId);
 
     Optional<Donation> findByIdAndOrganizationIdAndDeletedFalse(Long id, Long organizationId);
 
@@ -60,6 +63,17 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             @Param("organizationId") Long organizationId);
 
     @Query("""
+            SELECT COALESCE(SUM(d.amount), 0) FROM Donation d
+            WHERE d.fund.id = :fundId
+              AND d.organization.id = :organizationId
+              AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
+              AND d.deleted = false
+            """)
+    BigDecimal sumCompletedAmountByFund(
+            @Param("fundId") Long fundId,
+            @Param("organizationId") Long organizationId);
+
+    @Query("""
             SELECT COUNT(d) FROM Donation d
             WHERE d.donor.id = :donorId
               AND d.organization.id = :organizationId
@@ -68,6 +82,28 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             """)
     long countCompletedByDonor(
             @Param("donorId") Long donorId,
+            @Param("organizationId") Long organizationId);
+
+    @Query("""
+            SELECT COALESCE(SUM(d.amount), 0) FROM Donation d
+            WHERE d.member.id = :memberId
+              AND d.organization.id = :organizationId
+              AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
+              AND d.deleted = false
+            """)
+    BigDecimal sumCompletedAmountByMember(
+            @Param("memberId") Long memberId,
+            @Param("organizationId") Long organizationId);
+
+    @Query("""
+            SELECT COUNT(d) FROM Donation d
+            WHERE d.member.id = :memberId
+              AND d.organization.id = :organizationId
+              AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
+              AND d.deleted = false
+            """)
+    long countCompletedByMember(
+            @Param("memberId") Long memberId,
             @Param("organizationId") Long organizationId);
 
     @Query("""
@@ -98,11 +134,11 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             @Param("toDateTime") LocalDateTime toDateTime);
 
     @Query("""
-            SELECT COUNT(DISTINCT d.donor.id) FROM Donation d
+            SELECT COUNT(DISTINCT COALESCE(d.donor.id, d.member.id)) FROM Donation d
             WHERE d.organization.id = :organizationId
               AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
               AND d.deleted = false
-              AND d.donor IS NOT NULL
+              AND (d.donor IS NOT NULL OR d.member IS NOT NULL)
               AND d.donationTime >= :fromDateTime
               AND d.donationTime <= :toDateTime
             """)
@@ -110,4 +146,28 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             @Param("organizationId") Long organizationId,
             @Param("fromDateTime") LocalDateTime fromDateTime,
             @Param("toDateTime") LocalDateTime toDateTime);
+
+    @Query("""
+            SELECT COALESCE(SUM(d.amount), 0) FROM Donation d
+            WHERE d.partnership.id = :partnershipId
+              AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
+              AND d.deleted = false
+              AND d.partnershipMonth = :month
+            """)
+    BigDecimal sumCompletedByPartnershipAndMonth(
+            @Param("partnershipId") Long partnershipId,
+            @Param("month") LocalDate month);
+
+    @Query("""
+            SELECT COALESCE(SUM(d.amount), 0) FROM Donation d
+            WHERE d.partnership.id = :partnershipId
+              AND d.status = com.project.daisyDonation.donation.entity.DonationStatus.COMPLETED
+              AND d.deleted = false
+              AND d.partnershipMonth >= :fromMonth
+              AND d.partnershipMonth <= :toMonth
+            """)
+    BigDecimal sumCompletedByPartnershipBetweenMonths(
+            @Param("partnershipId") Long partnershipId,
+            @Param("fromMonth") LocalDate fromMonth,
+            @Param("toMonth") LocalDate toMonth);
 }

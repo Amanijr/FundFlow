@@ -85,6 +85,27 @@ public class PledgeService {
         pledgeRepository.save(pledge);
     }
 
+    @Transactional
+    public void reverseDonationOnPledge(Pledge pledge, BigDecimal amount) {
+        BigDecimal newFulfilled = pledge.getFulfilledAmount().subtract(amount).max(BigDecimal.ZERO);
+        pledge.setFulfilledAmount(newFulfilled);
+
+        if (pledge.getStatus() == PledgeStatus.CANCELLED) {
+            pledgeRepository.save(pledge);
+            return;
+        }
+
+        if (newFulfilled.compareTo(BigDecimal.ZERO) <= 0) {
+            pledge.setStatus(PledgeStatus.OPEN);
+        } else if (newFulfilled.compareTo(pledge.getPledgedAmount()) >= 0) {
+            pledge.setStatus(PledgeStatus.FULFILLED);
+        } else {
+            pledge.setStatus(PledgeStatus.PARTIALLY_FULFILLED);
+        }
+
+        pledgeRepository.save(pledge);
+    }
+
     private PledgeResponse toResponse(Pledge pledge) {
         BigDecimal remaining = pledge.getPledgedAmount().subtract(pledge.getFulfilledAmount()).max(BigDecimal.ZERO);
         return PledgeResponse.builder()

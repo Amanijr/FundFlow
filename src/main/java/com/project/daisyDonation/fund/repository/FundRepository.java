@@ -19,4 +19,6 @@ public interface FundRepository extends JpaRepository<Fund, Long> {
     boolean existsByOrganizationIdAndCodeAndDeletedFalse(Long organizationId, String code);
 
     List<Fund> findByOrganizationIdAndTypeAndDeletedFalse(Long organizationId, FundType type);
+
+    Optional<Fund> findByOrganizationIdAndDefaultForCollectionsTrueAndDeletedFalse(Long organizationId);
 }

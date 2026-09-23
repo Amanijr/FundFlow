@@ -5,6 +5,13 @@ import type {
   CollectionSessionCreateRequest,
 } from "@/types/collection";
 import type { PlatformOrganization, PlatformUser, SystemLogResponse } from "@/types/platform";
+import type {
+  AttendanceRecordResponse,
+  MemberMinistryResponse,
+  MinistryResponse,
+  PartnershipResponse,
+  ServiceEventResponse,
+} from "@/types/verticals";
 
 import { mockDelay } from "@/lib/mock/config";
 import {
@@ -22,8 +29,10 @@ import {
   MOCK_INSIGHTS,
   MOCK_MINISTRIES,
   MOCK_ORG,
+  MOCK_PARTNERSHIPS,
   MOCK_ORGANIZATIONS,
   MOCK_PROGRAMS,
+  MOCK_SERVICES,
   MOCK_SPONSORSHIPS,
   MOCK_TRENDS,
   buildAuthResponse,
@@ -62,8 +71,17 @@ import {
   uploadMockDocument,
   uploadMockDocumentVersion,
 } from "@/lib/mock/document-store";
-
 import type { RequestOptions } from "@/lib/api/client";
+
+const MOCK_DONATION_AUDIT: {
+  id: number;
+  actorUserId: number;
+  action: string;
+  entityType: string;
+  entityId: number;
+  details?: string;
+  createdAt: string;
+}[] = [];
 
 function ok<T>(data: T, message = "OK"): ApiResponse<T> {
   return {
@@ -82,6 +100,44 @@ function parsePath(path: string): { pathname: string; search: URLSearchParams } 
 function matchId(pathname: string, prefix: string): number | null {
   const match = pathname.match(new RegExp(`^${prefix}/(\\d+)(?:/|$)`));
   return match ? Number(match[1]) : null;
+}
+
+const mockMemberMinistries: MemberMinistryResponse[] = [
+  {
+    id: 9001,
+    memberId: 1,
+    memberName: "James Mbeki",
+    ministryId: 1,
+    ministryName: "Worship & Chants",
+    role: "Choir",
+    status: "ACTIVE",
+    joinedAt: "2025-01-01",
+    createdAt: "2025-01-01T08:00:00Z",
+  },
+];
+
+const mockPartnerships: PartnershipResponse[] = MOCK_PARTNERSHIPS.map((row) => ({ ...row }));
+
+const mockServices: ServiceEventResponse[] = MOCK_SERVICES.map((row) => ({ ...row }));
+const mockAttendance: AttendanceRecordResponse[] = [
+  {
+    id: 11,
+    serviceEventId: 1,
+    ministryId: 1,
+    ministryName: "Worship & Chants",
+    serviceDate: "2026-09-14",
+    eventName: "Sunday service",
+    attendanceCount: 248,
+    createdAt: "2026-09-14T12:00:00Z",
+  },
+];
+
+function ministryMemberCount(ministryId: number) {
+  return mockMemberMinistries.filter((row) => row.ministryId === ministryId && row.status === "ACTIVE").length;
+}
+
+function withMinistryCounts(ministries: MinistryResponse[]): MinistryResponse[] {
+  return ministries.map((ministry) => ({ ...ministry, memberCount: ministryMemberCount(ministry.id) }));
 }
 
 const mockPlatformOrganizations: PlatformOrganization[] = Object.values(MOCK_ORGANIZATIONS).map((organization) => ({
@@ -314,7 +370,7 @@ export async function mockApiRequest<T>(
   await mockDelay();
 
   const method = (options.method ?? "GET").toUpperCase();
-  const { pathname } = parsePath(path);
+  const { pathname, search } = parsePath(path);
   const body = options.body;
 
   if (pathname === "/api/v1/auth/me" && method === "GET") {
@@ -344,19 +400,26 @@ export async function mockApiRequest<T>(
     return ok(MOCK_INSIGHTS) as ApiResponse<T>;
   }
 
-  if (pathname === "/api/v1/donors") {
+  if (pathname === "/api/v1/donors" || pathname === "/api/v1/members") {
     if (method === "GET") return ok(MOCK_DONORS) as ApiResponse<T>;
     if (method === "POST") {
       const req = body as Record<string, string>;
+      const id = nextMockId();
       return ok({
-        id: nextMockId(),
+        id,
         organizationId: 1,
+        memberNumber: req.memberNumber || `M-${String(id).padStart(4, "0")}`,
         ...req,
         createdAt: new Date().toISOString(),
       }) as ApiResponse<T>;
     }
   }
-  const donorId = matchId(pathname, "/api/v1/donors");
+  const memberMinistriesMatch = pathname.match(/^\/api\/v1\/(?:donors|members)\/(\d+)\/ministries$/);
+  if (memberMinistriesMatch) {
+    const memberId = Number(memberMinistriesMatch[1]);
+    return ok(mockMemberMinistries.filter((row) => row.memberId === memberId)) as ApiResponse<T>;
+  }
+  const donorId = matchId(pathname, "/api/v1/donors") ?? matchId(pathname, "/api/v1/members");
   if (donorId != null) {
     if (method === "GET") {
       const detail = getDonorDetail(donorId);
@@ -390,7 +453,45 @@ export async function mockApiRequest<T>(
     const id = Number(donationCancelMatch[1]);
     const detail = getDonationDetail(id);
     if (!detail) throw new ApiError("Donation not found", 404);
+    const summary = MOCK_DONATIONS.find((row) => row.id === id);
+    if (summary) summary.status = "CANCELLED";
+    MOCK_DONATION_AUDIT.unshift({
+      id: nextMockId(),
+      actorUserId: 1,
+      action: "DONATION_CANCELLED",
+      entityType: "donation",
+      entityId: id,
+      createdAt: new Date().toISOString(),
+    });
     return ok({ ...detail, status: "CANCELLED" }) as ApiResponse<T>;
+  }
+
+  const donationVoidMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/void$/);
+  if (donationVoidMatch && method === "POST") {
+    const id = Number(donationVoidMatch[1]);
+    const detail = getDonationDetail(id);
+    if (!detail) throw new ApiError("Donation not found", 404);
+    const reason = (body as { reason?: string } | undefined)?.reason?.trim();
+    if (!reason) throw new ApiError("Reason is required", 400);
+    if (detail.status !== "COMPLETED") throw new ApiError("Only completed gifts can be voided", 400);
+    const summary = MOCK_DONATIONS.find((row) => row.id === id);
+    if (summary) summary.status = "VOIDED";
+    MOCK_DONATION_AUDIT.unshift({
+      id: nextMockId(),
+      actorUserId: 1,
+      action: "DONATION_VOIDED",
+      entityType: "donation",
+      entityId: id,
+      details: reason,
+      createdAt: new Date().toISOString(),
+    });
+    return ok({ ...getDonationDetail(id)!, status: "VOIDED" }) as ApiResponse<T>;
+  }
+
+  const donationAuditMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/audit-events$/);
+  if (donationAuditMatch && method === "GET") {
+    const id = Number(donationAuditMatch[1]);
+    return ok(MOCK_DONATION_AUDIT.filter((row) => row.entityId === id)) as ApiResponse<T>;
   }
 
   const paymentMatch = pathname.match(/^\/api\/v1\/donations\/(\d+)\/payments\/(gateway|manual)$/);
@@ -600,26 +701,235 @@ export async function mockApiRequest<T>(
     return ok(session) as ApiResponse<T>;
   }
 
-  if (pathname === "/api/v1/church/ministries") {
-    if (method === "GET") return ok(MOCK_MINISTRIES) as ApiResponse<T>;
+  if (pathname === "/api/v1/church/partnerships") {
+    if (method === "GET") {
+      const memberId = search.get("memberId");
+      const rows = memberId
+        ? mockPartnerships.filter((row) => row.memberId === Number(memberId))
+        : mockPartnerships;
+      return ok(rows) as ApiResponse<T>;
+    }
     if (method === "POST") {
-      return ok({ id: nextMockId(), active: true, createdAt: new Date().toISOString(), ...(body as object) }) as ApiResponse<T>;
+      const req = body as {
+        memberId?: number;
+        fundId?: number;
+        monthlyAmount?: number;
+        startDate?: string;
+        endDate?: string;
+        status?: PartnershipResponse["status"];
+        notes?: string;
+      };
+      const member = MOCK_DONORS.find((row) => row.id === req.memberId);
+      const created: PartnershipResponse = {
+        id: nextMockId(),
+        memberId: req.memberId ?? 1,
+        memberName: member ? `${member.firstName} ${member.lastName}` : "Member",
+        memberNumber: member?.memberNumber,
+        fundId: req.fundId,
+        monthlyAmount: req.monthlyAmount ?? 0,
+        startDate: req.startDate ?? new Date().toISOString().slice(0, 10),
+        endDate: req.endDate,
+        status: req.status ?? "ACTIVE",
+        notes: req.notes,
+        createdAt: new Date().toISOString(),
+        thisMonthExpected: req.monthlyAmount ?? 0,
+        thisMonthReceived: 0,
+        thisMonthStatus: "MISSING",
+        thisYearExpected: req.monthlyAmount ?? 0,
+        thisYearReceived: 0,
+        months: [],
+      };
+      mockPartnerships.push(created);
+      return ok(created) as ApiResponse<T>;
+    }
+  }
+  const partnershipId = matchId(pathname, "/api/v1/church/partnerships");
+  if (partnershipId != null) {
+    const existing = mockPartnerships.find((row) => row.id === partnershipId) ?? mockPartnerships[0];
+    if (method === "PUT") {
+      Object.assign(existing, body as object);
+      return ok(existing) as ApiResponse<T>;
+    }
+    return ok(existing) as ApiResponse<T>;
+  }
+  const memberPartnerships = pathname.match(/^\/api\/v1\/members\/(\d+)\/partnerships$/);
+  if (memberPartnerships) {
+    const memberId = Number(memberPartnerships[1]);
+    return ok(mockPartnerships.filter((row) => row.memberId === memberId)) as ApiResponse<T>;
+  }
+
+  if (pathname === "/api/v1/church/ministries") {
+    if (method === "GET") return ok(withMinistryCounts(MOCK_MINISTRIES)) as ApiResponse<T>;
+    if (method === "POST") {
+      return ok({
+        id: nextMockId(),
+        active: true,
+        memberCount: 0,
+        createdAt: new Date().toISOString(),
+        ...(body as object),
+      }) as ApiResponse<T>;
+    }
+  }
+  const ministryMembersMatch = pathname.match(/^\/api\/v1\/church\/ministries\/(\d+)\/members(?:\/(\d+))?$/);
+  if (ministryMembersMatch) {
+    const ministryId = Number(ministryMembersMatch[1]);
+    const assignmentId = ministryMembersMatch[2] ? Number(ministryMembersMatch[2]) : null;
+    const ministry = MOCK_MINISTRIES.find((row) => row.id === ministryId) ?? MOCK_MINISTRIES[0];
+    if (assignmentId != null && method === "DELETE") {
+      const assignment = mockMemberMinistries.find((row) => row.id === assignmentId);
+      if (!assignment) throw new ApiError("Ministry assignment not found", 404);
+      assignment.status = "INACTIVE";
+      return ok(assignment) as ApiResponse<T>;
+    }
+    if (method === "GET") {
+      return ok(mockMemberMinistries.filter((row) => row.ministryId === ministryId)) as ApiResponse<T>;
+    }
+    if (method === "POST") {
+      const req = body as { memberId?: number; role?: string };
+      const member = MOCK_DONORS.find((row) => row.id === req.memberId);
+      const existing = mockMemberMinistries.find(
+        (row) => row.ministryId === ministryId && row.memberId === req.memberId,
+      );
+      if (existing?.status === "ACTIVE") throw new ApiError("This member is already in the ministry", 409);
+      if (existing) {
+        existing.status = "ACTIVE";
+        existing.role = req.role ?? existing.role;
+        return ok(existing) as ApiResponse<T>;
+      }
+      const created: MemberMinistryResponse = {
+        id: nextMockId(),
+        memberId: req.memberId ?? 1,
+        memberName: member ? `${member.firstName} ${member.lastName}` : "Member",
+        ministryId,
+        ministryName: ministry.name,
+        role: req.role,
+        status: "ACTIVE",
+        joinedAt: new Date().toISOString().slice(0, 10),
+        createdAt: new Date().toISOString(),
+      };
+      mockMemberMinistries.push(created);
+      return ok(created) as ApiResponse<T>;
     }
   }
   const ministryId = matchId(pathname, "/api/v1/church/ministries");
   if (ministryId != null) {
     const m = MOCK_MINISTRIES.find((x) => x.id === ministryId) ?? MOCK_MINISTRIES[0];
-    return ok(m) as ApiResponse<T>;
+    return ok({ ...m, memberCount: ministryMemberCount(ministryId) }) as ApiResponse<T>;
+  }
+
+  if (pathname === "/api/v1/church/services") {
+    if (method === "GET") return ok(mockServices) as ApiResponse<T>;
+    if (method === "POST") {
+      const req = body as {
+        name?: string;
+        serviceDate?: string;
+        startsAt?: string;
+        location?: string;
+        ministryId?: number;
+        notes?: string;
+      };
+      const ministry = MOCK_MINISTRIES.find((row) => row.id === req.ministryId);
+      const created: ServiceEventResponse = {
+        id: nextMockId(),
+        name: req.name ?? "Service",
+        serviceDate: req.serviceDate ?? new Date().toISOString().slice(0, 10),
+        startsAt: req.startsAt,
+        location: req.location,
+        ministryId: req.ministryId,
+        ministryName: ministry?.name,
+        notes: req.notes,
+        attendanceCount: null,
+        createdAt: new Date().toISOString(),
+      };
+      mockServices.unshift(created);
+      return ok(created) as ApiResponse<T>;
+    }
+  }
+  const churchServiceId = matchId(pathname, "/api/v1/church/services");
+  if (churchServiceId != null) {
+    const service = mockServices.find((row) => row.id === churchServiceId);
+    if (!service) throw new ApiError("Service not found", 404);
+    if (method === "PUT") {
+      Object.assign(service, body);
+      return ok(service) as ApiResponse<T>;
+    }
+    return ok(service) as ApiResponse<T>;
   }
 
   if (pathname === "/api/v1/church/attendance") {
-    if (method === "GET") return ok([]) as ApiResponse<T>;
+    if (method === "GET") return ok(mockAttendance) as ApiResponse<T>;
     if (method === "POST") {
-      return ok({ id: nextMockId(), recordedAt: new Date().toISOString(), ...(body as object) }) as ApiResponse<T>;
+      const req = body as {
+        serviceEventId?: number;
+        ministryId?: number;
+        serviceDate?: string;
+        eventName?: string;
+        attendanceCount?: number;
+        notes?: string;
+      };
+      let service = req.serviceEventId != null ? mockServices.find((row) => row.id === req.serviceEventId) : undefined;
+      if (req.serviceEventId != null && !service) throw new ApiError("Service not found", 404);
+      if (service?.attendanceCount != null) {
+        throw new ApiError("Attendance is already recorded for this service", 409);
+      }
+      if (!service) {
+        service = {
+          id: nextMockId(),
+          name: req.eventName ?? "Service",
+          serviceDate: req.serviceDate ?? new Date().toISOString().slice(0, 10),
+          ministryId: req.ministryId,
+          ministryName: MOCK_MINISTRIES.find((row) => row.id === req.ministryId)?.name,
+          attendanceCount: null,
+          createdAt: new Date().toISOString(),
+        };
+        mockServices.unshift(service);
+      }
+      const created = {
+        id: nextMockId(),
+        serviceEventId: service.id,
+        ministryId: service.ministryId,
+        ministryName: service.ministryName,
+        serviceDate: service.serviceDate,
+        eventName: service.name,
+        attendanceCount: req.attendanceCount ?? 0,
+        notes: req.notes,
+        createdAt: new Date().toISOString(),
+      };
+      service.attendanceCount = created.attendanceCount;
+      service.attendanceId = created.id;
+      mockAttendance.unshift(created);
+      return ok(created) as ApiResponse<T>;
     }
   }
   if (pathname.includes("/api/v1/church/attendance/summary")) {
-    return ok({ totalAttendance: 248, recordCount: 4 }) as ApiResponse<T>;
+    const total = mockAttendance.reduce((sum, row) => sum + row.attendanceCount, 0);
+    return ok({ totalAttendance: total, recordCount: mockAttendance.length }) as ApiResponse<T>;
+  }
+  if (pathname === "/api/v1/church/dashboard") {
+    const giving = MOCK_DONATIONS.filter((row) => row.status === "COMPLETED").reduce(
+      (sum, row) => sum + row.amount,
+      0,
+    );
+    const last = mockAttendance[0];
+    return ok({
+      memberCount: MOCK_DONORS.length,
+      activeMemberCount: MOCK_DONORS.filter((row) => row.membershipStatus === "ACTIVE").length,
+      fundsRemaining: MOCK_FUNDS.reduce((sum, fund) => sum + fund.currentBalance, 0),
+      givingThisYear: giving,
+      collectionsNeedingAction: 1,
+      attendanceThisYear: mockAttendance.reduce((sum, row) => sum + row.attendanceCount, 0),
+      lastServiceName: last?.eventName,
+      lastServiceDate: last?.serviceDate,
+      lastAttendanceCount: last?.attendanceCount,
+    }) as ApiResponse<T>;
+  }
+  if (pathname === "/api/v1/church/reports/membership") {
+    return ok({
+      total: MOCK_DONORS.length,
+      active: MOCK_DONORS.filter((row) => row.membershipStatus === "ACTIVE").length,
+      inactive: MOCK_DONORS.filter((row) => row.membershipStatus === "INACTIVE").length,
+      visitors: MOCK_DONORS.filter((row) => row.membershipStatus === "VISITOR").length,
+    }) as ApiResponse<T>;
   }
 
   if (pathname === "/api/v1/school/sponsorships") {

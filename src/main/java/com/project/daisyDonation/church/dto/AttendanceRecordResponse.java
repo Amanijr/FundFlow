@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class AttendanceRecordResponse {
 
     private Long id;
+    private Long serviceEventId;
     private Long ministryId;
     private String ministryName;
     private LocalDate serviceDate;

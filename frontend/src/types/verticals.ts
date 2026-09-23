@@ -134,19 +134,64 @@ export interface MinistryResponse {
   description?: string;
   leaderName?: string;
   active: boolean;
+  memberCount?: number;
+  createdAt: string;
+}
+
+export interface MemberMinistryRequest {
+  memberId: number;
+  role?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  joinedAt?: string;
+}
+
+export interface MemberMinistryResponse {
+  id: number;
+  memberId: number;
+  memberName: string;
+  ministryId: number;
+  ministryName: string;
+  role?: string;
+  status: "ACTIVE" | "INACTIVE";
+  joinedAt?: string;
+  createdAt: string;
+}
+
+export interface ServiceEventRequest {
+  name: string;
+  serviceDate: string;
+  startsAt?: string;
+  location?: string;
+  ministryId?: number;
+  notes?: string;
+}
+
+export interface ServiceEventResponse {
+  id: number;
+  name: string;
+  serviceDate: string;
+  startsAt?: string;
+  location?: string;
+  ministryId?: number;
+  ministryName?: string;
+  notes?: string;
+  attendanceId?: number;
+  attendanceCount?: number | null;
   createdAt: string;
 }
 
 export interface AttendanceRecordRequest {
+  serviceEventId?: number;
   ministryId?: number;
-  serviceDate: string;
-  eventName: string;
+  serviceDate?: string;
+  eventName?: string;
   attendanceCount: number;
   notes?: string;
 }
 
 export interface AttendanceRecordResponse {
   id: number;
+  serviceEventId?: number;
   ministryId?: number;
   ministryName?: string;
   serviceDate: string;
@@ -162,6 +207,69 @@ export interface AttendanceSummaryResponse {
   toDate?: string;
   totalAttendance: number;
   recordCount: number;
+}
+
+export interface ChurchDashboardResponse {
+  memberCount: number;
+  activeMemberCount: number;
+  fundsRemaining: number;
+  givingThisYear: number;
+  collectionsNeedingAction: number;
+  attendanceThisYear: number;
+  lastServiceName?: string;
+  lastServiceDate?: string;
+  lastAttendanceCount?: number | null;
+}
+
+export interface MembershipReportResponse {
+  total: number;
+  active: number;
+  inactive: number;
+  visitors: number;
+}
+
+export type PartnershipStatus = "ACTIVE" | "PAUSED" | "ENDED";
+
+export type PartnershipMonthStatus = "PAID" | "PARTIAL" | "MISSING" | "AHEAD" | "NONE";
+
+export interface PartnershipRequest {
+  memberId: number;
+  fundId?: number;
+  monthlyAmount: number;
+  startDate: string;
+  endDate?: string;
+  status?: PartnershipStatus;
+  notes?: string;
+}
+
+export interface PartnershipMonthProgress {
+  year: number;
+  month: number;
+  yearMonth: string;
+  expected: number;
+  received: number;
+  status: PartnershipMonthStatus;
+}
+
+export interface PartnershipResponse {
+  id: number;
+  memberId: number;
+  memberName: string;
+  memberNumber?: string;
+  fundId?: number;
+  fundName?: string;
+  monthlyAmount: number;
+  startDate: string;
+  endDate?: string;
+  status: PartnershipStatus;
+  notes?: string;
+  createdAt: string;
+  thisMonthExpected: number;
+  thisMonthReceived: number;
+  thisMonthStatus: PartnershipMonthStatus;
+  thisYearExpected: number;
+  thisYearReceived: number;
+  months?: PartnershipMonthProgress[];
 }
 
 export interface StudentSponsorshipRequest {

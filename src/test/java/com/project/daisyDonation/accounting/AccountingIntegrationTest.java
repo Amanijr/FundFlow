@@ -251,7 +251,7 @@ class AccountingIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated());
 
-        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
+        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -264,8 +264,8 @@ class AccountingIntegrationTest {
                                 """.formatted(suffix)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
-                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
 
         MvcResult fundResult = mockMvc.perform(post("/api/v1/funds")
                         .header("Authorization", "Bearer " + token)
@@ -288,13 +288,13 @@ class AccountingIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "donorId": %d,
+                                  "memberId": %d,
                                   "amount": 50000.00,
                                   "donationType": "ONE_TIME",
                                   "fundId": %d,
                                   "source": "Zaka"
                                 }
-                                """.formatted(donorId, fundId)))
+                                """.formatted(memberId, fundId)))
                 .andExpect(status().isCreated())
                 .andReturn();
         Long donationId = ((Number) com.jayway.jsonpath.JsonPath.read(

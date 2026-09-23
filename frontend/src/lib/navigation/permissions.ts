@@ -24,8 +24,9 @@ export const FUNDRAISING_DASHBOARD_ROLES: Role[] = [
 export function canAccessNavItem(
   roles: Role[],
   userRole: Role | undefined,
-  organizationType?: OrganizationType,
+  organizationType?: OrganizationType | null,
   requiredOrgTypes?: OrganizationType[],
+  excludeOrgTypes?: OrganizationType[],
 ) {
   if (!userRole) {
     return false;
@@ -33,8 +34,13 @@ export function canAccessNavItem(
   if (!roles.includes(userRole)) {
     return false;
   }
-  if (requiredOrgTypes && organizationType && !requiredOrgTypes.includes(organizationType)) {
+  if (excludeOrgTypes && organizationType && excludeOrgTypes.includes(organizationType)) {
     return false;
+  }
+  if (requiredOrgTypes && requiredOrgTypes.length > 0) {
+    if (!organizationType || !requiredOrgTypes.includes(organizationType)) {
+      return false;
+    }
   }
   return true;
 }
@@ -54,7 +60,10 @@ export function getDefaultDashboardPath(role: Role) {
 }
 
 /** Role-specific analytics overview (linked from Home). */
-export function getRoleOverviewPath(role: Role) {
+export function getRoleOverviewPath(role: Role, organizationType?: OrganizationType | null) {
+  if (organizationType && ["CHURCH", "RELIGIOUS_INSTITUTION"].includes(organizationType)) {
+    return "/church";
+  }
   switch (role) {
     case "SUPER_ADMIN":
       return "/platform/dashboard";

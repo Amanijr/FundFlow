@@ -2,8 +2,11 @@ export type AccountType = "ASSET" | "LIABILITY" | "EQUITY" | "REVENUE" | "EXPENS
 
 export type JournalSourceType =
   | "DONATION_PAYMENT"
+  | "DONATION_VOID"
   | "IN_KIND_DONATION"
+  | "IN_KIND_VOID"
   | "COLLECTION_PAYMENT"
+  | "COLLECTION_VOID"
   | "EXPENSE_PAYMENT";
 
 export interface ChartOfAccountRequest {
