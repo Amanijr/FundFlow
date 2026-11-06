@@ -1,7 +1,5 @@
 # Phase 2.5 Implementation — Hybrid & Physical Collections
 
-> **Historical record:** Church-specific collection labels below are superseded by V21, which maps `SERVICE_OFFERING` and `DEPARTMENT` to `GENERAL`.
-
 **Status:** Implemented
 
 ## Objectives Delivered
@@ -49,7 +47,7 @@ ADR-007 through ADR-013 — see `docs/DECISIONS.md`
 Create donation (PENDING) → Finance Manager records manual payment → COMPLETED
 ```
 
-### Church group collection
+### Group cash collection
 ```
 Create session (DRAFT) → Submit count (COUNTED) → Finance Manager verifies (VERIFIED)
   → One anonymous COLLECTION donation + manual payment at count time
@@ -57,16 +55,16 @@ Create session (DRAFT) → Submit count (COUNTED) → Finance Manager verifies (
 
 ## Collection Types
 
-`SERVICE_OFFERING`, `EVENT`, `DEPARTMENT`, `PROJECT`, `SPECIAL_APPEAL`
+`GENERAL`, `EVENT`, `PROJECT`, `SPECIAL_APPEAL`
 
-## Example: Sunday offering
+## Example: Event collection
 
 ```bash
 # Create session
 curl -X POST http://localhost:8080/api/v1/collection-sessions \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"collectionType":"SERVICE_OFFERING","title":"Sunday Offering","location":"Main Sanctuary"}'
+  -d '{"collectionType":"EVENT","title":"Annual Gala","location":"Main Hall"}'
 
 # Submit count
 curl -X PUT http://localhost:8080/api/v1/collection-sessions/1/count \

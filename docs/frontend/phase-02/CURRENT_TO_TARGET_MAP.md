@@ -1,7 +1,5 @@
 # Phase 02 — Current to Target Mapping
 
-> **Superseded in part:** Church components, routes, and services in this historical map were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Date:** 2026-06-30  
 **Purpose:** File-by-file guide for incremental migration from layer-based to feature-first architecture.
 
@@ -74,7 +72,7 @@
 | `types/analytics.ts` | `features/dashboard/types/` |
 | `types/admin.ts` | `features/users/types/` + `features/settings/types/` |
 | `types/platform.ts` | `features/platform/types/` |
-| `types/verticals.ts` | Split → `features/church/types/`, `features/school/types/`, `features/beneficiaries/types/` |
+| `types/verticals.ts` | Split → `features/school/types/`, `features/beneficiaries/types/` |
 
 ---
 
@@ -98,7 +96,6 @@
 | `lib/api/programs.ts` | `services/programs.ts` |
 | `lib/api/grants.ts` | `services/grants.ts` |
 | `lib/api/beneficiaries.ts` | `services/beneficiaries.ts` |
-| `lib/api/church.ts` | `services/church.ts` |
 | `lib/api/school.ts` | `services/school.ts` |
 | `lib/api/platform.ts` | `services/platform.ts` |
 
@@ -161,7 +158,6 @@ First feature to migrate end-to-end as the template for all others.
 | `beneficiaries/` | `features/beneficiaries/components/` |
 | `budgets/` | `features/budgets/components/` |
 | `campaigns/` | `features/campaigns/components/` |
-| `church/` | `features/church/components/` |
 | `dashboard/` (4 files) | `features/dashboard/components/` |
 | `donations/` | `features/donations/components/` |
 | `donors/` | `features/donors/components/` |
@@ -179,7 +175,7 @@ First feature to migrate end-to-end as the template for all others.
 |---------|--------|
 | `components/finance/finance-status-badge.tsx` | `features/funds/components/` or `components/shared/status-badge.tsx` with props |
 | `components/fundraising/fundraising-status-badge.tsx` | Split to respective features |
-| `components/verticals/vertical-status-badge.tsx` | Split to `features/church/`, `features/school/` |
+| `components/verticals/vertical-status-badge.tsx` | Move to `features/school/` |
 
 ---
 
@@ -219,7 +215,7 @@ Migrate fat pages to feature pages in this order:
 | P2 | `accounting` | 4 | Sub-nav module |
 | P2 | `reports` | 5 | Sub-nav module |
 | P3 | `programs`, `grants`, `beneficiaries` | 2 each | Programs |
-| P3 | `church`, `school` | 2–3 each | Verticals |
+| P3 | `school` | 2–3 | Verticals |
 | P3 | `users`, `settings` | 3 | Admin |
 | P4 | `platform` | 5 | Super-admin |
 | Done | `dashboard` | 0 (already thin) | Views extracted |

@@ -89,7 +89,7 @@ Decision:
 Accounting is a core domain.
 
 Reason:
-The platform's primary value is financial accountability, not attendance tracking.
+The platform's primary value is financial accountability, governance, and reporting.
 
 Date:
 2026-06-24
@@ -198,7 +198,7 @@ Decision:
 Revenue is recognized at collection count (session `VERIFIED`), not at bank deposit.
 
 Reason:
-The organization treats the offering as received when it is counted and verified by finance, even if bank deposit happens later.
+The organization treats the contribution as received when it is counted and verified by finance, even if bank deposit happens later.
 
 Implementation:
 

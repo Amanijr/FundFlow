@@ -1,7 +1,5 @@
 # Phase 00 — Migration Plan
 
-> **Historical plan:** Church frontend modules mentioned here were permanently removed and are not migration targets. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Date:** 2026-06-30  
 **Objective:** Migrate FundFlow ERP frontend to the Material + shadcn visual design system while preserving all backend contracts, authentication, Zustand stores, routing, and business logic.
 
@@ -214,7 +212,7 @@ Every item in the migration is classified as:
 | Accounting | chart-of-accounts, journals, GL, trial-balance | Medium |
 | Reporting | financial, donations, campaigns, budgets | Medium |
 | Administration | users, settings, setup | Medium |
-| Programs & verticals | programs, grants, beneficiaries, church, school | Low |
+| Programs & organization-specific modules | programs, grants, beneficiaries, school | Low |
 | Platform | dashboard, organizations, users, logs | Low |
 | Dev showcase | components, reference-list, reference-form | Low |
 

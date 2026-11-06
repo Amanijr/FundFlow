@@ -73,7 +73,7 @@ Automatic posting uses stable system codes (for example, cash `1000` and contrib
 
 | Business event | Typical ledger effect |
 |----------------|----------------------|
-| Donation paid | Debit Cash / Bank / Lipa (from how it was paid) · Credit tithe, offering, or gift income (from fund or source) |
+| Donation paid | Debit Cash / Bank / Lipa (from how it was paid) · Credit contribution income (from fund or source) |
 | Expense paid | Debit Expense Account · Credit Cash |
 | Fund transfer | Debit/Credit between fund accounts |
 

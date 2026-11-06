@@ -1,7 +1,5 @@
 # Phase 4 Implementation — Accounting
 
-> **Historical record:** Church-specific chart seeds and terminology below are superseded by permanent Church CMS removal and neutral nonprofit account defaults.
-
 **Status:** Implemented
 
 ## Objectives Delivered
@@ -21,7 +19,7 @@
 
 ## Default Chart of Accounts
 
-Seeded **names** follow `OrganizationType` (church, school, foundation, NGO). System **codes** stay stable for posting.
+Seeded **names** follow `OrganizationType` (school, foundation, charity, community organization, or NGO). System **codes** stay stable for posting.
 
 | Code | Default role | Type |
 |------|--------------|------|
@@ -30,7 +28,7 @@ Seeded **names** follow `OrganizationType` (church, school, foundation, NGO). Sy
 | 1020 | Mobile money / Lipa (optional detail) | ASSET |
 | 1200 | In-kind contributions | ASSET |
 | 4000 | Contribution / donation revenue (auto-posted) | REVENUE |
-| 4010–4030 | Church detail: tithes / offerings / building | REVENUE |
+| 4010–4030 | Optional contribution revenue detail | REVENUE |
 | 5100–5900 | Expense categories (labels by org type) | EXPENSE |
 
 Initialize via `POST /api/v1/accounting/initialize` (also auto-initializes on first posting).
@@ -41,13 +39,13 @@ Accounts are chosen from the org chart based on the entry (not a single hardcode
 
 | Event | Debit (how money arrived / left) | Credit |
 |-------|----------------------------------|--------|
-| Gift paid in cash | Cash on hand `1000` | Tithe / offering / gifts (`4010` / `4020` / `4000` from fund or source) |
+| Contribution paid in cash | Cash on hand `1000` | Contribution revenue (`4000`, or an optional detail account from fund or source) |
 | Gift via M-Pesa / Lipa | Mobile money `1020` (fallback cash) | Same income mapping |
 | Gift via bank / cheque | Bank `1010` (fallback cash) | Same income mapping |
 | In-kind | In-kind `1200` | Contribution income |
 | Expense paid | Expense `5xxx` by category | Cash / bank / Lipa from payment method |
 
-Income mapping (Tanzanian church language): zaka/tithe → `4010`, sadaka/offering/collection → `4020`, building/kanisa → `4030`, else `4000`. If an optional code is missing on that org’s chart, posting falls back to cash and contribution income.
+Income mapping uses the selected fund or contribution source when a matching detail account exists; otherwise posting falls back to cash and contribution income (`4000`).
 
 Posting is idempotent — duplicate source events do not create duplicate entries.
 

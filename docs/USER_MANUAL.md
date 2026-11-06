@@ -265,7 +265,7 @@ Use the **search bar** in the header to find records and navigate (where impleme
 | **ACCOUNTANT** | Chart of accounts, journal entries, ledger, trial balance (read-heavy + COA creation) |
 | **FUNDRAISING_MANAGER** | Donors, donations, campaigns, pledges, collections |
 | **PROGRAM_MANAGER** | Programs, grants, beneficiaries, school sponsorships |
-| **STAFF** | Day-to-day data entry (donors, donations, expenses, attendance, etc.) |
+| **STAFF** | Day-to-day data entry (donors, donations, expenses, etc.) |
 | **AUDITOR** | Read access to reports and activity (future enforcement expanding) |
 | **VIEW_ONLY** | Read-only access to dashboards and reports |
 | **SUPER_ADMIN** | Platform-wide operator — manages all organizations (separate console) |
@@ -875,7 +875,7 @@ When running the frontend in **mock API mode** (`NEXT_PUBLIC_MOCK_API=true`), us
 | **Audit log** | Record of who performed an action and when |
 | **Campaign** | A time-bound fundraising drive with a target |
 | **Chart of accounts** | List of all financial accounts used in bookkeeping |
-| **Collection session** | A counted group offering (e.g. Sunday service) before finance verification |
+| **Collection session** | A counted group cash collection (e.g. event or appeal) before finance verification |
 | **Donor** | Person or entity that gives to the organization |
 | **Double-entry** | Accounting method where every transaction has equal debits and credits |
 | **Fund** | Designated pool of money (restricted or unrestricted) |

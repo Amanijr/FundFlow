@@ -1,7 +1,5 @@
 # Authorization Model
 
-> **Superseded in part:** Church organization-type examples and gates in this historical model were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Phase:** 09 — Authentication & Identity Experience  
 **Current model:** Role-Based Access Control (RBAC)  
 **Target model:** RBAC + fine-grained permissions from API
@@ -82,7 +80,7 @@ Each nav item declares:
   label: "Donations",
   href: "/donations",
   roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF", "VIEW_ONLY"],
-  organizationTypes: ["NGO", "CHURCH", ...], // optional
+  organizationTypes: ["NGO", "FOUNDATION", ...], // optional
 }
 ```
 
@@ -144,7 +142,7 @@ Use for conditional logic; prefer `PermissionGate` for render gating.
 
 ## 8. Organization Type Gating
 
-Some features apply only to certain org types (church ministries, school sponsorships):
+Some features apply only to certain org types (for example, school sponsorships):
 
 ```ts
 canAccessNavItem(item.roles, userRole, orgType, item.organizationTypes)

@@ -1,7 +1,5 @@
 # Phase 02 — Folder Structure
 
-> **Superseded in part:** Church folders, routes, and services in this historical structure were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Date:** 2026-06-30  
 **Base path:** `frontend/src/`
 
@@ -34,7 +32,6 @@ src/
 │   ├── programs/
 │   ├── grants/
 │   ├── beneficiaries/
-│   ├── church/
 │   ├── school/
 │   ├── settings/
 │   ├── users/
@@ -142,7 +139,6 @@ See [MODULE_BOUNDARIES.md](./MODULE_BOUNDARIES.md) for the standard internal str
 | `programs` | `/programs/*` | `services/programs.ts` |
 | `grants` | `/grants/*` | `services/grants.ts` |
 | `beneficiaries` | `/beneficiaries/*` | `services/beneficiaries.ts` |
-| `church` | `/church/*` | `services/church.ts` |
 | `school` | `/school/*` | `services/school.ts` |
 | `settings` | `/admin/settings`, `/admin/setup` | `services/organization.ts` |
 | `users` | `/admin/users/*` | `services/users.ts` |
@@ -243,7 +239,6 @@ services/
 ├── programs.ts
 ├── grants.ts
 ├── beneficiaries.ts
-├── church.ts
 ├── school.ts
 └── platform.ts
 ```

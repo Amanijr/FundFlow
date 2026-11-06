@@ -1,7 +1,5 @@
 # CrossLife ERP — Backend Phase Plan (Notus Frontend)
 
-> **Superseded in part:** Church CMS APIs and modules in this historical plan were permanently removed from FundFlow. See [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Version:** 1.0  
 **Status:** In progress  
 **Pairs with:** [FRONTEND_NOTUS_PHASE_PLAN.md](./FRONTEND_NOTUS_PHASE_PLAN.md)  
@@ -24,7 +22,7 @@ The Spring Boot backend already implements Phases 1–10 (auth, fundraising, fin
 | **B-N7** | N7 | Accounting initialize guard + ledger date filters |
 | **B-N8** | N8 | Report export endpoints |
 | **B-N9** | N9 | User invite + org settings |
-| **B-N10** | N10 | Church/school/grant modules |
+| **B-N10** | N10 | School, grant, and program modules |
 | **B-N11** | N11 | Platform owner APIs |
 | **B-N12** | N12 | Observability, rate limits, production config |
 
@@ -52,7 +50,7 @@ The Spring Boot backend already implements Phases 1–10 (auth, fundraising, fin
 | `fundraising@demo.local` | `demo` | FUNDRAISING_MANAGER |
 | `super@demo.local` | `demo` | SUPER_ADMIN |
 
-Demo org: **CrossLife Mission Network** (`slug=crosslife`, type `CHURCH`).
+Demo org: **CrossLife Mission Network** (`slug=crosslife`, type `FOUNDATION`).
 
 ### Run with live API
 
@@ -202,9 +200,9 @@ Finance and fundraising dashboards reuse executive + trends endpoints (same as m
 
 ---
 
-## B-N10 — Vertical modules
+## B-N10 — Organization-specific modules
 
-Church, school, grants, programs — APIs exist per Phase 8–9 docs.
+School sponsorships, grants, programs, and beneficiaries — APIs exist per Phase 8–9 docs.
 
 ---
 

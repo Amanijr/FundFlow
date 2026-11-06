@@ -1,7 +1,5 @@
 # Phase 8 Implementation — Communications
 
-> **Historical record:** References to church attendance and ministries are superseded by permanent Church CMS removal.
-
 **Status:** Implemented
 
 ## Objectives Delivered
@@ -69,4 +67,4 @@ communication.default-receipt-channel=EMAIL
 
 ## Next: Phase 9 — Organization-Specific Modules
 
-Attendance, ministries, beneficiaries, and vertical-specific features.
+Beneficiaries, school sponsorships, and other organization-specific features.

@@ -1,7 +1,5 @@
 # Phase 03 — Navigation System
 
-> **Superseded in part:** Church navigation items in this historical specification were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
-
 **Date:** 2026-06-30  
 **Config:** frontend/src/lib/navigation/navigation.ts  
 **RBAC:** frontend/src/lib/navigation/permissions.ts
@@ -74,7 +72,7 @@ Mapped to current ERP routes. Items marked (future) have no route yet.
 
 ### Current groups not in Phase 03 spec (retain)
 - Programs, Grants, Beneficiaries (org-type gated)
-- Church ministries, Attendance, School sponsorships
+- School sponsorships
 - Developer showcase (/dev/*)
 
 ---
@@ -88,7 +86,7 @@ Mapped to current ERP routes. Items marked (future) have no route yet.
 | finance | Finance | Funds, Budgets, Expenses, Accounting |
 | reporting | Reporting | Reports hub |
 | programs | Programs | Programs, Grants, Beneficiaries |
-| verticals | Verticals | Ministries, Attendance, Sponsorships |
+| verticals | Verticals | Sponsorships |
 | administration | Administration | Users, Settings |
 | developer | Developer | Components, Reference list/form |
 

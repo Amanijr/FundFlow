@@ -1,7 +1,5 @@
 # Phase 1 Implementation — Foundation
 
-> **Historical record:** The church organization example below predates permanent Church CMS removal and is superseded by Flyway V21.
-
 **Status:** Implemented (pending local verification with Java 17)
 
 ## Objectives Delivered
@@ -67,12 +65,12 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "organization": {
-      "name": "Grace Community Church",
-      "slug": "grace-community",
-      "type": "CHURCH",
-      "email": "admin@grace.org"
+      "name": "Community Impact Foundation",
+      "slug": "community-impact",
+      "type": "FOUNDATION",
+      "email": "admin@community-impact.org"
     },
-    "email": "admin@grace.org",
+    "email": "admin@community-impact.org",
     "password": "password123",
     "firstName": "Jane",
     "lastName": "Admin"

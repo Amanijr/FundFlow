@@ -227,7 +227,7 @@ Automated communication available.
 
 # PHASE 9 — ORGANIZATION-SPECIFIC MODULES
 
-Status: Complete (Church CMS later extracted — see docs/architecture/CHURCH_CMS_EXTRACTION.md)
+Status: Complete
 
 Priority: Medium
 

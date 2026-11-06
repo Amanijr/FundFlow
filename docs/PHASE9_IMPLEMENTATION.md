@@ -1,8 +1,6 @@
 # Phase 9 Implementation — Organization-Specific Modules
 
-**Status:** Historical implementation record — Church portions superseded by permanent removal and Flyway V21
-
-> The church endpoints, entities, and organization-type gates described below no longer exist. This phase record is retained for audit history; see [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md) for current state.
+**Status:** Complete
 
 ## Objectives Delivered
 
@@ -11,7 +9,7 @@
 | NGO | Beneficiaries, Impact tracking | Done |
 | School | Student beneficiaries, Sponsorships | Done |
 
-Church ministries/attendance/partnerships were delivered in this phase historically and later **removed** from FundFlow (see extraction doc). Pledges remain in the shared `pledge/` financial module.
+Shared financial pledges remain in the `pledge/` module for all organization types.
 
 ## Vertical Access Control
 

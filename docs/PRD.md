@@ -392,12 +392,6 @@ Features:
 
 ---
 
-## Removed domain: Church CMS
-
-Membership, ministry, service, and attendance management are not FundFlow modules. They were permanently extracted in Flyway V21; FundFlow retains financial donor and donation management only.
-
----
-
 ## Module 14: Communication Center
 
 Channels:

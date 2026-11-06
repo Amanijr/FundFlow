@@ -98,7 +98,7 @@ See ADR-007 through ADR-013 in `docs/DECISIONS.md`
 
 Exit Criteria:
 
-Organizations can record cash offerings, group collections, and manual payments with finance accountability.
+Organizations can record cash contributions, group collections, and manual payments with finance accountability.
 
 ---
 
@@ -230,10 +230,6 @@ Automated communication available.
 Status: Complete
 
 Priority: Medium
-
-Examples:
-
-> Church CMS examples previously listed here were permanently removed in Flyway V21.
 
 NGO:
 
