@@ -23,13 +23,11 @@ import { ApiError, type OrganizationType } from "@/types/api";
 import type { PlatformOrganization } from "@/types/platform";
 
 const organizationTypes: OrganizationType[] = [
-  "CHURCH",
   "NGO",
   "FOUNDATION",
   "CHARITY",
   "COMMUNITY_ORGANIZATION",
   "SCHOOL",
-  "RELIGIOUS_INSTITUTION",
 ];
 
 export default function PlatformOrganizationsPage() {

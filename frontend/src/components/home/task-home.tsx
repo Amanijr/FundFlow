@@ -1,17 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowRight, Check, LayoutDashboard } from "lucide-react";
 
-import { ChurchHomeSnapshot } from "@/components/home/church-home-snapshot";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useInboxCount } from "@/hooks/use-workflow";
 import { useOrganization } from "@/hooks/use-organization";
-import { getChurchDashboard } from "@/lib/api/church";
-import { isChurchOrganization } from "@/lib/organization/verticals";
 import {
   checklistForRole,
   homeGreeting,
@@ -36,14 +32,13 @@ function TaskCard({ task, featured }: { task: HomeTask; featured?: boolean }) {
         featured && "sm:col-span-2 sm:p-5",
       )}
     >
-      <span
+      <Icon
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground",
-          featured && "h-10 w-10",
+          "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground",
+          featured && "h-5 w-5",
         )}
-      >
-        <Icon className={cn("h-4 w-4", featured && "h-5 w-5")} aria-hidden />
-      </span>
+        aria-hidden
+      />
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-start justify-between gap-2">
           <p className={cn("font-medium text-foreground", featured && "text-base")}>{task.title}</p>
@@ -79,7 +74,7 @@ function ApprovalsCallout({ count }: { count: number }) {
   if (count <= 0) return null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border border-l-4 border-l-amber-500 bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-xl border border-border border-l-4 border-l-warning bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p className="text-sm font-medium text-foreground">
           {count} item{count === 1 ? "" : "s"} waiting for review
@@ -236,15 +231,9 @@ function TaskGrid({
 }
 
 export function TaskHome() {
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
   const organizationQuery = useOrganization();
   const inboxQuery = useInboxCount();
-  const church = isChurchOrganization(organizationQuery.data?.type ?? user?.organizationType);
-  const dashboardQuery = useQuery({
-    queryKey: ["church", "dashboard"],
-    queryFn: async () => (await getChurchDashboard(accessToken!)).data,
-    enabled: Boolean(accessToken) && church,
-  });
 
   if (!user) {
     return null;
@@ -280,13 +269,11 @@ export function TaskHome() {
           <Button variant="ghost" size="sm" asChild>
             <Link href={overviewPath}>
               <LayoutDashboard className="mr-1.5 h-4 w-4" />
-              {church ? "Church overview" : "Full overview"}
+              Full overview
             </Link>
           </Button>
         }
       />
-
-      {church && dashboardQuery.data ? <ChurchHomeSnapshot data={dashboardQuery.data} /> : null}
 
       {showApprovalsCallout && <ApprovalsCallout count={pendingApprovals} />}
 

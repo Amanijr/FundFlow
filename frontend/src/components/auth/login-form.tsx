@@ -112,7 +112,7 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
       <EmailField control={control} name="email" label="Email" required />
 
       <div className="flex justify-end">
-        <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">
+        <Link href="/forgot-password" className="text-xs font-medium text-link hover:underline">
           Forgot password?
         </Link>
       </div>
@@ -130,8 +130,8 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
         )}
       />
 
-      <Button type="submit" className={cn("w-full", variant === "panel" && "mt-1")} disabled={isSubmitting}>
-        {isSubmitting ? "Signing in…" : "Sign in"}
+      <Button type="submit" className={cn("w-full", variant === "panel" && "mt-1")} loading={isSubmitting}>
+        Sign in
       </Button>
     </form>
   );
@@ -140,8 +140,12 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
     return (
       <div className={cn("flex h-full flex-col justify-center px-6 py-8 sm:px-10", className)}>
         <div className="mb-5 text-center">
-          <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Access your FundFlow workspace</p>
+          <h1 className="text-xl font-semibold tracking-tight text-[var(--color-heading)]">
+            Sign in
+          </h1>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            Access your FundFlow workspace
+          </p>
           {process.env.NODE_ENV === "development" && (
             <p className="mt-2 text-[11px] uppercase tracking-wide text-warning">Development environment</p>
           )}
@@ -150,16 +154,16 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
         {isMockApiEnabled() && (
           <p className="mt-4 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-center text-xs text-muted-foreground">
             Demo: <strong className="text-foreground">admin@demo.local</strong> / password{" "}
-            <strong className="font-mono text-primary">{MOCK_DEMO_PASSWORD}</strong>
+            <strong className="font-mono text-link">{MOCK_DEMO_PASSWORD}</strong>
             <br />
             MFA demo: <strong className="text-foreground">mfa@demo.local</strong> → code{" "}
-            <strong className="font-mono text-primary">123456</strong>
+            <strong className="font-mono text-link">123456</strong>
           </p>
         )}
         {onSwitchToSignUp && (
           <p className="mt-5 text-center text-sm text-muted-foreground lg:hidden">
             New organization?{" "}
-            <button type="button" onClick={onSwitchToSignUp} className="font-medium text-primary hover:underline">
+            <button type="button" onClick={onSwitchToSignUp} className="font-medium text-link hover:underline">
               Create an account
             </button>
           </p>
@@ -178,7 +182,7 @@ export function LoginForm({ variant = "card", className, onSwitchToSignUp }: Log
         {formBody}
         <p className="mt-6 text-center text-sm text-muted-foreground">
           New organization?{" "}
-          <Link href="/register" className="font-medium text-primary hover:underline">
+          <Link href="/register" className="font-medium text-link hover:underline">
             Create an account
           </Link>
         </p>

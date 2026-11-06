@@ -97,7 +97,7 @@ export default function JournalEntriesPage() {
       <PageHeader
         breadcrumbs={[{ label: "Accounting" }, { label: "Journal entries" }]}
         title="Journal entries"
-        description="Each gift or expense is posted to named accounts such as Lipa and Tithes."
+        description="Each donation or expense is posted to the appropriate named accounts."
       />
 
       {entriesQuery.isError && <ErrorAlert message="Unable to load journal entries." />}

@@ -81,7 +81,7 @@ export function FilePreview({
       <iframe
         title={`${document.name} preview`}
         src={url}
-        className={cn("h-full min-h-[24rem] w-full border-0 bg-white", className)}
+        className={cn("h-full min-h-[24rem] w-full border-0 bg-surface", className)}
         style={{ transform: `scale(${zoom})`, transformOrigin: "top center" }}
       />
     );

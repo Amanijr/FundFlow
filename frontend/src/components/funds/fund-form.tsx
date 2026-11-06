@@ -105,14 +105,14 @@ export function FundForm({ defaultValues, submitLabel, serverError, onSubmit, on
             Fund is active
           </label>
         </FormField>
-        <FormField label="Sunday offering" className="sm:col-span-2">
+        <FormField label="Default for collections" className="sm:col-span-2">
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               className="h-4 w-4 rounded border-input"
               {...register("defaultForCollections")}
             />
-            Use for Sunday collections unless another fund is chosen
+            Use for collections unless another fund is chosen
           </label>
         </FormField>
       </FormSection>
@@ -123,7 +123,7 @@ export function FundForm({ defaultValues, submitLabel, serverError, onSubmit, on
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {submitLabel}
         </Button>
       </div>

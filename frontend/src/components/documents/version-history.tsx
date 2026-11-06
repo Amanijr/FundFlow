@@ -36,7 +36,7 @@ export function VersionHistory({ document, className }: VersionHistoryProps) {
           <span
             className={cn(
               "absolute left-0 top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-surface",
-              version.isCurrent ? "border-stone-900" : "border-border",
+              version.isCurrent ? "border-primary" : "border-border",
             )}
           />
           <div className="space-y-1">

@@ -85,7 +85,7 @@ export function MfaChallengeForm({ returnUrl, className }: MfaChallengeFormProps
           <FormActions submitLabel="Verify" isSubmitting={isSubmitting} />
         </FormContainer>
         <p className="text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="font-medium text-link hover:underline">
             Back to sign in
           </Link>
         </p>

@@ -31,9 +31,6 @@ import type { ChartOfAccountRequest, ChartOfAccountResponse } from "@/types/acco
 
 function initializeToastMessage(organizationType?: string) {
   switch (organizationType) {
-    case "CHURCH":
-    case "RELIGIOUS_INSTITUTION":
-      return "Church chart of accounts initialized";
     case "SCHOOL":
       return "School chart of accounts initialized";
     case "FOUNDATION":
@@ -125,7 +122,7 @@ export default function ChartOfAccountsPage() {
       <PageHeader
         breadcrumbs={[{ label: "Accounting" }, { label: "Chart of accounts" }]}
         title="Chart of accounts"
-        description="These are the named buckets money moves through (cash, Lipa, tithes). The small numbers are only for the books."
+        description="These are the named buckets money moves through. The account numbers are used by the books."
         action={
           <div className="flex gap-2">
             <PermissionGate roles={["ORG_ADMIN", "FINANCE_MANAGER"]}>

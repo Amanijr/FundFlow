@@ -62,7 +62,7 @@ export default function ApprovalsPage() {
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                 filters.status === option.value
-                  ? "border-stone-900 bg-stone-900 text-white"
+                  ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background text-muted-foreground hover:text-foreground",
               )}
             >
@@ -82,7 +82,7 @@ export default function ApprovalsPage() {
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                 filters.entityType === option.value
-                  ? "border-stone-900 bg-stone-900 text-white"
+                  ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background text-muted-foreground hover:text-foreground",
               )}
             >

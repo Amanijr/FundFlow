@@ -86,13 +86,13 @@ export function AuthSlider({ initialMode = "sign-in" }: AuthSliderProps) {
           <div className="auth-slider__overlay">
             <div className="auth-slider__overlay-panel auth-slider__overlay-panel--left">
               <h2 className="text-2xl font-bold">Welcome back</h2>
-              <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/90">
+              <p className="mt-3 max-w-xs text-sm leading-relaxed">
                 Sign in to manage donations, expenses, and reports for your organization.
               </p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-6 border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                className="mt-6 border-white/70 bg-transparent text-[var(--auth-overlay-foreground)] hover:border-white hover:bg-white/10 hover:text-[var(--auth-overlay-foreground)]"
                 onClick={showSignIn}
               >
                 Sign in
@@ -100,13 +100,13 @@ export function AuthSlider({ initialMode = "sign-in" }: AuthSliderProps) {
             </div>
             <div className="auth-slider__overlay-panel auth-slider__overlay-panel--right">
               <h2 className="text-2xl font-bold">Get started</h2>
-              <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/90">
+              <p className="mt-3 max-w-xs text-sm leading-relaxed">
                 Create your organization workspace and set up FundFlow ERP in minutes.
               </p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-6 border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                className="mt-6 border-white/70 bg-transparent text-[var(--auth-overlay-foreground)] hover:border-white hover:bg-white/10 hover:text-[var(--auth-overlay-foreground)]"
                 onClick={showSignUp}
               >
                 Create account
@@ -118,7 +118,7 @@ export function AuthSlider({ initialMode = "sign-in" }: AuthSliderProps) {
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-primary/15 text-[10px] font-bold text-primary">
+          <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-[var(--brand-pale)] text-[10px] font-bold text-[var(--brand-graphite)]">
             F
           </span>
           FundFlow ERP — fundraising &amp; financial management
