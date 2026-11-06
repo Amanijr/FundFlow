@@ -1,15 +1,17 @@
 # Phase 9 Implementation — Organization-Specific Modules
 
-**Status:** Implemented
+**Status:** Historical implementation record — Church portions superseded by permanent removal and Flyway V21
+
+> The church endpoints, entities, and organization-type gates described below no longer exist. This phase record is retained for audit history; see [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md) for current state.
 
 ## Objectives Delivered
 
 | Vertical | Features | Status |
 |----------|----------|--------|
-| Church | Ministries, Attendance | Done |
-| Church | Pledges | Already in `pledge/` module (Phase 2) |
 | NGO | Beneficiaries, Impact tracking | Done |
 | School | Student beneficiaries, Sponsorships | Done |
+
+Church ministries/attendance/partnerships were delivered in this phase historically and later **removed** from FundFlow (see extraction doc). Pledges remain in the shared `pledge/` financial module.
 
 ## Vertical Access Control
 
@@ -17,22 +19,9 @@
 
 | Feature | Allowed types |
 |---------|---------------|
-| Church modules | `CHURCH`, `RELIGIOUS_INSTITUTION` |
 | NGO modules | `NGO`, `FOUNDATION`, `CHARITY`, `COMMUNITY_ORGANIZATION` |
 | School modules | `SCHOOL` |
 | Student beneficiaries | `SCHOOL` (type `STUDENT` only) |
-
-## Church — `/api/v1/church`
-
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/ministries` | Create ministry |
-| GET | `/ministries` | List ministries |
-| GET | `/ministries/{id}` | Ministry detail |
-| PUT | `/ministries/{id}` | Update ministry |
-| POST | `/attendance` | Record service/event attendance |
-| GET | `/attendance` | List attendance records |
-| GET | `/attendance/summary` | Total attendance for period |
 
 ## NGO — `/api/v1/beneficiaries`
 

@@ -1,5 +1,7 @@
 # Phase 1 Implementation — Foundation
 
+> **Historical record:** The church organization example below predates permanent Church CMS removal and is superseded by Flyway V21.
+
 **Status:** Implemented (pending local verification with Java 17)
 
 ## Objectives Delivered

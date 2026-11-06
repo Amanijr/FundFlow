@@ -1,5 +1,7 @@
 # Phase 4 Implementation — Accounting
 
+> **Historical record:** Church-specific chart seeds and terminology below are superseded by permanent Church CMS removal and neutral nonprofit account defaults.
+
 **Status:** Implemented
 
 ## Objectives Delivered

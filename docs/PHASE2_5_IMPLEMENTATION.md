@@ -1,5 +1,7 @@
 # Phase 2.5 Implementation — Hybrid & Physical Collections
 
+> **Historical record:** Church-specific collection labels below are superseded by V21, which maps `SERVICE_OFFERING` and `DEPARTMENT` to `GENERAL`.
+
 **Status:** Implemented
 
 ## Objectives Delivered

@@ -1,5 +1,7 @@
 # Phase 8 Implementation — Communications
 
+> **Historical record:** References to church attendance and ministries are superseded by permanent Church CMS removal.
+
 **Status:** Implemented
 
 ## Objectives Delivered
