@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ChurchNav } from "@/components/church/church-nav";
 import { DonorForm } from "@/components/donors/donor-form";
 import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
@@ -57,7 +56,6 @@ export function PeopleEditPage({ module }: { module: PeopleModule }) {
 
   return (
     <div className="space-y-4">
-      {module === "members" ? <ChurchNav /> : null}
       <PageHeader
         breadcrumbs={[
           { label: copy.title, href: peopleListPath(module) },
@@ -73,10 +71,8 @@ export function PeopleEditPage({ module }: { module: PeopleModule }) {
         defaultValues={{
           firstName: person.firstName,
           lastName: person.lastName,
-          memberNumber: person.memberNumber ?? "",
           email: person.email ?? "",
           phone: person.phone ?? "",
-          membershipStatus: person.membershipStatus ?? "ACTIVE",
           notes: person.notes ?? "",
           address: person.address ?? "",
           city: person.city ?? "",

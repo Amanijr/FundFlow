@@ -25,6 +25,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 API calls use the Next.js rewrite proxy (`/api/*` → backend), so CORS is not required in local dev.
 
+### Buttons, status & color meaning
+
+Interaction legend (Material 3 / Meta-aligned): cyan = primary CTA, green/amber/red soft chips = status, crimson filled = destructive confirm only. See [`DESIGN.md`](../DESIGN.md) and the live matrix at [`/dev/components`](http://localhost:3000/dev/components).
+
 ## Phase status
 
 **F1 — Foundation:** auth, API client, AppShell, design tokens, light/dark theme.
@@ -43,7 +47,7 @@ API calls use the Next.js rewrite proxy (`/api/*` → backend), so CORS is not r
 
 **F8 — Administration:** user management, organization settings, post-register setup wizard.
 
-**F9 — Programs & verticals:** programs, grants, beneficiaries, church ministries/attendance, school sponsorships (org-type gated sidebar).
+**F9 — Programs & verticals:** programs, grants, beneficiaries, and school sponsorships (org-type gated sidebar).
 
 **F10 — Platform owner dashboard:** super-admin control center at `/platform/dashboard` with organizations, users, logs, tenant context, and bootstrap.
 
@@ -65,8 +69,6 @@ API calls use the Next.js rewrite proxy (`/api/*` → backend), so CORS is not r
 | Programs | `/programs`, `/programs/new`, `/programs/[id]`, `/programs/[id]/edit` | NGO, FOUNDATION, CHARITY, COMMUNITY_ORGANIZATION, SCHOOL |
 | Grants | `/grants`, `/grants/new`, `/grants/[id]`, `/grants/[id]/edit` | NGO, FOUNDATION, CHARITY, COMMUNITY_ORGANIZATION |
 | Beneficiaries | `/beneficiaries`, `/beneficiaries/new`, `/beneficiaries/[id]`, `/beneficiaries/[id]/edit` | NGO, FOUNDATION, CHARITY, COMMUNITY_ORGANIZATION, SCHOOL |
-| Church ministries | `/church/ministries`, `/church/ministries/new`, `/church/ministries/[id]` | CHURCH, RELIGIOUS_INSTITUTION |
-| Church attendance | `/church/attendance` | CHURCH, RELIGIOUS_INSTITUTION |
 | School sponsorships | `/school/sponsorships`, `/school/sponsorships/new`, `/school/sponsorships/[id]` | SCHOOL |
 
 ### F8 routes (ORG_ADMIN only)

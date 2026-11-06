@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ChurchNav } from "@/components/church/church-nav";
 import { DonorForm } from "@/components/donors/donor-form";
 import { PageHeader } from "@/components/layout/page-header";
 import { useAuth } from "@/hooks/use-auth";
@@ -33,7 +32,6 @@ export function PeopleNewPage({ module }: { module: PeopleModule }) {
 
   return (
     <div className="space-y-4">
-      {module === "members" ? <ChurchNav /> : null}
       <PageHeader
         breadcrumbs={[
           { label: copy.title, href: peopleListPath(module) },

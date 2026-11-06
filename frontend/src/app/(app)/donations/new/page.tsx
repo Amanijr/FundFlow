@@ -10,14 +10,10 @@ import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { useAuth } from "@/hooks/use-auth";
-import { useOrganization } from "@/hooks/use-organization";
 import { listCampaigns } from "@/lib/api/campaigns";
-import { isChurchOrganization } from "@/lib/organization/verticals";
 import { createDonation } from "@/lib/api/donations";
-import { listPeople } from "@/lib/api/donors";
-import { peopleModuleForOrganization } from "@/lib/people/module";
+import { listDonors } from "@/lib/api/donors";
 import { listFunds } from "@/lib/api/funds";
-import { listPartnerships } from "@/lib/api/church";
 import { processGatewayPayment, recordManualPayment } from "@/lib/api/payments";
 import { useSessionPreferencesStore } from "@/stores/session-preferences-store";
 import { ApiError } from "@/types/api";
@@ -26,22 +22,18 @@ export default function NewDonationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { accessToken, user } = useAuth();
-  const organizationQuery = useOrganization();
-  const churchOrg = isChurchOrganization(organizationQuery.data?.type ?? user?.organizationType);
-  const peopleModule = peopleModuleForOrganization(organizationQuery.data?.type ?? user?.organizationType);
   const [serverError, setServerError] = useState<string | null>(null);
   const lastCampaignId = useSessionPreferencesStore((state) => state.lastCampaignId);
   const setLastCampaignId = useSessionPreferencesStore((state) => state.setLastCampaignId);
 
   const prefillDonorId = searchParams.get("donorId") ?? "";
   const prefillCampaignId = searchParams.get("campaignId") ?? lastCampaignId ?? "";
-  const prefillPartnershipId = searchParams.get("partnershipId") ?? "";
   const canRecordManual = user?.role === "ORG_ADMIN" || user?.role === "FINANCE_MANAGER";
 
   const donorsQuery = useQuery({
-    queryKey: ["people", peopleModule],
+    queryKey: ["donors"],
     queryFn: async () => {
-      const response = await listPeople(accessToken!, peopleModule);
+      const response = await listDonors(accessToken!);
       return response.data;
     },
     enabled: Boolean(accessToken),
@@ -53,7 +45,7 @@ export default function NewDonationPage() {
       const response = await listCampaigns(accessToken!);
       return response.data;
     },
-    enabled: Boolean(accessToken) && !churchOrg,
+    enabled: Boolean(accessToken),
   });
 
   const fundsQuery = useQuery({
@@ -62,18 +54,12 @@ export default function NewDonationPage() {
     enabled: Boolean(accessToken),
   });
 
-  const partnershipsQuery = useQuery({
-    queryKey: ["church", "partnerships"],
-    queryFn: async () => (await listPartnerships(accessToken!)).data,
-    enabled: Boolean(accessToken) && churchOrg,
-  });
-
   const donorOptions = useMemo(
     () =>
       (donorsQuery.data ?? []).map((donor) => ({
         id: String(donor.id),
         label: `${donor.firstName} ${donor.lastName}`,
-        description: [donor.memberNumber, donor.email].filter(Boolean).join(" · "),
+        description: donor.email,
       })),
     [donorsQuery.data],
   );
@@ -96,20 +82,6 @@ export default function NewDonationPage() {
         description: fund.description,
       })),
     [fundsQuery.data],
-  );
-
-  const partnershipOptions = useMemo(
-    () =>
-      (partnershipsQuery.data ?? [])
-        .filter((row) => row.status === "ACTIVE")
-        .map((row) => ({
-          id: String(row.id),
-          label: `${row.memberName} · ${row.monthlyAmount}`,
-          description: row.fundName ?? "Monthly partnership",
-          memberId: String(row.memberId),
-          fundId: row.fundId ? String(row.fundId) : undefined,
-        })),
-    [partnershipsQuery.data],
   );
 
   async function handleSubmit(payload: DonationIntakePayload) {
@@ -151,11 +123,11 @@ export default function NewDonationPage() {
     }
   }
 
-  if (donorsQuery.isLoading || (!churchOrg && campaignsQuery.isLoading) || fundsQuery.isLoading) {
+  if (donorsQuery.isLoading || campaignsQuery.isLoading || fundsQuery.isLoading) {
     return <LoadingState />;
   }
 
-  if (donorsQuery.isError || (!churchOrg && campaignsQuery.isError) || fundsQuery.isError) {
+  if (donorsQuery.isError || campaignsQuery.isError || fundsQuery.isError) {
     return <ErrorAlert message="Unable to load form options." />;
   }
 
@@ -163,25 +135,22 @@ export default function NewDonationPage() {
     <div className="space-y-4">
       <PageHeader
         breadcrumbs={[
-          { label: churchOrg ? "Giving" : "Donations", href: "/donations" },
-          { label: churchOrg ? "Record gift" : "Record donation" },
+          { label: "Donations", href: "/donations" },
+          { label: "Record donation" },
         ]}
-        title={churchOrg ? "Record member gift" : "Record donation"}
+        title="Record donation"
         description="One sequence: gift details, optional extras, then cash / Lipa / pay later."
       />
       <DonationForm
         donorOptions={donorOptions}
-        campaignOptions={churchOrg ? [] : campaignOptions}
+        campaignOptions={campaignOptions}
         fundOptions={fundOptions}
-        partnershipOptions={churchOrg ? partnershipOptions : []}
         serverError={serverError}
         canRecordManual={canRecordManual}
-        showCampaign={!churchOrg}
-        peopleNoun={churchOrg ? "member" : "donor"}
+        showCampaign
         defaultValues={{
           donorId: prefillDonorId,
-          campaignId: churchOrg ? "" : prefillCampaignId,
-          partnershipId: churchOrg ? prefillPartnershipId : "",
+          campaignId: prefillCampaignId,
         }}
         onSubmit={handleSubmit}
         onCancel={() => router.push("/donations")}

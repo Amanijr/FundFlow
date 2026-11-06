@@ -25,13 +25,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
-import { useOrganization } from "@/hooks/use-organization";
 import { listJournalEntries } from "@/lib/api/accounting";
 import { findJournalEntriesForDonation, journalPostingSummary } from "@/lib/accounting/journal-links";
 import { cancelDonation, getDonation, listDonationAuditEvents, previewReceipt, voidDonation } from "@/lib/api/donations";
 import { processGatewayPayment, recordManualPayment } from "@/lib/api/payments";
-import { peopleCopyForOrganization } from "@/lib/people/copy";
-import { peopleModuleForOrganization, personPath } from "@/lib/people/module";
+import { peopleCopy } from "@/lib/people/copy";
+import { personPath } from "@/lib/people/module";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDateTime } from "@/lib/utils/dates";
 import { ApiError } from "@/types/api";
@@ -42,9 +41,7 @@ import { PermissionGate } from "@/components/security/permission-gate";
 export default function DonationDetailPage() {
   const params = useParams();
   const { accessToken, user } = useAuth();
-  const organizationQuery = useOrganization();
-  const copy = peopleCopyForOrganization(organizationQuery.data?.type ?? user?.organizationType);
-  const peopleModule = peopleModuleForOrganization(organizationQuery.data?.type ?? user?.organizationType);
+  const copy = peopleCopy("donors");
   const donationId = Number(params.id);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptResponse | null>(null);
@@ -172,17 +169,17 @@ export default function DonationDetailPage() {
     <div className="space-y-4">
       <PageHeader
         breadcrumbs={[
-          { label: copy.church ? "Giving" : "Donations", href: "/donations" },
-          { label: copy.church ? `Gift #${donation.id}` : `Donation #${donation.id}` },
+          { label: "Donations", href: "/donations" },
+          { label: `Donation #${donation.id}` },
         ]}
-        title={copy.church ? `Gift #${donation.id}` : `Donation #${donation.id}`}
+        title={`Donation #${donation.id}`}
         description={formatDateTime(donation.donationTime)}
         action={
           <div className="flex gap-2">
             {(donation.status === "PENDING" || donation.status === "FAILED") && (
               <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER"]}>
-                <Button variant="outline" onClick={handleCancelDonation} disabled={cancelling}>
-                  {cancelling ? "Cancelling…" : copy.church ? "Cancel gift" : "Cancel donation"}
+                <Button variant="outline" onClick={handleCancelDonation} loading={cancelling}>
+                  Cancel donation
                 </Button>
               </PermissionGate>
             )}
@@ -237,10 +234,10 @@ export default function DonationDetailPage() {
           title="Relationships"
           fields={[
             {
-              label: copy.church ? "Member" : "Donor",
+              label: "Donor",
               value: donation.donorId ? (
-                <Link href={personPath(peopleModule, donation.donorId)} className="text-primary hover:underline">
-                  {donation.donorName ?? `${copy.church ? "Member" : "Donor"} #${donation.donorId}`}
+                <Link href={personPath("donors", donation.donorId)} className="text-primary hover:underline">
+                  {donation.donorName ?? `Donor #${donation.donorId}`}
                 </Link>
               ) : (
                 "Anonymous"
@@ -324,15 +321,20 @@ export default function DonationDetailPage() {
               value={voidReason}
               onChange={(event) => setVoidReason(event.target.value)}
               maxLength={500}
-              placeholder="Wrong member, duplicate entry, …"
+              placeholder="Wrong donor, duplicate entry, …"
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setVoidOpen(false)}>
               {copy.keepGiftLabel}
             </Button>
-            <Button onClick={handleVoidDonation} disabled={voiding || !voidReason.trim()}>
-              {voiding ? "Voiding…" : copy.voidLabel}
+            <Button
+              variant="destructive"
+              onClick={handleVoidDonation}
+              loading={voiding}
+              disabled={!voidReason.trim()}
+            >
+              {copy.voidLabel}
             </Button>
           </DialogFooter>
         </DialogContent>
