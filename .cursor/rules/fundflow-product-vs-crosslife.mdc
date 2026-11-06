@@ -1,0 +1,19 @@
+---
+description: FundFlow is the product; CrossLife is only a pilot tenant
+alwaysApply: true
+---
+
+# Product vs pilot
+
+**FundFlow** is the multi-tenant SaaS product (nonprofit ERP). It is **not** a CrossLife system.
+
+**CrossLife** is a **pilot / first customer** used to test before market — demo org seed data, evaluation overlay (`docker-compose.dev.yml`), and brand docs that may mention CrossLife.
+
+## Implications for design and docs
+
+- Do **not** treat CrossLife orange/`CROSSLIFE_BRAND.md` as the FundFlow product brand by default.
+- **Approved FundFlow product brand (light fintech):** Canvas `#F2F4F7`, pure white sidebar `#FFFFFF`, matte navy type `#0B1C2C`, digital cyan primary `#0B8EC9` (CTAs / primary actions), crisp gray borders `#D9DEE5`. Status: muted emerald and soft crimson surfaces; slate icons. Tokens in `frontend/src/app/globals.css`. Light mode is primary.
+- **Green is semantic-only** (success / positive money / completed)—not brand chrome.
+- Keep CrossLife as tenant/demo content where useful; do not rename the product to CrossLife or hard-wire CrossLife as the only org type/brand.
+- When docs say “CrossLife brand,” interpret as pilot reference or deferred experiment — clarify with the user before shipping it as product identity.
+- Stale Graphite / Material black / CrossLife orange docs (`COLOR_GUIDE`, `DESIGN_SYSTEM`) must not override live `globals.css` tokens.
