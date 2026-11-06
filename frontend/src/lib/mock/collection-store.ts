@@ -10,14 +10,14 @@ const sessions: CollectionSessionResponse[] = [
   {
     id: 41,
     organizationId: 1,
-    collectionType: "SERVICE_OFFERING",
-    title: "Sunday 1st service",
+    collectionType: "GENERAL",
+    title: "Community fundraiser",
     totalAmount: 850000,
     paymentMethod: "CASH",
     collectedAt: "2026-08-16T10:00:00",
-    location: "Main sanctuary",
+    location: "Community hall",
     status: "COUNTED",
-    notes: "Two bags from ushers",
+    notes: "Two cash bags",
     createdAt: "2026-08-16T12:15:00",
   },
 ];

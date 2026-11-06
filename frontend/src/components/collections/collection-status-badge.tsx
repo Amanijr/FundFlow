@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { collectionStatusLabel } from "@/lib/church/labels";
+import { collectionStatusLabel } from "@/lib/collections/labels";
 import type { CollectionSessionStatus } from "@/types/collection";
 
 const variants: Record<CollectionSessionStatus, "secondary" | "warning" | "success" | "outline"> = {

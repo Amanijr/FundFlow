@@ -5,8 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { ChurchNav } from "@/components/church/church-nav";
-import { CollectionStatusBadge } from "@/components/church/collection-status-badge";
+import { CollectionStatusBadge } from "@/components/collections/collection-status-badge";
 import { CurrencyCell } from "@/components/data";
 import { ErrorAlert } from "@/components/feedback/error-alert";
 import { LoadingState } from "@/components/feedback/loading-state";
@@ -17,24 +16,24 @@ import { FilterBar } from "@/components/tables/filter-bar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { getCollectionDashboard, listCollectionSessions } from "@/lib/api/collections";
-import { collectionStatusLabel, collectionTypeLabel } from "@/lib/church/labels";
+import { collectionStatusLabel, collectionTypeLabel } from "@/lib/collections/labels";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDate } from "@/lib/utils/dates";
 import type { CollectionSessionResponse, CollectionSessionStatus } from "@/types/collection";
 
-export default function ChurchCollectionsPage() {
+export default function CollectionsPage() {
   const { accessToken } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   const sessionsQuery = useQuery({
-    queryKey: ["church", "collections"],
+    queryKey: ["collections"],
     queryFn: async () => (await listCollectionSessions(accessToken!)).data,
     enabled: Boolean(accessToken),
   });
 
   const dashboardQuery = useQuery({
-    queryKey: ["church", "collections", "dashboard"],
+    queryKey: ["collections", "dashboard"],
     queryFn: async () => (await getCollectionDashboard(accessToken!)).data,
     enabled: Boolean(accessToken),
   });
@@ -42,9 +41,7 @@ export default function ChurchCollectionsPage() {
   const filtered = useMemo(() => {
     return (sessionsQuery.data ?? []).filter((session) => {
       const haystack = `${session.title ?? ""} ${session.location ?? ""} ${session.collectionType}`.toLowerCase();
-      const matchesSearch = haystack.includes(search.toLowerCase());
-      const matchesStatus = statusFilter === "ALL" || session.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      return haystack.includes(search.toLowerCase()) && (statusFilter === "ALL" || session.status === statusFilter);
     });
   }, [search, sessionsQuery.data, statusFilter]);
 
@@ -54,10 +51,7 @@ export default function ChurchCollectionsPage() {
         accessorKey: "title",
         header: "Collection",
         cell: ({ row }) => (
-          <Link
-            href={`/church/collections/${row.original.id}`}
-            className="font-medium text-primary hover:underline"
-          >
+          <Link href={`/collections/${row.original.id}`} className="font-medium text-primary hover:underline">
             {row.original.title || collectionTypeLabel(row.original.collectionType)}
           </Link>
         ),
@@ -71,11 +65,7 @@ export default function ChurchCollectionsPage() {
         accessorKey: "totalAmount",
         header: () => <span className="block text-right">Amount</span>,
         cell: ({ row }) =>
-          row.original.totalAmount != null ? (
-            <CurrencyCell value={toNumber(row.original.totalAmount)} />
-          ) : (
-            "—"
-          ),
+          row.original.totalAmount != null ? <CurrencyCell value={toNumber(row.original.totalAmount)} /> : "—",
       },
       {
         accessorKey: "status",
@@ -84,7 +74,7 @@ export default function ChurchCollectionsPage() {
       },
       {
         accessorKey: "collectedAt",
-        header: "Service date",
+        header: "Collection date",
         cell: ({ row }) => formatDate(row.original.collectedAt ?? row.original.createdAt),
       },
     ],
@@ -93,42 +83,34 @@ export default function ChurchCollectionsPage() {
 
   if (sessionsQuery.isLoading) return <LoadingState />;
 
-  const dashboard = dashboardQuery.data;
-  const statuses: Array<"ALL" | CollectionSessionStatus> = [
-    "ALL",
-    "DRAFT",
-    "COUNTED",
-    "VERIFIED",
-    "DEPOSITED",
-  ];
+  const statuses: Array<"ALL" | CollectionSessionStatus> = ["ALL", "DRAFT", "COUNTED", "VERIFIED", "DEPOSITED"];
 
   return (
     <div className="space-y-4">
-      <ChurchNav />
       <PageHeader
-        breadcrumbs={[{ label: "Church", href: "/church" }, { label: "Sunday collections" }]}
-        title="Sunday collections"
-        description="Count the plate or Lipa total. Treasurer verifies, then the books post automatically."
+        breadcrumbs={[{ label: "Collections" }]}
+        title="Collections"
+        description="Count collected funds, verify them, and post them to the books."
         action={
           <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"]}>
             <Button asChild>
-              <Link href="/church/collections/new">New collection</Link>
+              <Link href="/collections/new">New collection</Link>
             </Button>
           </PermissionGate>
         }
       />
 
-      {dashboard && (
+      {dashboardQuery.data && (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-4">
-            <p className="text-sm text-muted-foreground">Verified offerings</p>
+            <p className="text-sm text-muted-foreground">Verified amount</p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatCurrency(toNumber(dashboard.totalVerifiedAmount))}
+              {formatCurrency(toNumber(dashboardQuery.data.totalVerifiedAmount))}
             </p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-4">
-            <p className="text-sm text-muted-foreground">Services verified</p>
-            <p className="mt-1 text-2xl font-semibold">{dashboard.totalVerifiedSessions}</p>
+            <p className="text-sm text-muted-foreground">Verified collections</p>
+            <p className="mt-1 text-2xl font-semibold">{dashboardQuery.data.totalVerifiedSessions}</p>
           </div>
         </div>
       )}

@@ -4,25 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { ErrorAlert } from "@/components/feedback/error-alert";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
-import { ErrorAlert } from "@/components/feedback/error-alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { COLLECTION_TYPE_LABELS } from "@/lib/church/labels";
+import { COLLECTION_TYPE_LABELS } from "@/lib/collections/labels";
 import type { CollectionSessionCreateRequest, CollectionType } from "@/types/collection";
 import type { FundResponse } from "@/types/finance";
 
 const collectionTypes = Object.keys(COLLECTION_TYPE_LABELS) as CollectionType[];
 
 const schema = z.object({
-  collectionType: z.enum([
-    "SERVICE_OFFERING",
-    "EVENT",
-    "DEPARTMENT",
-    "PROJECT",
-    "SPECIAL_APPEAL",
-  ]),
+  collectionType: z.enum(["GENERAL", "EVENT", "PROJECT", "SPECIAL_APPEAL"]),
   title: z.string().min(1, "Give this collection a name").max(255),
   location: z.string().max(255).optional(),
   notes: z.string().max(1000).optional(),
@@ -52,11 +46,11 @@ export function CollectionSessionForm({
   } = useForm<CollectionSessionFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      collectionType: "SERVICE_OFFERING",
-      title: "Sunday offering",
+      collectionType: "GENERAL",
+      title: "",
       location: "",
       notes: "",
-      fundId: "",
+      fundId: defaultFund ? String(defaultFund.id) : "",
     },
   });
 
@@ -76,9 +70,9 @@ export function CollectionSessionForm({
       {serverError && <ErrorAlert message={serverError} />}
       <FormSection
         title="Collection"
-        description="Start a count for the service. The treasurer verifies it later, then it posts to the books."
+        description="Start a count for collected funds. Finance verifies it before it posts to the books."
       >
-        <FormField label="What was collected" error={errors.collectionType?.message}>
+        <FormField label="Collection type" error={errors.collectionType?.message}>
           <select
             className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm"
             {...register("collectionType")}
@@ -91,38 +85,26 @@ export function CollectionSessionForm({
           </select>
         </FormField>
         <FormField label="Name" error={errors.title?.message}>
-          <Input {...register("title")} placeholder="e.g. Sunday 1st service" />
+          <Input {...register("title")} placeholder="e.g. Community fundraiser" />
         </FormField>
-        <FormField
-          label="Fund"
-          className="sm:col-span-2"
-          description={
-            defaultFund
-              ? "Leave on Sunday offering unless this count belongs in another pot."
-              : "Mark a fund as the Sunday offering fund under Funds if plates should increase remaining."
-          }
-        >
+        <FormField label="Fund" className="sm:col-span-2">
           <select className="h-9 w-full rounded-md border border-input bg-surface px-2.5 text-sm" {...register("fundId")}>
-            <option value="">
-              {defaultFund
-                ? `Sunday offering — ${defaultFund.name}`
-                : "No fund (won't change fund remaining)"}
-            </option>
+            <option value="">No fund selected</option>
             {funds
               .filter((fund) => fund.active)
               .map((fund) => (
                 <option key={fund.id} value={String(fund.id)}>
                   {fund.name}
-                  {fund.defaultForCollections ? " (Sunday offering)" : ""}
+                  {fund.defaultForCollections ? " (default)" : ""}
                 </option>
               ))}
           </select>
         </FormField>
-        <FormField label="Where" error={errors.location?.message} className="sm:col-span-2">
-          <Input {...register("location")} placeholder="e.g. Main sanctuary, Kinondoni" />
+        <FormField label="Location" error={errors.location?.message} className="sm:col-span-2">
+          <Input {...register("location")} placeholder="Optional" />
         </FormField>
         <FormField label="Notes" className="sm:col-span-2">
-          <Input {...register("notes")} placeholder="Optional — ushers, bag count, etc." />
+          <Input {...register("notes")} placeholder="Optional" />
         </FormField>
       </FormSection>
       <div className="flex justify-end gap-2">
@@ -131,7 +113,7 @@ export function CollectionSessionForm({
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           Start collection
         </Button>
       </div>
