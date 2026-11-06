@@ -23,9 +23,9 @@ class AuthIntegrationTest {
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "Grace Community Church",
+                    "name": "Grace Community Foundation",
                     "slug": "grace-community",
-                    "type": "CHURCH",
+                    "type": "FOUNDATION",
                     "email": "admin@grace.org",
                     "phone": "+1234567890",
                     "country": "US"

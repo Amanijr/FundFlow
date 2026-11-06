@@ -35,7 +35,7 @@ class PlatformIntegrationTest {
 
     private static String superAdminToken;
     private static long orgSuffix;
-    private static Long churchOrganizationId;
+    private static Long testOrganizationId;
 
     @Test
     @Order(1)
@@ -87,12 +87,12 @@ class PlatformIntegrationTest {
                         .content("""
                                 {
                                   "organization": {
-                                    "name": "Platform Test Church",
-                                    "slug": "platform-test-church-%d",
-                                    "type": "CHURCH",
-                                    "email": "church-%d@example.org"
+                                    "name": "Platform Test Foundation",
+                                    "slug": "platform-test-org-%d",
+                                    "type": "FOUNDATION",
+                                    "email": "org-%d@example.org"
                                   },
-                                  "email": "church-%d@example.org",
+                                  "email": "org-%d@example.org",
                                   "password": "password123",
                                   "firstName": "Org",
                                   "lastName": "Admin"
@@ -101,7 +101,7 @@ class PlatformIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        churchOrganizationId = ((Number) com.jayway.jsonpath.JsonPath.read(
+        testOrganizationId = ((Number) com.jayway.jsonpath.JsonPath.read(
                 registerResult.getResponse().getContentAsString(), "$.data.organizationId")).longValue();
 
         mockMvc.perform(get(DASHBOARD)
@@ -132,16 +132,16 @@ class PlatformIntegrationTest {
     @Test
     @Order(4)
     void superAdminCanActOnOrganizationWithHeader() throws Exception {
-        mockMvc.perform(put(DASHBOARD + "/organizations/" + churchOrganizationId + "/status")
+        mockMvc.perform(put(DASHBOARD + "/organizations/" + testOrganizationId + "/status")
                         .header("Authorization", "Bearer " + superAdminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"active\": false}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.active").value(false));
 
-        mockMvc.perform(get("/api/v1/church/ministries")
+        mockMvc.perform(get("/api/v1/donors")
                         .header("Authorization", "Bearer " + superAdminToken)
-                        .header("X-Organization-Id", churchOrganizationId.toString()))
+                        .header("X-Organization-Id", testOrganizationId.toString()))
                 .andExpect(status().isOk());
     }
 
@@ -152,7 +152,7 @@ class PlatformIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "church-%d@example.org",
+                                  "email": "org-%d@example.org",
                                   "password": "password123"
                                 }
                                 """.formatted(orgSuffix)))
@@ -198,7 +198,7 @@ class PlatformIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "church-%d@example.org",
+                                  "email": "org-%d@example.org",
                                   "password": "password123"
                                 }
                                 """.formatted(orgSuffix)))
