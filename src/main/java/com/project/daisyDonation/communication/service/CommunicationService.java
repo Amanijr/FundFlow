@@ -118,7 +118,7 @@ public class CommunicationService {
             return;
         }
 
-        if (donation.isAnonymous() || (donation.getDonor() == null && donation.getMember() == null)) {
+        if (donation.isAnonymous() || donation.getDonor() == null) {
             return;
         }
 
@@ -185,12 +185,6 @@ public class CommunicationService {
             return switch (channel) {
                 case EMAIL -> donation.getDonor().getEmail();
                 case SMS, WHATSAPP -> donation.getDonor().getPhone();
-            };
-        }
-        if (donation.getMember() != null) {
-            return switch (channel) {
-                case EMAIL -> donation.getMember().getEmail();
-                case SMS, WHATSAPP -> donation.getMember().getPhone();
             };
         }
         throw new BadRequestException("No contact available for this donation");
