@@ -81,7 +81,7 @@ Priority: Critical
 Objectives:
 
 * Manual payment recording (cash, cheque, in-person)
-* Collection sessions for group/church collections
+* Collection sessions for group / event collections
 * Anonymous physical payment support
 * Finance Manager verification workflow
 
@@ -227,17 +227,11 @@ Automated communication available.
 
 # PHASE 9 — ORGANIZATION-SPECIFIC MODULES
 
-Status: Complete
+Status: Complete (Church CMS later extracted — see docs/architecture/CHURCH_CMS_EXTRACTION.md)
 
 Priority: Medium
 
 Examples:
-
-Church:
-
-* Attendance
-* Ministries
-* Pledges
 
 NGO:
 
@@ -248,9 +242,14 @@ School:
 
 * Student Sponsorship
 
+Shared financial (all org types):
+
+* Pledges
+* Collection sessions
+
 Exit Criteria:
 
-Vertical-specific features available.
+Vertical-specific features available for supported CSO / school tenants.
 
 ---
 
