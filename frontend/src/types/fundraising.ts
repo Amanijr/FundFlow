@@ -4,27 +4,21 @@ export type DonationStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED" | 
 
 export type DonationType = "ONE_TIME" | "RECURRING" | "PLEDGE" | "IN_KIND" | "COLLECTION";
 
-export type MembershipStatus = "ACTIVE" | "INACTIVE" | "VISITOR";
-
 export interface DonorRequest {
   firstName: string;
   lastName: string;
-  memberNumber?: string;
   email?: string;
   phone?: string;
   address?: string;
   city?: string;
   state?: string;
   country?: string;
-  membershipStatus?: MembershipStatus;
-  joinedAt?: string;
   notes?: string;
 }
 
 export interface DonorResponse {
   id: number;
   organizationId: number;
-  memberNumber?: string;
   firstName: string;
   lastName: string;
   email?: string;
@@ -33,8 +27,6 @@ export interface DonorResponse {
   city?: string;
   state?: string;
   country?: string;
-  membershipStatus?: MembershipStatus;
-  joinedAt?: string;
   notes?: string;
   createdAt: string;
 }
@@ -83,7 +75,6 @@ export interface CampaignDashboardResponse {
 
 export interface DonationCreateRequest {
   donorId?: number;
-  memberId?: number;
   amount: number;
   donationType: DonationType;
   anonymous?: boolean;
@@ -91,8 +82,6 @@ export interface DonationCreateRequest {
   fundId?: number;
   pledgeId?: number;
   recurringDonationId?: number;
-  partnershipId?: number;
-  partnershipMonth?: string;
   source?: string;
   notes?: string;
   itemDescription?: string;
@@ -115,7 +104,6 @@ export interface DonationDetailResponse {
   organizationId: number;
   donorId?: number;
   donorName?: string;
-  memberId?: number;
   amount: number;
   donationTime: string;
   status: DonationStatus;
@@ -134,8 +122,6 @@ export interface DonationDetailResponse {
   itemDescription?: string;
   estimatedValue?: number;
   paymentId?: number;
-  partnershipId?: number;
-  partnershipMonth?: string;
 }
 
 export interface DonationAuditEventResponse {

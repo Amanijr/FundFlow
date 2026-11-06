@@ -66,3 +66,14 @@ export function getCurrentUser(token: string) {
     token,
   });
 }
+
+export function updateCurrentUser(
+  token: string,
+  body: { firstName: string; lastName: string },
+) {
+  return apiRequest<UserResponse>("/api/v1/auth/me", {
+    method: "PUT",
+    token,
+    body,
+  });
+}

@@ -41,7 +41,3 @@ export function updateDonor(token: string, id: number, body: DonorRequest) {
 export function deleteDonor(token: string, id: number) {
   return deletePerson(token, "donors", id);
 }
-
-export function listMembers(token: string) {
-  return listPeople(token, "members");
-}
