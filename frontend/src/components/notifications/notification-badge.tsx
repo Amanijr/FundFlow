@@ -13,7 +13,7 @@ export function NotificationBadge({ count, className }: NotificationBadgeProps) 
   return (
     <span
       className={cn(
-        "absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-stone-900 px-1 text-[10px] font-medium text-white",
+        "absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground",
         className,
       )}
       aria-hidden

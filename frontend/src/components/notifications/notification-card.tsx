@@ -18,15 +18,15 @@ import { cn } from "@/lib/utils";
 const SEVERITY_BORDER: Record<NotificationSeverity, string> = {
   info: "",
   success: "",
-  warning: "border-l-2 border-l-amber-500",
-  critical: "border-l-2 border-l-red-600",
+  warning: "border-l-2 border-l-warning",
+  critical: "border-l-2 border-l-destructive",
 };
 
 const SEVERITY_ICON: Record<NotificationSeverity, string> = {
   info: "text-muted-foreground",
-  success: "text-emerald-600",
-  warning: "text-amber-600",
-  critical: "text-red-600",
+  success: "text-success",
+  warning: "text-warning",
+  critical: "text-destructive",
 };
 
 const CATEGORY_ICONS: Record<NotificationCategory, typeof Bell> = {
@@ -100,7 +100,7 @@ export function NotificationCard({
               {notification.title}
             </p>
             {isUnread && (
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-stone-900" aria-hidden />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
             )}
           </div>
           {!compact && notification.body && (

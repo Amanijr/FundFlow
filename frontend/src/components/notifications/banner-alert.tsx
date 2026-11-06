@@ -10,9 +10,9 @@ interface BannerAlertProps {
 }
 
 const SEVERITY_STYLES = {
-  info: "border-blue-200 bg-blue-50 text-blue-950",
-  warning: "border-amber-200 bg-amber-50 text-amber-950",
-  critical: "border-red-200 bg-red-50 text-red-950",
+  info: "border-info/30 bg-info/10 text-foreground",
+  warning: "border-warning/30 bg-warning/10 text-foreground",
+  critical: "border-destructive/30 bg-destructive/10 text-foreground",
 };
 
 const SEVERITY_ICONS = {

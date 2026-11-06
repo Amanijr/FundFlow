@@ -42,8 +42,8 @@ export function SLAIndicator(props: SLAIndicatorProps) {
 
   const styles = {
     on_track: "bg-muted text-muted-foreground",
-    warning: "bg-amber-50 text-amber-800",
-    breached: "bg-red-50 text-red-800",
+    warning: "bg-warning/15 text-warning",
+    breached: "bg-destructive/15 text-destructive",
   }[status];
 
   return (
