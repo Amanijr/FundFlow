@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request to invite a user into the current organization")
 public class CreateUserRequest {
 
-    @Schema(description = "email", example = "staff@church.org")
+    @Schema(description = "email", example = "staff@org.example")
     @NotBlank
     @Email
     @Size(max = 100)

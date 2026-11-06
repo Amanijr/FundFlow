@@ -12,7 +12,6 @@ import com.project.daisyDonation.common.exception.ConflictException;
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.common.service.TenantSupport;
-import com.project.daisyDonation.common.service.VerticalAccess;
 import com.project.daisyDonation.donation.repository.DonationRepository;
 import com.project.daisyDonation.donation.service.DonationMapper;
 import com.project.daisyDonation.donor.dto.DonorDetailResponse;
@@ -36,7 +35,6 @@ public class DonorService {
     @Transactional
     public DonorResponse create(UserPrincipal principal, DonorRequest request) {
         Organization organization = tenantSupport.organization(principal);
-        VerticalAccess.requireNotChurch(organization);
         String email = blankToNull(request.getEmail());
         String phone = blankToNull(request.getPhone());
         validateEmailFormat(email);
@@ -51,7 +49,6 @@ public class DonorService {
     @Transactional(readOnly = true)
     public List<DonorResponse> list(UserPrincipal principal) {
         Organization organization = tenantSupport.organization(principal);
-        VerticalAccess.requireNotChurch(organization);
         Long organizationId = organization.getId();
         return donorRepository.findByOrganizationIdAndDeletedFalse(organizationId).stream()
                 .sorted(Comparator.comparing(Donor::getLastName).thenComparing(Donor::getFirstName))
@@ -115,7 +112,6 @@ public class DonorService {
 
     public Donor requireDonor(UserPrincipal principal, Long donorId) {
         Organization organization = tenantSupport.organization(principal);
-        VerticalAccess.requireNotChurch(organization);
         return donorRepository.findByIdAndOrganizationIdAndDeletedFalse(donorId, organization.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Donor not found"));
     }
