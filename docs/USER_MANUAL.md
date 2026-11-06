@@ -4,7 +4,7 @@
 **Last updated:** July 2026  
 **Audience:** New users, organization administrators, finance staff, fundraising teams, and platform operators
 
-> **Role-based guides:** For shorter, task-focused walkthroughs see **[User Guides](guides/getting-started.md)** (Getting Started, Organization Admin, Fundraising, Finance, Accounting, Reports, Church, School, Platform Owner, and more).
+> **Role-based guides:** For shorter, task-focused walkthroughs see **[User Guides](guides/getting-started.md)** (Getting Started, Organization Admin, Fundraising, Finance, Accounting, Reports, School, Platform Owner, and more).
 
 ---
 
@@ -50,7 +50,7 @@
 - **Budgeting and variance analysis**
 - **Financial and operational reporting**
 - **Grant and program tracking**
-- **Organization-specific tools** (church ministries, school sponsorships, NGO beneficiaries)
+- **Organization-specific tools** (school sponsorships and NGO beneficiaries)
 
 FundFlow is designed so that every financial transaction is **traceable**, **auditable**, and **reportable**. The platform answers questions such as:
 
@@ -74,8 +74,6 @@ FundFlow serves organizations such as:
 
 | Organization type | Examples of use |
 |-------------------|-----------------|
-| **Church** | Offerings, ministries, attendance, pledges |
-| **Religious institution** | Same as church vertical features |
 | **NGO** | Programs, grants, beneficiaries, donor CRM |
 | **Foundation** | Grant tracking, fund accounting |
 | **Charity** | Campaigns, donations, expense control |
@@ -243,7 +241,7 @@ Menus are grouped as follows (items you see depend on your **role** and **organi
 | **Reporting** | Reports hub |
 | **Communication** | Approvals, Notifications, Activity, Documents |
 | **Programs** | Programs, Grants, Beneficiaries *(NGO-type orgs)* |
-| **Verticals** | Ministries, Attendance *(churches)*; Sponsorships *(schools)* |
+| **Verticals** | Sponsorships *(schools)* |
 | **Administration** | Users, Settings *(org admins only)* |
 
 ### Command palette
@@ -439,9 +437,9 @@ The donation detail page (`/donations/[id]`) shows amount, donor, fund, campaign
 
 ---
 
-### Physical collections (churches and cash offerings)
+### Physical collections
 
-For **group collections** (for example, Sunday offering), FundFlow supports **collection sessions**. This workflow is especially useful for churches recording counted cash before finance verification.
+For **group cash collections** (for example, an event or appeal), FundFlow supports **collection sessions** so counted cash can be verified by finance.
 
 **Workflow:**
 
@@ -450,9 +448,9 @@ Create session (Draft) → Submit count (Counted) → Finance verifies (Verified
     → One consolidated donation created → Revenue recognized → Optional bank deposit
 ```
 
-**Collection types:** Service offering, Event, Department, Project, Special appeal.
+**Collection types:** General, Event, Project, Special appeal.
 
-> **Note:** Collection sessions are primarily managed via the API today (`/api/v1/collection-sessions`). Church finance teams should coordinate with your administrator for UI access or API integration. See [PHASE2_5_IMPLEMENTATION.md](./PHASE2_5_IMPLEMENTATION.md).
+> **Note:** Collection sessions are primarily managed via the API today (`/api/v1/collection-sessions`). Coordinate with your administrator for UI access or API integration. See [PHASE2_5_IMPLEMENTATION.md](./PHASE2_5_IMPLEMENTATION.md).
 
 ---
 
@@ -656,13 +654,6 @@ Beneficiaries are individuals or groups served by your programs (common for NGOs
 
 Some features only appear based on your **organization type** at registration.
 
-### Church and religious institution
-
-| Feature | Path | Purpose |
-|---------|------|---------|
-| **Ministries** | `/church/ministries` | Manage church ministries and departments |
-| **Attendance** | `/church/attendance` | Record service or event attendance |
-
 ### School
 
 | Feature | Path | Purpose |
@@ -822,9 +813,9 @@ X-Organization-Id: <organizationId>
 6. Add first **donors** and **campaign**  
 7. Record a test **donation** and verify it appears in reports  
 
-### Workflow F — Sunday offering (church, via API)
+### Workflow F — Group cash collection (via API)
 
-1. Staff creates **collection session** (service offering)  
+1. Staff creates a **general collection session**
 2. After counting, submit **count** with total and payment method  
 3. Finance Manager **verifies** session — consolidated donation created  
 4. Finance Manager records **bank deposit** when cash is deposited  

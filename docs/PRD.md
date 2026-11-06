@@ -10,12 +10,10 @@ FundFlow ERP is a multi-tenant SaaS platform that provides financial accountabil
 
 The system must serve:
 
-* Churches
 * NGOs
 * Charities
 * Foundations
 * Community Organizations
-* Religious Institutions
 * Associations
 * Donor-Funded Projects
 * Educational Nonprofits
@@ -117,13 +115,11 @@ Each organization must operate independently.
 
 Organization Types:
 
-* Church
 * NGO
 * Foundation
 * Charity
 * Community Organization
 * School
-* Religious Institution
 
 Every record must belong to an Organization.
 
@@ -396,22 +392,9 @@ Features:
 
 ---
 
-## Module 13: Attendance Management
+## Removed domain: Church CMS
 
-Applicable to churches and membership organizations.
-
-Features:
-
-* Service Attendance
-* Event Attendance
-* Ministry Attendance
-* Attendance Analytics
-
-KPIs:
-
-* Attendance Growth
-* Retention
-* Participation Rates
+Membership, ministry, service, and attendance management are not FundFlow modules. They were permanently extracted in Flyway V21; FundFlow retains financial donor and donation management only.
 
 ---
 
