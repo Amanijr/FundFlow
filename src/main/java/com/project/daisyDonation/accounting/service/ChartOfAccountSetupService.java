@@ -41,45 +41,10 @@ public class ChartOfAccountSetupService {
             return nonprofitSeeds();
         }
         return switch (type) {
-            case CHURCH, RELIGIOUS_INSTITUTION -> churchSeeds();
+            case NGO, CHARITY, COMMUNITY_ORGANIZATION -> nonprofitSeeds();
             case SCHOOL -> schoolSeeds();
             case FOUNDATION -> foundationSeeds();
-            case NGO, CHARITY, COMMUNITY_ORGANIZATION -> nonprofitSeeds();
         };
-    }
-
-    /**
-     * Default chart for churches in Tanzania (tithes, offerings, mobile money / bank).
-     * System codes used by posting keep their numbers; labels match church language.
-     */
-    private List<AccountSeed> churchSeeds() {
-        return List.of(
-                seed(AccountCodes.CASH, "Cash on Hand", AccountType.ASSET,
-                        "Cash counted from services and kept in the church till", true),
-                seed(AccountCodes.BANK, "Bank Account", AccountType.ASSET,
-                        "Church bank account (e.g. CRDB, NMB, Equity)", false),
-                seed(AccountCodes.MOBILE_MONEY, "Mobile Money / Lipa", AccountType.ASSET,
-                        "M-Pesa, Tigo Pesa, Airtel Money, or Lipa float", false),
-                seed(AccountCodes.IN_KIND_CONTRIBUTIONS, "In-Kind Contributions", AccountType.ASSET,
-                        "Goods and services given to the church", true),
-                seed(AccountCodes.DONATION_REVENUE, "Tithes, Offerings & Gifts", AccountType.REVENUE,
-                        "All contribution income posted automatically from gifts and collections", true),
-                seed(AccountCodes.TITHE_REVENUE, "Tithes", AccountType.REVENUE,
-                        "Optional detail account for tithe tracking (use funds or manual split)", false),
-                seed(AccountCodes.OFFERING_REVENUE, "Offerings & Collections", AccountType.REVENUE,
-                        "Sunday and midweek offerings / group collections", false),
-                seed(AccountCodes.BUILDING_REVENUE, "Building & Project Gifts", AccountType.REVENUE,
-                        "Building fund, land, and capital project contributions", false),
-                seed(AccountCodes.OPERATIONS_EXPENSE, "Church Operations", AccountType.EXPENSE,
-                        "Utilities, rent, transport, maintenance, and day-to-day running costs", true),
-                seed(AccountCodes.PROGRAM_EXPENSE, "Ministry & Programs", AccountType.EXPENSE,
-                        "Youth, worship, cell groups, conferences, and ministry activities", true),
-                seed(AccountCodes.ADMINISTRATIVE_EXPENSE, "Administration", AccountType.EXPENSE,
-                        "Office, stationery, salaries support, and admin overhead", true),
-                seed(AccountCodes.FUNDRAISING_EXPENSE, "Evangelism & Outreach", AccountType.EXPENSE,
-                        "Outreach, crusades, missions, and member engagement costs", true),
-                seed(AccountCodes.MISCELLANEOUS_EXPENSE, "Other Expenses", AccountType.EXPENSE,
-                        "Expenses that do not fit another category", true));
     }
 
     private List<AccountSeed> schoolSeeds() {
