@@ -57,7 +57,7 @@ All require `SUPER_ADMIN` JWT.
 
 ## Acting inside a tenant
 
-Super admins are not bound to one organization. To work with tenant data (donations, church modules, analytics, etc.):
+Super admins are not bound to one organization. To work with tenant data (donations, finance, analytics, etc.):
 
 ```http
 X-Organization-Id: 42

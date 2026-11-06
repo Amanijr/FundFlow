@@ -171,21 +171,13 @@ public class FinancialReportingService {
         List<AccountPeriodSummary> inPeriod = journalLineRepository.summarizeByAccount(
                 organizationId, fromDate, toDate, null);
 
-        AccountPeriodSummary cashAllTime = findByCode(allTime, AccountCodes.CASH);
-        AccountPeriodSummary cashBeforePeriod = findByCode(
-                journalLineRepository.summarizeByAccount(
-                        organizationId, null, fromDate.minusDays(1), null),
-                AccountCodes.CASH);
-        AccountPeriodSummary cashInPeriod = findByCode(inPeriod, AccountCodes.CASH);
+        List<AccountPeriodSummary> beforePeriod = journalLineRepository.summarizeByAccount(
+                organizationId, null, fromDate.minusDays(1), null);
 
-        BigDecimal openingCash = cashBeforePeriod != null
-                ? debitNormalBalance(cashBeforePeriod)
-                : BigDecimal.ZERO;
-        BigDecimal cashInflows = cashInPeriod != null ? cashInPeriod.getTotalDebits() : BigDecimal.ZERO;
-        BigDecimal cashOutflows = cashInPeriod != null ? cashInPeriod.getTotalCredits() : BigDecimal.ZERO;
-        BigDecimal closingCash = cashAllTime != null
-                ? debitNormalBalance(cashAllTime)
-                : openingCash.add(cashInflows).subtract(cashOutflows);
+        BigDecimal openingCash = sumLiquidBalance(beforePeriod);
+        BigDecimal cashInflows = sumLiquidDebits(inPeriod);
+        BigDecimal cashOutflows = sumLiquidCredits(inPeriod);
+        BigDecimal closingCash = sumLiquidBalance(allTime);
 
         return CashFlowResponse.builder()
                 .fromDate(fromDate)
@@ -377,5 +369,32 @@ public class FinancialReportingService {
                 .filter(s -> code.equals(s.getAccountCode()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static final List<String> LIQUID_ASSET_CODES = List.of(
+            AccountCodes.CASH, AccountCodes.BANK, AccountCodes.MOBILE_MONEY);
+
+    private BigDecimal sumLiquidBalance(List<AccountPeriodSummary> summaries) {
+        return LIQUID_ASSET_CODES.stream()
+                .map(code -> findByCode(summaries, code))
+                .filter(summary -> summary != null)
+                .map(this::debitNormalBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal sumLiquidDebits(List<AccountPeriodSummary> summaries) {
+        return LIQUID_ASSET_CODES.stream()
+                .map(code -> findByCode(summaries, code))
+                .filter(summary -> summary != null)
+                .map(AccountPeriodSummary::getTotalDebits)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal sumLiquidCredits(List<AccountPeriodSummary> summaries) {
+        return LIQUID_ASSET_CODES.stream()
+                .map(code -> findByCode(summaries, code))
+                .filter(summary -> summary != null)
+                .map(AccountPeriodSummary::getTotalCredits)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

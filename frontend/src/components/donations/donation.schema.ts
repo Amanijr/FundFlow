@@ -10,8 +10,6 @@ export const donationSchema = z
     anonymous: z.boolean(),
     campaignId: z.string().optional(),
     fundId: z.string().optional(),
-    partnershipId: z.string().optional(),
-    partnershipMonth: z.string().optional(),
     source: z.string().max(100).optional(),
     notes: z.string().max(1000).optional(),
     itemDescription: z.string().max(500).optional(),
@@ -24,7 +22,7 @@ export const donationSchema = z
 
 export type DonationFormValues = z.infer<typeof donationSchema>;
 
-/** Staff gift intake only. Bulk Sunday offerings use collection sessions, not this type. */
+/** Staff gift intake only. Bulk donations use collection sessions, not this type. */
 export const donationTypeOptions = [
   { value: "ONE_TIME", label: "One time" },
   { value: "RECURRING", label: "Recurring" },

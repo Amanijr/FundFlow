@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.project.daisyDonation.accounting.repository.ChartOfAccountRepository;
 import com.project.daisyDonation.donation.entity.Donation;
-import com.project.daisyDonation.donation.entity.DonationType;
 import com.project.daisyDonation.expense.entity.Expense;
 import com.project.daisyDonation.expense.entity.ExpenseCategory;
 import com.project.daisyDonation.fund.entity.Fund;
@@ -17,9 +16,9 @@ import com.project.daisyDonation.payment.entity.PaymentMethod;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Picks ledger accounts from the organization's chart based on how money actually moved.
- * Tanzanian church/NGO defaults (cash till, bank, Lipa/M-Pesa, zaka, sadaka) with fallbacks
- * so orgs that never seeded optional codes still post to Cash and contribution income.
+ * Picks ledger accounts from the organization's chart based on how money moved.
+ * Prefers cash / bank / mobile money asset codes and donation or capital project revenue,
+ * with fallbacks so tenants that never seeded optional detail codes still post.
  */
 @Component
 @RequiredArgsConstructor
@@ -40,19 +39,9 @@ public class LedgerAccountResolver {
     }
 
     public String contributionIncomeAccount(Organization organization, Donation donation) {
-        if (donation.getDonationType() == DonationType.COLLECTION) {
-            return firstExisting(organization, AccountCodes.OFFERING_REVENUE, AccountCodes.DONATION_REVENUE);
-        }
-
         String haystack = haystack(donation);
-        if (matches(haystack, "tithe", "zaka", "ushuru", "tenth")) {
-            return firstExisting(organization, AccountCodes.TITHE_REVENUE, AccountCodes.DONATION_REVENUE);
-        }
-        if (matches(haystack, "building", "construction", "kanisa", "kiwanja", "project", "capital")) {
+        if (matches(haystack, "building", "construction", "project", "capital", "facility")) {
             return firstExisting(organization, AccountCodes.BUILDING_REVENUE, AccountCodes.DONATION_REVENUE);
-        }
-        if (matches(haystack, "offering", "sadaka", "collection", "ibada", "sunday", "service")) {
-            return firstExisting(organization, AccountCodes.OFFERING_REVENUE, AccountCodes.DONATION_REVENUE);
         }
         return firstExisting(organization, AccountCodes.DONATION_REVENUE);
     }

@@ -303,8 +303,8 @@ export function SpendMoneyWizard() {
               Continue
             </Button>
           ) : (
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Finishing…" : "Finish"}
+            <Button type="submit" loading={isSubmitting}>
+              Finish
             </Button>
           )}
         </div>

@@ -16,7 +16,7 @@ interface SheetContentProps extends React.ComponentProps<typeof DialogPrimitive.
 export function SheetContent({ className, children, showClose = true, ...props }: SheetContentProps) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 dark:bg-black/60" />
       <DialogPrimitive.Content
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex h-full w-[min(18rem,88vw)] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground outline-none",

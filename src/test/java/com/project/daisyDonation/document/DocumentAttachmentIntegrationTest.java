@@ -32,9 +32,9 @@ class DocumentAttachmentIntegrationTest {
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "Umoja Chapel",
+                    "name": "Umoja Foundation",
                     "slug": "umoja-docs-%d",
-                    "type": "CHURCH",
+                    "type": "FOUNDATION",
                     "email": "docs@umoja-%d.org",
                     "city": "Dar es Salaam",
                     "country": "Tanzania"
@@ -42,7 +42,7 @@ class DocumentAttachmentIntegrationTest {
                   "email": "docs@umoja-%d.org",
                   "password": "password123",
                   "firstName": "Asha",
-                  "lastName": "Treasurer"
+                  "lastName": "Finance"
                 }
                 """.formatted(suffix, suffix, suffix);
 

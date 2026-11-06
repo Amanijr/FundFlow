@@ -122,14 +122,13 @@ Legend: ✅ Done · 🔶 Partial · ⬜ Missing · — Backend only
 | Org settings | ✅ | `/admin/settings` |
 | Org setup wizard | ✅ | `/admin/setup` |
 
-### Programs & verticals (F9)
+### Programs & organization-specific modules (F9)
 
 | Module | Status |
 |--------|--------|
 | Programs | ✅ |
 | Grants | ✅ |
 | Beneficiaries | ✅ |
-| Church ministries / attendance | ✅ |
 | School sponsorships | ✅ |
 
 ### Platform owner (F10)
@@ -183,7 +182,7 @@ Legend: ✅ Done · 🔶 Partial · ⬜ Missing · — Backend only
 | Funds / budgets / expenses | ✅ | ⬜ |
 | Accounting | ✅ | ⬜ |
 | Reports | ✅ | ⬜ |
-| Programs / grants / church / school | ✅ | ⬜ |
+| Programs / grants / school | ✅ | ⬜ |
 | Platform owner | ✅ | ⬜ |
 | Dev demo seed + CORS | ✅ | ✅ (use `DEV_SEED_ENABLED=true`) |
 
@@ -218,7 +217,7 @@ Follow `FRONTEND_NOTUS_PHASE_PLAN.md` sprints; reuse Track A pages as **behavior
 | **4** | N5 | Donor/campaign/donation CRUD in Notus cards | Feature components → Notus markup port |
 | **5** | N6 | Funds, budgets, expenses + workflow | `expense-workflow-panel` logic |
 | **6** | N7–N8 | Accounting tables + report hub | Table/report pages |
-| **7** | N9–N10 | Users, settings, verticals | Admin + church/school pages |
+| **7** | N9–N10 | Users, settings, organization-specific modules | Admin + school pages |
 | **8** | N11–N12 | Platform shell, loading/errors/a11y | Platform routes |
 
 ### Track C — Backend enablement (`BACKEND_NOTUS_PHASE_PLAN.md`)

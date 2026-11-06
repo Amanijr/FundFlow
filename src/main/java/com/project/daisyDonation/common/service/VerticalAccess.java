@@ -6,11 +6,10 @@ import com.project.daisyDonation.common.exception.BadRequestException;
 import com.project.daisyDonation.organization.entity.Organization;
 import com.project.daisyDonation.organization.entity.OrganizationType;
 
+/**
+ * Organization-type access helpers for FundFlow financial modules (CSO / school).
+ */
 public final class VerticalAccess {
-
-    private static final Set<OrganizationType> CHURCH_TYPES = Set.of(
-            OrganizationType.CHURCH,
-            OrganizationType.RELIGIOUS_INSTITUTION);
 
     private static final Set<OrganizationType> NGO_TYPES = Set.of(
             OrganizationType.NGO,
@@ -24,10 +23,6 @@ public final class VerticalAccess {
     private VerticalAccess() {
     }
 
-    public static boolean isChurch(Organization organization) {
-        return CHURCH_TYPES.contains(organization.getType());
-    }
-
     public static boolean isNgo(Organization organization) {
         return NGO_TYPES.contains(organization.getType());
     }
@@ -36,21 +31,9 @@ public final class VerticalAccess {
         return SCHOOL_TYPES.contains(organization.getType());
     }
 
-    public static void requireChurch(Organization organization) {
-        if (!CHURCH_TYPES.contains(organization.getType())) {
-            throw new BadRequestException("This feature is only available for church organizations");
-        }
-    }
-
-    public static void requireNotChurch(Organization organization) {
-        if (CHURCH_TYPES.contains(organization.getType())) {
-            throw new BadRequestException("Church organizations use members, not donors");
-        }
-    }
-
     public static void requireNgo(Organization organization) {
         if (!NGO_TYPES.contains(organization.getType())) {
-            throw new BadRequestException("This feature is only available for NGO organizations");
+            throw new BadRequestException("This feature is only available for NGO / foundation organizations");
         }
     }
 

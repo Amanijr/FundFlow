@@ -19,6 +19,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   destructive?: boolean;
+  loading?: boolean;
 }
 
 export function ConfirmDialog({
@@ -30,6 +31,7 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   onConfirm,
   destructive = false,
+  loading = false,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,11 +41,12 @@ export function ConfirmDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             {cancelLabel}
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
+            loading={loading}
             onClick={() => {
               onConfirm();
               onOpenChange(false);

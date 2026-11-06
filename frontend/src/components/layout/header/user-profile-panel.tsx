@@ -79,7 +79,7 @@ function ProfileAction({
 
 export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfilePanelProps) {
   const logout = useLogout();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [orgDetailsOpen, setOrgDetailsOpen] = useState(false);
   const {
     user,
@@ -165,7 +165,7 @@ export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfileP
 
       <section className="space-y-1">
         <p className="px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Account</p>
-        <ProfileAction icon={User} label="My Profile" href="#" disabled onClick={onClose} />
+        <ProfileAction icon={User} label="My Profile" href="/settings/profile" onClick={onClose} />
         <ProfileAction icon={Settings} label="Account Settings" href="/admin/settings" onClick={onClose} />
         <ProfileAction icon={Settings} label="Preferences" href="/settings/notifications" onClick={onClose} />
         <ProfileAction
@@ -179,9 +179,9 @@ export function UserProfilePanel({ onClose, onSwitchOrganization }: UserProfileP
           onClick={cycleCurrency}
         />
         <ProfileAction
-          icon={theme === "dark" ? Sun : Moon}
-          label="Theme"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          icon={resolvedTheme === "dark" ? Sun : Moon}
+          label={resolvedTheme === "dark" ? "Theme · Dark" : "Theme · Light"}
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
         />
         <ProfileAction icon={Bell} label="Notifications" href="/settings/notifications" onClick={onClose} />
         <ProfileAction icon={Keyboard} label="Keyboard Shortcuts" href="#" disabled />

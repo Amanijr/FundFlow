@@ -13,7 +13,6 @@ import {
   FilterBar,
   RowActionsMenu,
 } from "@/components/data";
-import { ChurchNav } from "@/components/church/church-nav";
 import { PageHeader } from "@/components/layout/page-header";
 import { PermissionGate } from "@/components/security/permission-gate";
 import { LoadingState } from "@/components/feedback/loading-state";
@@ -30,13 +29,11 @@ function exportPeople(module: PeopleModule, people: DonorResponse[]) {
   const copy = peopleCopy(module);
   downloadCsv(
     `${copy.nounPlural}-${format(new Date(), "yyyy-MM-dd")}.csv`,
-    [copy.title.replace(/s$/, ""), ...(module === "members" ? ["Member number"] : []), "Email", "Phone", "Status", "Added"],
+    [copy.title.replace(/s$/, ""), "Email", "Phone", "Added"],
     people.map((person) => [
       `${person.firstName} ${person.lastName}`,
-      ...(module === "members" ? [person.memberNumber ?? ""] : []),
       person.email ?? "",
       person.phone ?? "",
-      person.membershipStatus ?? "ACTIVE",
       formatDate(person.createdAt),
     ]),
   );
@@ -66,7 +63,6 @@ export function PeopleListPage({ module }: { module: PeopleModule }) {
     return people.filter(
       (person) =>
         `${person.firstName} ${person.lastName}`.toLowerCase().includes(q) ||
-        person.memberNumber?.toLowerCase().includes(q) ||
         person.email?.toLowerCase().includes(q) ||
         person.phone?.toLowerCase().includes(q),
     );
@@ -85,18 +81,6 @@ export function PeopleListPage({ module }: { module: PeopleModule }) {
           </Link>
         ),
       },
-      ...(module === "members"
-        ? [
-            {
-              accessorKey: "memberNumber",
-              header: "Member no.",
-              meta: { label: "Member number" },
-              cell: ({ row }) => (
-                <span className="font-mono text-sm">{row.original.memberNumber ?? "—"}</span>
-              ),
-            } satisfies ColumnDef<DonorResponse>,
-          ]
-        : []),
       {
         accessorKey: "email",
         header: "Email",
@@ -108,12 +92,6 @@ export function PeopleListPage({ module }: { module: PeopleModule }) {
         header: "Phone",
         meta: { label: "Phone", hiddenOnMobile: true },
         cell: ({ row }) => row.original.phone ?? "—",
-      },
-      {
-        accessorKey: "membershipStatus",
-        header: "Status",
-        meta: { label: "Status" },
-        cell: ({ row }) => row.original.membershipStatus ?? "ACTIVE",
       },
       {
         accessorKey: "createdAt",
@@ -158,7 +136,6 @@ export function PeopleListPage({ module }: { module: PeopleModule }) {
   if (peopleQuery.isError) {
     return (
       <div className="space-y-4">
-        {module === "members" ? <ChurchNav /> : null}
         <PageHeader breadcrumbs={[{ label: copy.title, href: basePath }]} title={copy.title} description={copy.listDescription} />
         <DataErrorState onRetry={() => peopleQuery.refetch()} />
       </div>
@@ -167,7 +144,6 @@ export function PeopleListPage({ module }: { module: PeopleModule }) {
 
   return (
     <div className="space-y-4">
-      {module === "members" ? <ChurchNav /> : null}
       <PageHeader
         breadcrumbs={[{ label: copy.title, href: basePath }]}
         title={copy.title}

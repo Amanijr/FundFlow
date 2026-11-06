@@ -7,7 +7,7 @@ interface DashboardInsightsProps {
 }
 
 const severityStyles: Record<InsightSeverity, string> = {
-  INFO: "border-l-success bg-success/5",
+  INFO: "border-l-info bg-info/5",
   WARNING: "border-l-warning bg-warning/5",
   CRITICAL: "border-l-danger bg-danger/5",
 };

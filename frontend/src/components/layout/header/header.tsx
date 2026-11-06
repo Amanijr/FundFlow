@@ -27,7 +27,7 @@ export function Header() {
   const showCurrency = !simpleMode;
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-2 border-b border-border bg-card px-3 sm:px-5">
+    <header className="sticky top-0 z-40 flex h-[var(--layout-header-height)] shrink-0 items-center gap-[var(--space-2)] border-b border-border bg-card px-[var(--space-3)] sm:px-[var(--layout-content-padding)]">
       <div className="flex min-w-0 flex-1 items-center gap-2 lg:max-w-[40%]">
         <Button
           variant="ghost"

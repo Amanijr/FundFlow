@@ -38,7 +38,7 @@ All super-admin operations live under the owner dashboard. Bootstrap (`POST /api
 | PUT `/logs/{id}/resolve` | ✓ | ✗ |
 | POST `/bootstrap` (outside dashboard) | Public with bootstrap secret (first super admin only) | — |
 
-**Acting on a tenant:** super admins have no default organization. For org-scoped APIs (donations, church, analytics, etc.), pass header `X-Organization-Id: <orgId>`.
+**Acting on a tenant:** super admins have no default organization. For org-scoped APIs (donations, finance, analytics, etc.), pass header `X-Organization-Id: <orgId>`.
 
 ### Platform observability (within dashboard)
 
@@ -80,7 +80,6 @@ The owner dashboard includes system health and an append-only `system_log` feed:
 | Programs | ADMIN, FINANCE, PROGRAM | — | — | Auth |
 | Grants | ADMIN, FINANCE, PROGRAM | Activate/close: ADMIN, FINANCE | — | Auth |
 | Beneficiaries | ADMIN, FINANCE, PROGRAM, STAFF | — | — | Auth (+ NGO/School vertical) |
-| Church | ADMIN, FINANCE, STAFF | — | — | Auth (+ Church vertical) |
 | School | ADMIN, FINANCE, PROGRAM, STAFF | — | — | Auth (+ School vertical) |
 
 *ADMIN = ORG_ADMIN*
@@ -157,21 +156,10 @@ Assignable roles: all except `SUPER_ADMIN` and `DONOR`. Admins cannot change the
 
 ---
 
-## Church — `/api/v1/church` (CHURCH org types only)
-
-| Endpoint | ORG_ADMIN | FINANCE | STAFF |
-|----------|-----------|---------|-------|
-| POST `/ministries`, PUT `/ministries/{id}` | ✓ | ✓ | ✓ |
-| POST `/attendance` | ✓ | ✓ | ✓ |
-| GET `/ministries`, `/attendance`, `/attendance/summary` | Auth | Auth | Auth |
-
----
-
 ## Vertical access (in addition to RBAC)
 
 | Feature | Allowed organization types |
 |---------|---------------------------|
-| Church modules | `CHURCH`, `RELIGIOUS_INSTITUTION` |
 | NGO beneficiaries | `NGO`, `FOUNDATION`, `CHARITY`, `COMMUNITY_ORGANIZATION` |
 | School sponsorships | `SCHOOL` |
 | Student beneficiaries | `SCHOOL` only |

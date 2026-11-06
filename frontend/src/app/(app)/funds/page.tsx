@@ -45,7 +45,7 @@ export default function FundsPage() {
           <Link href={`/funds/${row.original.id}`} className="font-medium text-primary hover:underline">
             {row.original.name}
             {row.original.defaultForCollections ? (
-              <span className="ml-2 text-xs font-normal text-muted-foreground">Sunday offering</span>
+              <span className="ml-2 text-xs font-normal text-muted-foreground">Collection default</span>
             ) : null}
           </Link>
         ),

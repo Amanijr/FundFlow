@@ -176,22 +176,22 @@ class AccountingIntegrationTest {
     }
 
     @Test
-    void churchInitializeSeedsChurchOrientedChartOfAccounts() throws Exception {
+    void nonprofitInitializeSeedsCivilSocietyChartOfAccounts() throws Exception {
         long suffix = System.nanoTime();
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "Grace Chapel DSM",
-                    "slug": "grace-chapel-%d",
-                    "type": "CHURCH",
-                    "email": "treasurer@grace-%d.org",
+                    "name": "Hope Charity DSM",
+                    "slug": "hope-charity-%d",
+                    "type": "CHARITY",
+                    "email": "treasurer@hope-%d.org",
                     "city": "Dar es Salaam",
                     "country": "Tanzania"
                   },
-                  "email": "treasurer@grace-%d.org",
+                  "email": "treasurer@hope-%d.org",
                   "password": "password123",
-                  "firstName": "Church",
-                  "lastName": "Treasurer"
+                  "firstName": "Finance",
+                  "lastName": "Lead"
                 }
                 """.formatted(suffix, suffix, suffix);
 
@@ -201,33 +201,32 @@ class AccountingIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        String churchToken = com.jayway.jsonpath.JsonPath.read(
+        String token = com.jayway.jsonpath.JsonPath.read(
                 result.getResponse().getContentAsString(), "$.data.accessToken");
 
         mockMvc.perform(post("/api/v1/accounting/initialize")
-                        .header("Authorization", "Bearer " + churchToken))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/accounting/chart-of-accounts")
-                        .header("Authorization", "Bearer " + churchToken))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[?(@.code == '1000')].name").value("Cash on Hand"))
-                .andExpect(jsonPath("$.data[?(@.code == '1020')].name").value("Mobile Money / Lipa"))
-                .andExpect(jsonPath("$.data[?(@.code == '4000')].name").value("Tithes, Offerings & Gifts"))
-                .andExpect(jsonPath("$.data[?(@.code == '4010')].name").value("Tithes"))
-                .andExpect(jsonPath("$.data[?(@.code == '5200')].name").value("Ministry & Programs"))
-                .andExpect(jsonPath("$.data[?(@.code == '5400')].name").value("Evangelism & Outreach"));
+                .andExpect(jsonPath("$.data[?(@.code == '1000')].name").value("Cash"))
+                .andExpect(jsonPath("$.data[?(@.code == '1020')].name").value("Mobile Money"))
+                .andExpect(jsonPath("$.data[?(@.code == '4000')].name").value("Donation Revenue"))
+                .andExpect(jsonPath("$.data[?(@.code == '5200')].name").value("Program Expense"))
+                .andExpect(jsonPath("$.data[?(@.code == '5400')].name").value("Fundraising Expense"));
     }
 
     @Test
-    void churchLipaTithePostsToMobileMoneyAndTitheAccounts() throws Exception {
+    void mobileMoneyGiftPostsToMobileMoneyAndDonationRevenue() throws Exception {
         long suffix = System.nanoTime();
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "Upendo Chapel",
+                    "name": "Upendo Community Org",
                     "slug": "upendo-%d",
-                    "type": "CHURCH",
+                    "type": "COMMUNITY_ORGANIZATION",
                     "email": "books@upendo-%d.org",
                     "city": "Dar es Salaam",
                     "country": "Tanzania"
@@ -235,7 +234,7 @@ class AccountingIntegrationTest {
                   "email": "books@upendo-%d.org",
                   "password": "password123",
                   "firstName": "Books",
-                  "lastName": "Elder"
+                  "lastName": "Officer"
                 }
                 """.formatted(suffix, suffix, suffix);
 
@@ -251,29 +250,29 @@ class AccountingIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated());
 
-        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
+        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "firstName": "Amina",
-                                  "lastName": "Member",
+                                  "lastName": "Donor",
                                   "email": "amina-%d@example.com",
                                   "phone": "+255712000002"
                                 }
                                 """.formatted(suffix)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
-                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
 
         MvcResult fundResult = mockMvc.perform(post("/api/v1/funds")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "name": "Zaka",
-                                  "code": "TITHE",
+                                  "name": "General Operations",
+                                  "code": "GEN",
                                   "type": "UNRESTRICTED",
                                   "openingBalance": 0
                                 }
@@ -288,13 +287,13 @@ class AccountingIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "memberId": %d,
+                                  "donorId": %d,
                                   "amount": 50000.00,
                                   "donationType": "ONE_TIME",
                                   "fundId": %d,
-                                  "source": "Zaka"
+                                  "source": "MOBILE"
                                 }
-                                """.formatted(memberId, fundId)))
+                                """.formatted(donorId, fundId)))
                 .andExpect(status().isCreated())
                 .andReturn();
         Long donationId = ((Number) com.jayway.jsonpath.JsonPath.read(
@@ -316,6 +315,6 @@ class AccountingIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].lines[?(@.accountCode == '1020')].debitAmount").value(50000.00))
-                .andExpect(jsonPath("$.data[0].lines[?(@.accountCode == '4010')].creditAmount").value(50000.00));
+                .andExpect(jsonPath("$.data[0].lines[?(@.accountCode == '4000')].creditAmount").value(50000.00));
     }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -45,12 +45,10 @@ interface DonationFormProps {
   donorOptions: { id: string; label: string; description?: string }[];
   campaignOptions: { id: string; label: string; description?: string }[];
   fundOptions?: { id: string; label: string; description?: string }[];
-  partnershipOptions?: { id: string; label: string; description?: string; memberId: string; fundId?: string }[];
   defaultValues?: Partial<DonationFormValues>;
   serverError?: string | null;
   canRecordManual?: boolean;
   showCampaign?: boolean;
-  peopleNoun?: string;
   onSubmit: (values: DonationIntakePayload) => Promise<void>;
   onCancel?: () => void;
 }
@@ -61,12 +59,10 @@ export function DonationForm({
   donorOptions,
   campaignOptions,
   fundOptions = [],
-  partnershipOptions = [],
   defaultValues,
   serverError,
   canRecordManual = false,
   showCampaign = true,
-  peopleNoun = "donor",
   onSubmit,
   onCancel,
 }: DonationFormProps) {
@@ -81,8 +77,6 @@ export function DonationForm({
       anonymous: false,
       campaignId: "",
       fundId: "",
-      partnershipId: "",
-      partnershipMonth: "",
       source: "",
       notes: "",
       ...defaultValues,
@@ -102,14 +96,8 @@ export function DonationForm({
 
   const anonymous = giftForm.watch("anonymous");
   const donationType = giftForm.watch("donationType");
-  const donorId = giftForm.watch("donorId");
   const skipPayment = paymentForm.watch("skipPayment");
   const isSubmitting = giftForm.formState.isSubmitting || paymentForm.formState.isSubmitting;
-
-  const matchingPartnerships = useMemo(() => {
-    if (!donorId) return [];
-    return partnershipOptions.filter((row) => row.memberId === donorId);
-  }, [donorId, partnershipOptions]);
 
   async function goToDetails() {
     const fields: (keyof DonationFormValues)[] = anonymous
@@ -141,15 +129,12 @@ export function DonationForm({
 
     await onSubmit({
       donation: {
-        donorId: peopleNoun === "member" ? undefined : gift.donorId ? Number(gift.donorId) : undefined,
-        memberId: peopleNoun === "member" && gift.donorId ? Number(gift.donorId) : undefined,
+        donorId: gift.donorId ? Number(gift.donorId) : undefined,
         amount: gift.amount,
         donationType: gift.donationType,
         anonymous: gift.anonymous,
         campaignId: gift.campaignId ? Number(gift.campaignId) : undefined,
         fundId: gift.fundId ? Number(gift.fundId) : undefined,
-        partnershipId: gift.partnershipId ? Number(gift.partnershipId) : undefined,
-        partnershipMonth: gift.partnershipMonth ? `${gift.partnershipMonth}-01` : undefined,
         source: gift.source || undefined,
         notes: gift.notes || undefined,
         itemDescription: gift.itemDescription || undefined,
@@ -219,15 +204,15 @@ export function DonationForm({
             control={giftForm.control}
             name="anonymous"
             label="Anonymous gift"
-            checkboxLabel={`Record without identifying the ${peopleNoun}`}
+            checkboxLabel="Record without identifying the donor"
             className="sm:col-span-2"
           />
           {!anonymous && (
             <LookupField
               control={giftForm.control}
               name="donorId"
-              label={peopleNoun === "member" ? "Member" : "Donor"}
-              placeholder={peopleNoun === "member" ? "Search members..." : "Search donors..."}
+              label="Donor"
+              placeholder="Search donors..."
               options={donorOptions}
               required
               className="sm:col-span-2"
@@ -241,8 +226,8 @@ export function DonationForm({
           title="Optional details"
           description={
           showCampaign
-            ? "Fund tells the ledger whether this is zaka, sadaka, or building. Campaign is optional."
-            : "Fund tells the ledger whether this is zaka, sadaka, or building."
+            ? "Choose a fund for ledger allocation. Campaign is optional."
+            : "Choose a fund for ledger allocation."
         }
         >
           {showCampaign && (
@@ -259,33 +244,15 @@ export function DonationForm({
             control={giftForm.control}
             name="fundId"
             label="Fund"
-            placeholder="Tithe, offering, building..."
+            placeholder="General, restricted, project..."
             options={fundOptions}
             className="sm:col-span-2"
           />
-          {peopleNoun === "member" && matchingPartnerships.length > 0 && !anonymous && (
-            <>
-              <LookupField
-                control={giftForm.control}
-                name="partnershipId"
-                label="Partnership"
-                placeholder="Count toward monthly partnership..."
-                options={matchingPartnerships}
-                className="sm:col-span-2"
-              />
-              <TextField
-                control={giftForm.control}
-                name="partnershipMonth"
-                label="Partnership month"
-                placeholder="YYYY-MM"
-              />
-            </>
-          )}
           <TextField
             control={giftForm.control}
             name="source"
             label="Source"
-            placeholder="e.g. Sunday service, Lipa, Event"
+            placeholder="e.g. Mobile money, Event, Referral"
           />
           <TextField
             control={giftForm.control}

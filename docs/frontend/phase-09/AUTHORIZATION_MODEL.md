@@ -80,7 +80,7 @@ Each nav item declares:
   label: "Donations",
   href: "/donations",
   roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF", "VIEW_ONLY"],
-  organizationTypes: ["NGO", "CHURCH", ...], // optional
+  organizationTypes: ["NGO", "FOUNDATION", ...], // optional
 }
 ```
 
@@ -142,7 +142,7 @@ Use for conditional logic; prefer `PermissionGate` for render gating.
 
 ## 8. Organization Type Gating
 
-Some features apply only to certain org types (church ministries, school sponsorships):
+Some features apply only to certain org types (for example, school sponsorships):
 
 ```ts
 canAccessNavItem(item.roles, userRole, orgType, item.organizationTypes)

@@ -143,7 +143,6 @@ export default function Page() {
 | `programs` | `/programs/*` | `components/programs/`, `lib/api/programs.ts` |
 | `grants` | `/grants/*` | `components/grants/`, `lib/api/grants.ts` |
 | `beneficiaries` | `/beneficiaries/*` | `components/beneficiaries/`, `lib/api/beneficiaries.ts` |
-| `church` | `/church/*` | `components/church/`, `lib/api/church.ts` |
 | `school` | `/school/*` | `components/school/`, `lib/api/school.ts` |
 | `settings` | `/admin/settings`, `/admin/setup` | `components/admin/`, `lib/api/organization.ts` |
 | `users` | `/admin/users/*` | `components/admin/`, `lib/api/users.ts` |

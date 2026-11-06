@@ -173,7 +173,7 @@ How marketing-site patterns translate to the admin platform:
 |-----------------|----------------|
 | Hero slideshow | Auth slider gradient panel |
 | Giving section | Donations module |
-| Church activities | Ministries, attendance |
+| Community impact stories | Programs and beneficiary outcomes |
 | Feedback form | Future: support/feedback module |
 | Footer (black) | Optional: platform footer |
 

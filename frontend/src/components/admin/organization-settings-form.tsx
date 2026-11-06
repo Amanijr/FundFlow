@@ -13,25 +13,21 @@ import type { OrganizationType } from "@/types/api";
 import type { OrganizationUpdateRequest } from "@/types/admin";
 
 const organizationTypes: OrganizationType[] = [
-  "CHURCH",
   "NGO",
   "FOUNDATION",
   "CHARITY",
   "COMMUNITY_ORGANIZATION",
   "SCHOOL",
-  "RELIGIOUS_INSTITUTION",
 ];
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
   type: z.enum([
-    "CHURCH",
     "NGO",
     "FOUNDATION",
     "CHARITY",
     "COMMUNITY_ORGANIZATION",
     "SCHOOL",
-    "RELIGIOUS_INSTITUTION",
   ]),
   email: z.string().email("Enter a valid email").optional().or(z.literal("")),
   phone: z.string().max(20).optional(),

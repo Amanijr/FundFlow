@@ -85,7 +85,6 @@ app/layout.tsx
 │   ├── /programs/*
 │   ├── /grants/*
 │   ├── /beneficiaries/*
-│   ├── /church/*
 │   ├── /school/*
 │   ├── /admin/*            AdminGuard (ORG_ADMIN)
 │   └── /dev/*

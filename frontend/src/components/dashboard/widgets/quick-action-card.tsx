@@ -4,10 +4,9 @@ import Link from "next/link";
 import { DollarSign, HandCoins, PiggyBank, Receipt, UserPlus } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
-import { useOrganization } from "@/hooks/use-organization";
 import { SectionHeader } from "@/components/layout/section-header";
 import { Button } from "@/components/ui/button";
-import type { OrganizationType, Role } from "@/types/api";
+import type { Role } from "@/types/api";
 
 interface QuickAction {
   id: string;
@@ -15,18 +14,15 @@ interface QuickAction {
   href: string;
   roles: Role[];
   icon: React.ComponentType<{ className?: string }>;
-  organizationTypes?: OrganizationType[];
-  excludeOrganizationTypes?: OrganizationType[];
 }
 
 const quickActions: QuickAction[] = [
   {
     id: "collection",
-    label: "Sunday collection",
-    href: "/church/collections/new",
+    label: "Record collection",
+    href: "/collections/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     icon: HandCoins,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "donation",
@@ -34,15 +30,6 @@ const quickActions: QuickAction[] = [
     href: "/donations/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     icon: HandCoins,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "member-gift",
-    label: "Record member gift",
-    href: "/donations/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-    icon: HandCoins,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "donor",
@@ -50,15 +37,6 @@ const quickActions: QuickAction[] = [
     href: "/donors/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     icon: UserPlus,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "member",
-    label: "Add member",
-    href: "/members/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-    icon: UserPlus,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "campaign",
@@ -66,7 +44,6 @@ const quickActions: QuickAction[] = [
     href: "/campaigns/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     icon: DollarSign,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   { id: "expense", label: "Spend money", href: "/spend-money", roles: ["ORG_ADMIN", "FINANCE_MANAGER", "ACCOUNTANT", "STAFF"], icon: Receipt },
   { id: "budget", label: "Create budget", href: "/budgets/new", roles: ["ORG_ADMIN", "FINANCE_MANAGER"], icon: PiggyBank },
@@ -74,17 +51,9 @@ const quickActions: QuickAction[] = [
 
 export function QuickActionCard() {
   const { user } = useAuth();
-  const organizationQuery = useOrganization();
-  const organizationType = organizationQuery.data?.type ?? user?.organizationType ?? undefined;
   const visible = quickActions.filter((action) => {
     if (!user || !action.roles.includes(user.role)) {
       return false;
-    }
-    if (action.excludeOrganizationTypes && organizationType && action.excludeOrganizationTypes.includes(organizationType)) {
-      return false;
-    }
-    if (action.organizationTypes) {
-      return Boolean(organizationType && action.organizationTypes.includes(organizationType));
     }
     return true;
   });

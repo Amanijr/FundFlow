@@ -3,6 +3,7 @@ package com.project.daisyDonation.accounting.service;
 /**
  * Stable ledger codes used by automatic posting. Names/descriptions vary by organization type,
  * but these codes must remain present so donation and expense journals can post.
+ * Optional detail revenue codes (4010–4030) may exist on legacy charts; posting falls back to 4000.
  */
 public final class AccountCodes {
 
@@ -11,8 +12,7 @@ public final class AccountCodes {
     public static final String MOBILE_MONEY = "1020";
     public static final String IN_KIND_CONTRIBUTIONS = "1200";
     public static final String DONATION_REVENUE = "4000";
-    public static final String TITHE_REVENUE = "4010";
-    public static final String OFFERING_REVENUE = "4020";
+    /** Optional capital / building project revenue detail. */
     public static final String BUILDING_REVENUE = "4030";
     public static final String OPERATIONS_EXPENSE = "5100";
     public static final String PROGRAM_EXPENSE = "5200";

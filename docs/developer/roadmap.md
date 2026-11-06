@@ -81,7 +81,7 @@ Priority: Critical
 Objectives:
 
 * Manual payment recording (cash, cheque, in-person)
-* Collection sessions for group/church collections
+* Collection sessions for group cash collections
 * Anonymous physical payment support
 * Finance Manager verification workflow
 
@@ -98,7 +98,7 @@ See ADR-007 through ADR-013 in `docs/DECISIONS.md`
 
 Exit Criteria:
 
-Organizations can record cash offerings, group collections, and manual payments with finance accountability.
+Organizations can record cash contributions, group collections, and manual payments with finance accountability.
 
 ---
 
@@ -230,14 +230,6 @@ Automated communication available.
 Status: Complete
 
 Priority: Medium
-
-Examples:
-
-Church:
-
-* Attendance
-* Ministries
-* Pledges
 
 NGO:
 

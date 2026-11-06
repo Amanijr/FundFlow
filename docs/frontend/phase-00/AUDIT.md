@@ -62,7 +62,7 @@ daisyFoDonation/
 | `(app)/admin/layout.tsx` | `AdminGuard` | ORG_ADMIN only |
 | `platform/dashboard/layout.tsx` | `PlatformAuthGuard` → `PlatformShell` | SUPER_ADMIN |
 
-**Business route modules:** dashboards, donors, campaigns, donations, funds, budgets, expenses, accounting, reports, admin, programs, grants, beneficiaries, church, school, platform, dev showcase.
+**Business route modules:** dashboards, donors, campaigns, donations, funds, budgets, expenses, accounting, reports, admin, programs, grants, beneficiaries, school, platform, dev showcase.
 
 ### 1.3 Authentication Flow
 
@@ -103,7 +103,7 @@ Logout → clearSession() → /login
 **Proxy:** `next.config.ts` rewrites `/api/*` → backend (default `localhost:8080`)  
 **Mock mode:** short-circuits to `mockApiRequest()` before network
 
-**API modules (18):** auth, organization, users, donors, campaigns, donations, funds, budgets, expenses, accounting, reports, analytics, programs, grants, beneficiaries, church, school, platform.
+**API modules:** auth, organization, users, donors, campaigns, donations, funds, budgets, expenses, accounting, reports, analytics, programs, grants, beneficiaries, school, platform.
 
 **Data fetching:** TanStack Query in pages/hooks; `useApiContext()` supplies `token` + `organizationId`.
 
@@ -155,7 +155,7 @@ No React Context for auth — Zustand is used directly.
 | Accounting | chart-of-accounts, journals, GL | accounting | accounting-nav, forms |
 | Reporting | `/reports/*` | reports, analytics | filters, export |
 | Administration | `/admin/*` | users, organization | invite form, settings |
-| Programs & verticals | programs, grants, church, school | programs, grants, church, school | vertical forms |
+| Programs & organization-specific modules | programs, grants, school | programs, grants, school | organization-specific forms |
 | Platform | `/platform/dashboard/*` | platform | tenant switcher, org mgmt |
 
 ---

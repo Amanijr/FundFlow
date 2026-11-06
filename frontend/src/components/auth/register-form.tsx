@@ -18,25 +18,21 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 const organizationTypes: { value: OrganizationType; label: string }[] = [
-  { value: "CHURCH", label: "Church" },
   { value: "NGO", label: "NGO" },
   { value: "FOUNDATION", label: "Foundation" },
   { value: "CHARITY", label: "Charity" },
   { value: "COMMUNITY_ORGANIZATION", label: "Community organization" },
   { value: "SCHOOL", label: "School" },
-  { value: "RELIGIOUS_INSTITUTION", label: "Religious institution" },
 ];
 
 const registerSchema = z.object({
   organizationName: z.string().min(2, "Organization name is required"),
   organizationType: z.enum([
-    "CHURCH",
     "NGO",
     "FOUNDATION",
     "CHARITY",
     "COMMUNITY_ORGANIZATION",
     "SCHOOL",
-    "RELIGIOUS_INSTITUTION",
   ]),
   organizationEmail: z.string().email("Enter a valid organization email"),
   firstName: z.string().min(1, "First name is required"),
@@ -112,7 +108,7 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
         <Label htmlFor="organizationType">Organization type</Label>
         <select
           id="organizationType"
-          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+          className="flex h-9 w-full rounded-[var(--radius-control)] border border-input bg-input-surface px-3 py-1 text-sm"
           {...register("organizationType")}
         >
           {organizationTypes.map((type) => (
@@ -161,8 +157,8 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Creating account..." : "Create account"}
+      <Button type="submit" className="w-full" loading={isSubmitting}>
+        Create account
       </Button>
     </form>
   );
@@ -176,14 +172,16 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
         )}
       >
         <div className="mb-4 shrink-0 text-center">
-          <h1 className="text-xl font-semibold tracking-tight">Create your organization</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-[var(--color-heading)]">
+            Create your organization
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">Register a new organization on FundFlow</p>
         </div>
         <div className="min-h-0 flex-1">{form}</div>
         {onSwitchToSignIn && (
           <p className="mt-4 shrink-0 text-center text-sm text-muted-foreground lg:hidden">
             Already have an account?{" "}
-            <button type="button" onClick={onSwitchToSignIn} className="font-medium text-primary hover:underline">
+            <button type="button" onClick={onSwitchToSignIn} className="font-medium text-link hover:underline">
               Sign in
             </button>
           </p>
@@ -202,7 +200,7 @@ export function RegisterForm({ variant = "card", className, onSwitchToSignIn }: 
         {form}
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="font-medium text-link hover:underline">
             Sign in
           </Link>
         </p>

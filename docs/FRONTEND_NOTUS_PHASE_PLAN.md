@@ -85,7 +85,7 @@ daisyFoDonation/
 | **N7** | Accounting | COA, journals, GL, trial balance | `admin/tables` patterns |
 | **N8** | Reporting | Report hub + exports | `CardTable`, chart cards |
 | **N9** | Administration | Users, org settings, setup | `admin/settings`, `CardSettings` |
-| **N10** | Programs & verticals | Grants, church, school, NGO | New nav sections in Sidebar style |
+| **N10** | Programs & organization-specific modules | Grants, school, NGO | New nav sections in Sidebar style |
 | **N11** | Platform owner | Super-admin area | Separate layout; same Notus tokens |
 | **N12** | Polish & production | Loading, errors, a11y, performance | `PageChange.js` |
 
@@ -211,9 +211,6 @@ REPORTS
 
 PROGRAMS          (org-type gated)
   Programs · Grants · Beneficiaries
-
-CHURCH            (org-type gated)
-  Ministries · Attendance
 
 SCHOOL            (org-type gated)
   Sponsorships
@@ -382,7 +379,7 @@ Use stacked Notus cards (not custom stepper) — each status as a bordered card 
 
 ---
 
-## N10 — Programs & verticals
+## N10 — Programs & organization-specific modules
 
 **Goal:** Org-type-gated modules, same Notus chrome.
 
@@ -391,7 +388,6 @@ Use stacked Notus cards (not custom stepper) — each status as a bordered card 
 | Org types | Routes |
 |-----------|--------|
 | NGO, Foundation, etc. | `/programs`, `/grants`, `/beneficiaries` |
-| Church | `/church/ministries`, `/church/attendance` |
 | School | `/school/sponsorships` |
 
 ### Rules

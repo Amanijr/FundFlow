@@ -53,7 +53,6 @@ All **21 controllers** and **~114 endpoints** are documented with:
 | Programs | `/api/v1/programs` |
 | Grants | `/api/v1/grants` |
 | Beneficiaries | `/api/v1/beneficiaries` |
-| Church | `/api/v1/church` |
 | School Sponsorships | `/api/v1/school/sponsorships` |
 
 ## Configuration

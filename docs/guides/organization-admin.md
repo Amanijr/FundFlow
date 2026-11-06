@@ -128,7 +128,6 @@ Your type at registration controls extra menus:
 
 | Type | Extra features |
 |------|----------------|
-| Church / Religious institution | [Church Guide](./church.md) |
 | School | [School Guide](./school.md) |
 | NGO, Foundation, Charity, Community org | [Programs & Grants](./programs-and-grants.md) |
 

@@ -9,10 +9,15 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, description, action, className }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-2 flex items-center justify-between gap-3", className)}>
+    <div
+      className={cn(
+        "mb-[var(--space-3)] flex items-center justify-between gap-[var(--space-3)]",
+        className,
+      )}
+    >
       <div className="min-w-0">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        {description && <p className="text-xs text-muted-foreground">{description}</p>}
+        <h2 className="text-section-heading">{title}</h2>
+        {description && <p className="text-supporting">{description}</p>}
       </div>
       {action}
     </div>

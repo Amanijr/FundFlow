@@ -48,7 +48,7 @@ export function CommentPanel({
               key={comment.id}
               className={cn(
                 "rounded-md border border-border px-3 py-2",
-                comment.visibility === "internal" && "border-amber-200 bg-amber-50/50",
+                comment.visibility === "internal" && "border-warning/30 bg-warning/10",
               )}
             >
               <div className="flex items-center justify-between gap-2">

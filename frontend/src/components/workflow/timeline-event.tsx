@@ -10,9 +10,9 @@ interface TimelineEventProps {
 }
 
 const STATUS_DOT: Record<NonNullable<ActivityEvent["status"]>, string> = {
-  success: "border-emerald-600",
-  warning: "border-amber-500",
-  error: "border-red-600",
+  success: "border-success",
+  warning: "border-warning",
+  error: "border-destructive",
   neutral: "border-primary",
 };
 

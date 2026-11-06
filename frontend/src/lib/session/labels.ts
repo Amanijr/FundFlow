@@ -2,13 +2,11 @@ import type { OrganizationType, Role } from "@/types/api";
 import type { SubscriptionPlan, UserPresenceStatus } from "@/types/session";
 
 const ORG_TYPE_LABELS: Record<OrganizationType, string> = {
-  CHURCH: "Church",
   NGO: "Non-Profit Organization",
   FOUNDATION: "Foundation",
   CHARITY: "Charity",
   COMMUNITY_ORGANIZATION: "Community Organization",
   SCHOOL: "School",
-  RELIGIOUS_INSTITUTION: "Religious Institution",
 };
 
 const ROLE_LABELS: Record<Role, string> = {

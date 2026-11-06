@@ -81,7 +81,7 @@ Priority: Critical
 Objectives:
 
 * Manual payment recording (cash, cheque, in-person)
-* Collection sessions for group/church collections
+* Collection sessions for group / event collections
 * Anonymous physical payment support
 * Finance Manager verification workflow
 
@@ -233,12 +233,6 @@ Priority: Medium
 
 Examples:
 
-Church:
-
-* Attendance
-* Ministries
-* Pledges
-
 NGO:
 
 * Beneficiaries
@@ -248,9 +242,14 @@ School:
 
 * Student Sponsorship
 
+Shared financial (all org types):
+
+* Pledges
+* Collection sessions
+
 Exit Criteria:
 
-Vertical-specific features available.
+Vertical-specific features available for supported CSO / school tenants.
 
 ---
 

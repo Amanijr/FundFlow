@@ -70,10 +70,10 @@ function StepDot({
     <span
       className={cn(
         base,
-        step.status === "completed" && "border-emerald-600 bg-emerald-600 text-white",
-        step.status === "active" && isCurrent && "border-stone-900 bg-stone-900 text-white",
+        step.status === "completed" && "border-success bg-success text-white",
+        step.status === "active" && isCurrent && "border-primary bg-primary text-primary-foreground",
         step.status === "pending" && "border-border bg-surface",
-        step.status === "rejected" && "border-red-600 bg-red-600 text-white",
+        step.status === "rejected" && "border-destructive bg-destructive text-destructive-foreground",
         step.status === "skipped" && "border-muted bg-muted",
       )}
       aria-current={isCurrent ? "step" : undefined}

@@ -1,13 +1,13 @@
 "use client";
 
 import { MockModeBanner } from "@/components/dev/mock-mode-banner";
+import { ThemeToaster } from "@/components/providers/theme-toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { setMockApiEnabled } from "@/lib/mock/config";
 import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useEffect, useState } from "react";
-import { Toaster } from "sonner";
 
 export function AppProviders({
   children,
@@ -42,12 +42,19 @@ export function AppProviders({
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      enableColorScheme
+      storageKey="theme"
+      disableTransitionOnChange
+    >
       <QueryClientProvider client={queryClient}>
         <TooltipProvider delayDuration={300}>
           {children}
           <MockModeBanner />
-          <Toaster richColors position="top-right" />
+          <ThemeToaster />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

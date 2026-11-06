@@ -186,7 +186,7 @@ All domain-specific components retain their logic and API integration. Only visu
 | Reporting | `reports-nav`, `report-filters`, `export-actions`, `report-summary` | Refactor styling |
 | Admin | `admin-nav`, `invite-user-form`, `organization-settings-form` | Refactor styling |
 | Programs | `program-form`, `grant-form`, `beneficiary-form` | Refactor styling |
-| Verticals | `ministry-form`, `sponsorship-form`, status badges | Refactor styling |
+| Organization-specific | `sponsorship-form`, status badges | Refactor styling |
 | Platform | `super-admin-form`, org management, log viewer | Refactor styling |
 
 ---

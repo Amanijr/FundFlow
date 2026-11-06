@@ -78,7 +78,7 @@ export function SidebarNav({ collapsed = false, onNavigate, className }: Sidebar
               <button
                 type="button"
                 onClick={() => setMoreOpen((value) => !value)}
-                className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wide text-sidebar-muted hover:bg-[var(--color-sidebar-hover)] hover:text-sidebar-foreground"
                 aria-expanded={showMore}
               >
                 More
@@ -109,14 +109,14 @@ export function SidebarNav({ collapsed = false, onNavigate, className }: Sidebar
       {user && (
         <div
           className={cn(
-            "shrink-0 border-t border-sidebar-border text-[11px] text-muted-foreground",
+            "shrink-0 border-t border-sidebar-border text-[11px] text-sidebar-muted",
             collapsed ? "px-2 py-2 text-center" : "px-3 py-2.5",
           )}
         >
           {!collapsed ? (
             <>
               {organization?.name && (
-                <p className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+                <p className="truncate text-[10px] uppercase tracking-wide text-sidebar-muted">
                   {organization.name}
                 </p>
               )}

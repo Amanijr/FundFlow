@@ -52,7 +52,7 @@ export function NotificationCenter() {
         <Sheet open={open} onOpenChange={handleOpenChange}>
           <SheetContent
             showClose
-            className="inset-y-0 right-0 left-auto h-full w-full max-w-md border-l border-stone-200"
+            className="inset-y-0 right-0 left-auto h-full w-full max-w-md border-l border-border bg-surface"
           >
             <SheetTitle className="sr-only">Notifications</SheetTitle>
             <NotificationCenterPanel connectionStatus={connectionStatus} />

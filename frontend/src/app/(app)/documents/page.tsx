@@ -77,7 +77,7 @@ export default function DocumentsPage() {
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                 (option.value === "all" && !filters.status) || filters.status === option.value
-                  ? "border-stone-900 bg-stone-900 text-white"
+                  ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background text-muted-foreground hover:text-foreground",
               )}
             >
@@ -100,7 +100,7 @@ export default function DocumentsPage() {
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                 filters.category === category.value
-                  ? "border-stone-900 bg-stone-900 text-white"
+                  ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background text-muted-foreground hover:text-foreground",
               )}
             >

@@ -21,12 +21,12 @@ export function OrgBadge({ className }: OrgBadgeProps) {
   return (
     <div
       className={cn(
-        "hidden max-w-[10rem] items-center gap-1.5 truncate rounded-md border border-stone-200 bg-stone-50 px-2 py-1 text-xs text-stone-700 lg:flex",
+        "hidden max-w-[10rem] items-center gap-1.5 truncate rounded-md border border-border bg-muted px-2 py-1 text-xs text-foreground lg:flex",
         className,
       )}
       title={name}
     >
-      <Building2 className="h-3.5 w-3.5 shrink-0 text-stone-500" aria-hidden />
+      <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
       <span className="truncate font-medium">{name}</span>
     </div>
   );

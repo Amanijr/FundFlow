@@ -8,7 +8,7 @@ const MEMBERSHIP_CATALOG: OrganizationMembership[] = [
     organizationId: 1,
     name: "CrossLife Mission Network",
     slug: "crosslife",
-    type: "CHURCH",
+    type: "COMMUNITY_ORGANIZATION",
     role: "FINANCE_MANAGER",
     plan: "PROFESSIONAL",
     fiscalYear: 2026,

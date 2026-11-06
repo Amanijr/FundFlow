@@ -6,7 +6,6 @@ const ENTITY_ROUTES: Record<string, (id: string | number) => string> = {
   budget: (id) => `/budgets/${id}`,
   campaign: (id) => `/campaigns/${id}`,
   donor: (id) => `/donors/${id}`,
-  member: (id) => `/members/${id}`,
   grant: (id) => `/grants/${id}`,
   user: () => `/admin/users`,
   report: () => `/reports`,

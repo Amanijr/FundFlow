@@ -25,14 +25,14 @@ export function MobileSidebar() {
   return (
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
       <SheetContent aria-describedby={undefined} className="p-0">
-        <div className="flex h-12 items-center border-b border-sidebar-border px-4 pr-12">
+        <div className="flex h-[var(--layout-header-height)] items-center border-b border-sidebar-border px-[var(--space-4)] pr-12">
           <SheetTitle className="sr-only">Navigation menu</SheetTitle>
           <Link
             href={homeHref}
             onClick={closeMobile}
             className="flex items-center gap-2 font-semibold text-sidebar-foreground"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-sidebar-accent text-xs font-bold text-sidebar-foreground">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-xs font-bold text-foreground">
               F
             </span>
             <span className="font-nav text-sm tracking-wide">FundFlow</span>

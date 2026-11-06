@@ -1,9 +1,8 @@
 import type { PaymentMethod } from "@/types/finance";
 
 export type CollectionType =
-  | "SERVICE_OFFERING"
+  | "GENERAL"
   | "EVENT"
-  | "DEPARTMENT"
   | "PROJECT"
   | "SPECIAL_APPEAL";
 

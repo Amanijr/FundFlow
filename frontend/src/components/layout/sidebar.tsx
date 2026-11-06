@@ -24,14 +24,16 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       className={cn(
         "sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-300 lg:flex",
-        collapsed ? "w-[3.25rem]" : "w-60",
+        collapsed
+          ? "w-[var(--layout-sidebar-collapsed)]"
+          : "w-[var(--layout-sidebar-expanded)]",
         className,
       )}
     >
       <div
         className={cn(
-          "flex h-12 shrink-0 items-center border-b border-sidebar-border",
-          collapsed ? "justify-center px-2" : "justify-between px-2",
+          "flex h-[var(--layout-header-height)] shrink-0 items-center border-b border-sidebar-border",
+          collapsed ? "justify-center px-[var(--space-2)]" : "justify-between px-[var(--space-2)]",
         )}
       >
         {!collapsed ? (
@@ -39,7 +41,7 @@ export function Sidebar({ className }: SidebarProps) {
             href={homeHref}
             className="font-nav flex min-w-0 items-center gap-2 px-2 font-semibold text-sidebar-foreground"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-sidebar-accent text-xs font-bold text-sidebar-foreground">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--brand-pale)] text-xs font-bold text-[var(--brand-cyan)]">
               F
             </span>
             <span className="truncate text-sm tracking-wide">FundFlow</span>
@@ -47,18 +49,18 @@ export function Sidebar({ className }: SidebarProps) {
         ) : (
           <Link
             href={homeHref}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground hover:bg-sidebar-accent"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground hover:bg-[var(--color-sidebar-hover)]"
             title="FundFlow"
             aria-label="FundFlow home"
           >
-            <span className="text-xs font-bold">F</span>
+            <span className="text-xs font-bold text-[var(--brand-cyan)]">F</span>
           </Link>
         )}
         {!collapsed && (
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            className="h-8 w-8 text-sidebar-muted hover:bg-[var(--color-sidebar-hover)] hover:text-sidebar-foreground"
             onClick={toggleCollapsed}
             aria-label="Collapse sidebar"
           >
@@ -72,7 +74,7 @@ export function Sidebar({ className }: SidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            className="h-8 w-8 text-sidebar-muted hover:bg-[var(--color-sidebar-hover)] hover:text-sidebar-foreground"
             onClick={toggleCollapsed}
             aria-label="Expand sidebar"
           >

@@ -8,7 +8,7 @@ alwaysApply: true
 When the user returns to “public form”, “Lipa number”, “hosted giving”, or “donor self-serve payment”, follow this agreed approach. **Do not implement until explicitly asked.**
 
 ## Goal
-Church/NGO shareable page where a donor fills a form and pays via gateway; gift lands in FundFlow as a normal donation + payment.
+Organization shareable page where a donor fills a form and pays via gateway; gift lands in FundFlow as a normal donation + payment.
 
 ## Safest approach (harmonize current BP — no redesign)
 - **Parallel intake only** — do not replace staff **Receive a gift** wizard.

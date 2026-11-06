@@ -5,8 +5,6 @@ import { ChevronRight } from "lucide-react";
 
 import { ReportsNav } from "@/components/reports/reports-nav";
 import { PageHeader } from "@/components/layout/page-header";
-import { useOrganization } from "@/hooks/use-organization";
-import { isChurchOrganization } from "@/lib/organization/verticals";
 import {
   Table,
   TableBody,
@@ -16,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const ngoCategories = [
+const reportCategories = [
   {
     href: "/reports/financial",
     title: "Financial reports",
@@ -39,43 +37,12 @@ const ngoCategories = [
   },
 ];
 
-const churchCategories = [
-  {
-    href: "/reports/donations",
-    title: "Giving",
-    description: "Completed gifts this year and by source",
-  },
-  {
-    href: "/reports/members",
-    title: "Members",
-    description: "Active, inactive, and visitor counts",
-  },
-  {
-    href: "/reports/attendance",
-    title: "Attendance",
-    description: "Headcount by service",
-  },
-  {
-    href: "/reports/financial",
-    title: "Funds and books",
-    description: "Fund remaining, income and spend — treasurer view",
-  },
-];
-
 export default function ReportsHubPage() {
-  const organizationQuery = useOrganization();
-  const church = isChurchOrganization(organizationQuery.data?.type);
-  const categories = church ? churchCategories : ngoCategories;
-
   return (
     <div className="space-y-4">
       <PageHeader
         title="Reports"
-        description={
-          church
-            ? "Giving, members, attendance, and funds — for council, not three ERP boards."
-            : "Financial, fundraising, and budget reporting."
-        }
+        description="Financial, fundraising, and budget reporting."
       />
       <ReportsNav />
 
@@ -89,7 +56,7 @@ export default function ReportsHubPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map(({ href, title, description }) => (
+            {reportCategories.map(({ href, title, description }) => (
               <TableRow key={href}>
                 <TableCell className="font-medium">
                   <Link href={href} className="text-primary hover:underline">

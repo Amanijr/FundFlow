@@ -96,3 +96,10 @@ extra:
 
 extra_css:
   - stylesheets/extra.css
+
+# Screenshot tooling under docs/scripts must not become documentation pages.
+exclude_docs: |
+  scripts/node_modules/**
+  scripts/package.json
+  scripts/package-lock.json
+  scripts/capture-screenshots.mjs

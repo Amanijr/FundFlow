@@ -9,6 +9,7 @@ export function useAuth() {
   const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const rememberMe = useAuthStore((s) => s.rememberMe);
   const setSession = useAuthStore((s) => s.setSession);
+  const setUser = useAuthStore((s) => s.setUser);
   const clearSession = useAuthStore((s) => s.clearSession);
 
   return {
@@ -18,6 +19,7 @@ export function useAuth() {
     isReady: hasHydrated,
     rememberMe,
     setSession: (auth: AuthResponse, remember?: boolean) => setSession(auth, remember),
+    setUser,
     clearSession,
   };
 }

@@ -45,10 +45,10 @@ export function ChartOfAccountForm({ serverError, onSubmit, onCancel }: ChartOfA
       {serverError && <ErrorAlert message={serverError} />}
       <FormSection
         title="Account"
-        description="Give it a name people in the church will recognize. The number is only for the books."
+        description="Give it a name people in the organization will recognize. The number is only for the books."
       >
         <FormField label="Account name" error={errors.name?.message} required>
-          <Input {...register("name")} placeholder="e.g. Tithes, Lipa, Building fund" />
+          <Input {...register("name")} placeholder="e.g. Donations, Mobile money, Project fund" />
         </FormField>
         <FormField
           label="Bookkeeping number"

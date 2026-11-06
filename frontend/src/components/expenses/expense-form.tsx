@@ -215,8 +215,8 @@ export function ExpenseForm({
             <Button type="button" variant="outline" onClick={() => setStep(0)}>
               Back
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving…" : submitLabel}
+            <Button type="submit" loading={isSubmitting}>
+              {submitLabel}
             </Button>
           </>
         )}

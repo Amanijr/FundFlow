@@ -89,7 +89,7 @@ Decision:
 Accounting is a core domain.
 
 Reason:
-The platform's primary value is financial accountability, not attendance tracking.
+The platform's primary value is financial accountability, governance, and reporting.
 
 Date:
 2026-06-24
@@ -105,7 +105,7 @@ Decision:
 FundFlow is a hybrid manual-and-automation fundraising system.
 
 Reason:
-Many nonprofits (especially churches) receive cash, cheques, and group plate collections alongside card and mobile money. A single electronic-only flow does not match real operations.
+Many civil society organizations receive cash, cheques, and group collections alongside card and mobile money. A single electronic-only flow does not match real operations.
 
 Implementation:
 
@@ -129,7 +129,7 @@ Decision:
 Group physical collections produce one consolidated donation per collection session.
 
 Reason:
-A single church offering or department collection is one counted total, not hundreds of individual anonymous donation rows. Consolidation keeps reporting, accounting, and dashboards accurate.
+A single event or department collection is one counted total, not hundreds of individual anonymous donation rows. Consolidation keeps reporting, accounting, and dashboards accurate.
 
 Implementation:
 
@@ -149,10 +149,10 @@ Accepted
 ## ADR-009
 
 Decision:
-Use a `CollectionSession` model for church and group physical collections.
+Use a `CollectionSession` model for group physical collections.
 
 Reason:
-Plate offerings, event collections, and ministry collections need a batch workflow: count → verify → record.
+Event collections, project appeals, and other bulk cash intakes need a batch workflow: count → verify → record.
 
 Implementation:
 
@@ -198,7 +198,7 @@ Decision:
 Revenue is recognized at collection count (session `VERIFIED`), not at bank deposit.
 
 Reason:
-The organization treats the offering as received when it is counted and verified by finance, even if bank deposit happens later.
+The organization treats the contribution as received when it is counted and verified by finance, even if bank deposit happens later.
 
 Implementation:
 
@@ -221,11 +221,11 @@ Decision:
 `collectionType` is the primary reporting dimension for group collections.
 
 Reason:
-Churches and nonprofits report by collection context (Sunday service offering, event, department, project) more naturally than by campaign alone.
+Civil society organizations report by collection context (general intake, event, project, special appeal) more naturally than by campaign alone.
 
 Implementation:
 
-* `CollectionType` enum examples: `SERVICE_OFFERING`, `EVENT`, `DEPARTMENT`, `PROJECT`, `SPECIAL_APPEAL`
+* `CollectionType` enum: `GENERAL`, `EVENT`, `PROJECT`, `SPECIAL_APPEAL`
 * Reports and dashboards group by `collectionType` first
 * `campaignId` remains an optional secondary link, not the primary classifier
 * Fund allocation (Phase 3/6) may split a verified session across funds as a follow-on enhancement

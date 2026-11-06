@@ -58,7 +58,7 @@ App: http://localhost:3000
 
 1. Open http://localhost:3000/register  
 2. Fill in:
-   - Organization name and **type** (Church, NGO, School, etc.)
+   - Organization name and **type** (NGO, community organization, school, etc.)
    - Organization email
    - Your name, email, and password (min. 8 characters)
 3. Click **Create account**  
@@ -120,7 +120,6 @@ flowchart LR
 | Finance | [Finance](./finance.md) |
 | Accounting | [Accounting](./accounting.md) |
 | Program / NGO work | [Programs & Grants](./programs-and-grants.md) |
-| Church staff | [Church](./church.md) |
 | School staff | [School](./school.md) |
 
 ---

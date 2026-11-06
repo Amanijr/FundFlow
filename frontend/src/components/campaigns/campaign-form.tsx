@@ -128,7 +128,7 @@ export function CampaignForm({
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {submitLabel}
         </Button>
       </div>

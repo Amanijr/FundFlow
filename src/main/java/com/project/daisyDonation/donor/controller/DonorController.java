@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/donors")
 @RequiredArgsConstructor
-@Tag(name = "Donors", description = "Fundraising donors. Church congregations use /api/v1/members instead.")
+@Tag(name = "Donors", description = "Financial stakeholders (donors, contributors, funding partners).")
 @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
 public class DonorController {
 

@@ -12,13 +12,11 @@ export type Role =
   | "VIEW_ONLY";
 
 export type OrganizationType =
-  | "CHURCH"
   | "NGO"
   | "FOUNDATION"
   | "CHARITY"
   | "COMMUNITY_ORGANIZATION"
-  | "SCHOOL"
-  | "RELIGIOUS_INSTITUTION";
+  | "SCHOOL";
 
 export interface ApiResponse<T> {
   success: boolean;

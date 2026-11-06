@@ -212,7 +212,7 @@ Every item in the migration is classified as:
 | Accounting | chart-of-accounts, journals, GL, trial-balance | Medium |
 | Reporting | financial, donations, campaigns, budgets | Medium |
 | Administration | users, settings, setup | Medium |
-| Programs & verticals | programs, grants, beneficiaries, church, school | Low |
+| Programs & organization-specific modules | programs, grants, beneficiaries, school | Low |
 | Platform | dashboard, organizations, users, logs | Low |
 | Dev showcase | components, reference-list, reference-form | Low |
 

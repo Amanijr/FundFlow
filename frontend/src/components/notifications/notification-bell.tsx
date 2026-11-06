@@ -36,7 +36,7 @@ export function NotificationBell({
       <NotificationBadge count={unreadCount} />
       {connectionStatus === "disconnected" && (
         <span
-          className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white"
+          className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-warning ring-2 ring-background"
           aria-hidden
         />
       )}

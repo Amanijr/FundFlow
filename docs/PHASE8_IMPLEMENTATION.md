@@ -67,4 +67,4 @@ communication.default-receipt-channel=EMAIL
 
 ## Next: Phase 9 — Organization-Specific Modules
 
-Attendance, ministries, beneficiaries, and vertical-specific features.
+Beneficiaries, school sponsorships, and other organization-specific features.

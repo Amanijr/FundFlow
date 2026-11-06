@@ -66,7 +66,7 @@ export function ResetPasswordForm({ token, variant = "card", className }: ResetP
         <CardContent className="pt-6">
           <ErrorAlert message="This reset link is invalid. Request a new password reset." />
           <p className="mt-4 text-center text-sm">
-            <Link href="/forgot-password" className="font-medium text-primary hover:underline">
+            <Link href="/forgot-password" className="font-medium text-link hover:underline">
               Request reset link
             </Link>
           </p>

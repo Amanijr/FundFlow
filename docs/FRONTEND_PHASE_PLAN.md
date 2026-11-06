@@ -52,7 +52,7 @@ daisyFoDonation/
 | **F6** | Accounting & ledger | COA, journals, GL, trial balance | F5 |
 | **F7** | Reporting center | Financial & operational reports + export | F5, F6 |
 | **F8** | Administration | Users, org settings, onboarding | F1, F2 |
-| **F9** | Programs & verticals | Grants, programs, church, school, NGO | F4, F5 |
+| **F9** | Programs & organization-specific modules | Grants, programs, school, NGO | F4, F5 |
 | **F10** | Platform owner dashboard | Super-admin control center | F1, F2 |
 | **F11** | Advanced fundraising & polish | Pledges, recurring, collections, comms, performance | F4+ |
 
@@ -406,7 +406,7 @@ frontend/
 
 ---
 
-## F9 — Programs & vertical modules
+## F9 — Programs & organization-specific modules
 
 **Goal:** Organization-type-specific features behind vertical nav.
 
@@ -419,12 +419,6 @@ frontend/
 | Grants | `/grants` | `/api/v1/grants` |
 | Beneficiaries | `/beneficiaries` | `/api/v1/beneficiaries` |
 
-**Church** (`CHURCH`)
-| Screen | Route | API |
-|--------|-------|-----|
-| Ministries | `/church/ministries` | `/api/v1/church/ministries` |
-| Attendance | `/church/attendance` | church endpoints |
-
 **School** (`SCHOOL`)
 | Screen | Route | API |
 |--------|-------|-----|
@@ -436,7 +430,7 @@ frontend/
 - PROGRAM_MANAGER role navigation
 
 ### Exit criteria
-- [ ] Church org sees church nav; NGO does not
+- [ ] Organization-specific navigation follows `organization.type`
 - [ ] Program and grant list/detail functional
 
 ---

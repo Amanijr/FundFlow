@@ -30,6 +30,7 @@ import { FormSection } from "@/components/forms/form-section";
 import { PageHeader } from "@/components/layout/page-header";
 import { SectionHeader } from "@/components/layout/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,13 +67,76 @@ export default function ComponentsShowcasePage() {
       <PageHeader
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Component library" }]}
         title="Component library"
-        description="FundFlow F2 shared primitives. Press Cmd/Ctrl+K for the command palette."
+        description="FundFlow shared primitives. Button & status rules follow Material 3 / Meta Horizon. See DESIGN.md."
         action={
           <Button onClick={() => toast({ title: "Action triggered", variant: "success" })}>
             Sample action
           </Button>
         }
       />
+
+      <section className="space-y-4">
+        <SectionHeader
+          title="Buttons & status"
+          description="Emphasis ladder: one cyan primary per row · green/red/amber = status · red filled = destructive confirm only"
+        />
+        <div className="rounded-[var(--radius-card)] border border-border bg-card p-4 space-y-4">
+          <div>
+            <p className="mb-2 text-label font-medium text-muted-foreground">
+              Buttons — Meta Primary / Secondary / Borderless / Destructive · M3 filled / outlined / text
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>Save (primary)</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Cancel</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="link">Link</Button>
+              <Button variant="destructive">Delete</Button>
+              <Button loading>Saving…</Button>
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-label font-medium text-muted-foreground">
+              Badges — soft containers (not CTAs): cyan go · green done · amber wait · red fail
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>Default</Badge>
+              <Badge variant="secondary">Secondary</Badge>
+              <Badge variant="outline">Outline</Badge>
+              <Badge variant="success">Completed</Badge>
+              <Badge variant="warning">Pending</Badge>
+              <Badge variant="danger">Failed</Badge>
+              <Badge variant="info">Info</Badge>
+            </div>
+          </div>
+          <div className="grid gap-2 md:grid-cols-2">
+            <Alert variant="success">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>Soft emerald container — outcome feedback, not a button.</AlertDescription>
+            </Alert>
+            <Alert variant="destructive">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>Soft crimson container — failure feedback.</AlertDescription>
+            </Alert>
+            <Alert variant="warning">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Warning</AlertTitle>
+              <AlertDescription>Soft amber container — needs attention.</AlertDescription>
+            </Alert>
+            <Alert variant="info">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Info</AlertTitle>
+              <AlertDescription>Soft cyan wash — neutral guidance.</AlertDescription>
+            </Alert>
+          </div>
+          <p className="text-supporting text-muted-foreground">
+            Dialog pattern: outline Cancel + one primary Confirm; for Delete/Void use outline trigger then
+            destructive confirm. Full dictionary in repo root DESIGN.md.
+          </p>
+        </div>
+      </section>
 
       <section className="space-y-4">
         <SectionHeader title="UI primitives" description="Adopted from Phase 05 component library" />
@@ -194,8 +258,8 @@ export default function ComponentsShowcasePage() {
             Toast error
           </Button>
         </div>
-        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
-          Open confirm dialog
+        <Button variant="outline" onClick={() => setConfirmOpen(true)}>
+          Open delete confirm
         </Button>
         <ConfirmDialog
           open={confirmOpen}

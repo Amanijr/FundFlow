@@ -3,13 +3,10 @@ import {
   Bell,
   BookOpen,
   Building2,
-  CalendarDays,
   ClipboardCheck,
-  ClipboardList,
   FileText,
   Files,
   GraduationCap,
-  CircleDollarSign,
   HandCoins,
   Heart,
   History,
@@ -24,8 +21,6 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-
-import { CHURCH_ORGANIZATION_TYPES } from "@/lib/organization/verticals";
 
 import type { NavGroup } from "@/types/navigation";
 
@@ -88,7 +83,6 @@ export const navigationGroups: NavGroup[] = [
         href: "/donors",
         icon: Heart,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
-        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -97,7 +91,6 @@ export const navigationGroups: NavGroup[] = [
         href: "/campaigns",
         icon: Target,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
       {
@@ -106,7 +99,6 @@ export const navigationGroups: NavGroup[] = [
         href: "/donations",
         icon: PiggyBank,
         roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
-        excludeOrganizationTypes: CHURCH_ORGANIZATION_TYPES,
         priority: "primary",
       },
     ],
@@ -115,6 +107,14 @@ export const navigationGroups: NavGroup[] = [
     id: "finance",
     label: "Finance",
     items: [
+      {
+        id: "collections",
+        label: "Collections",
+        href: "/collections",
+        icon: HandCoins,
+        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
+        priority: "primary",
+      },
       {
         id: "funds",
         label: "Funds",
@@ -276,81 +276,6 @@ export const navigationGroups: NavGroup[] = [
         roles: ["ORG_ADMIN", "FINANCE_MANAGER", "PROGRAM_MANAGER", "STAFF"],
         organizationTypes: ["NGO", "FOUNDATION", "CHARITY", "COMMUNITY_ORGANIZATION", "SCHOOL"],
         priority: "secondary",
-      },
-    ],
-  },
-  {
-    id: "congregation",
-    label: "Congregation",
-    items: [
-      {
-        id: "members",
-        label: "Members",
-        href: "/members",
-        icon: Heart,
-        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-      {
-        id: "church-ministries",
-        label: "Ministries",
-        href: "/church/ministries",
-        icon: Users,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-      {
-        id: "church-services",
-        label: "Services",
-        href: "/church/services",
-        icon: CalendarDays,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-      {
-        id: "church-attendance",
-        label: "Attendance",
-        href: "/church/attendance",
-        icon: ClipboardList,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-    ],
-  },
-  {
-    id: "giving",
-    label: "Giving",
-    items: [
-      {
-        id: "church-collections",
-        label: "Sunday collections",
-        href: "/church/collections",
-        icon: HandCoins,
-        roles: ["ORG_ADMIN", "FINANCE_MANAGER", "FUNDRAISING_MANAGER", "STAFF", "ACCOUNTANT"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-      {
-        id: "church-partnerships",
-        label: "Partnerships",
-        href: "/church/partnerships",
-        icon: CircleDollarSign,
-        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
-      },
-      {
-        id: "church-giving",
-        label: "Gifts",
-        href: "/donations",
-        icon: PiggyBank,
-        roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"],
-        organizationTypes: CHURCH_ORGANIZATION_TYPES,
-        priority: "primary",
       },
     ],
   },

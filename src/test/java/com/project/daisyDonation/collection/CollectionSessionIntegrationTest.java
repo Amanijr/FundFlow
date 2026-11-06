@@ -31,9 +31,9 @@ class CollectionSessionIntegrationTest {
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "Grace Church",
-                    "slug": "grace-church-%d",
-                    "type": "CHURCH",
+                    "name": "Grace Foundation",
+                    "slug": "grace-foundation-%d",
+                    "type": "FOUNDATION",
                     "email": "finance@grace-%d.org"
                   },
                   "email": "finance@grace-%d.org",
@@ -54,12 +54,12 @@ class CollectionSessionIntegrationTest {
     }
 
     @Test
-    void churchOfferingCollectionFlow() throws Exception {
+    void cashCollectionSessionFlow() throws Exception {
         String createPayload = """
                 {
-                  "collectionType": "SERVICE_OFFERING",
-                  "title": "Sunday Morning Offering",
-                  "location": "Main Sanctuary"
+                  "collectionType": "GENERAL",
+                  "title": "Community Fundraising Day",
+                  "location": "Main Hall"
                 }
                 """;
 
@@ -69,7 +69,7 @@ class CollectionSessionIntegrationTest {
                         .content(createPayload))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.status").value("DRAFT"))
-                .andExpect(jsonPath("$.data.collectionType").value("SERVICE_OFFERING"))
+                .andExpect(jsonPath("$.data.collectionType").value("GENERAL"))
                 .andReturn();
 
         Long sessionId = ((Number) com.jayway.jsonpath.JsonPath.read(
@@ -102,7 +102,7 @@ class CollectionSessionIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.totalVerifiedAmount").value(5000.00))
                 .andExpect(jsonPath("$.data.totalVerifiedSessions").value(1))
-                .andExpect(jsonPath("$.data.byCollectionType[0].collectionType").value("SERVICE_OFFERING"));
+                .andExpect(jsonPath("$.data.byCollectionType[0].collectionType").value("GENERAL"));
     }
 
     @Test
@@ -146,7 +146,7 @@ class CollectionSessionIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "collectionType": "SERVICE_OFFERING",
+                                  "collectionType": "GENERAL",
                                   "title": "Sunday offering"
                                 }
                                 """))
@@ -224,7 +224,7 @@ class CollectionSessionIntegrationTest {
 
     @Test
     void manualCashPaymentForIndividualDonation() throws Exception {
-        String memberPayload = """
+        String donorPayload = """
                 {
                   "firstName": "John",
                   "lastName": "Cash",
@@ -233,24 +233,24 @@ class CollectionSessionIntegrationTest {
                 }
                 """;
 
-        MvcResult memberResult = mockMvc.perform(post("/api/v1/members")
+        MvcResult donorResult = mockMvc.perform(post("/api/v1/donors")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(memberPayload))
+                        .content(donorPayload))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long memberId = ((Number) com.jayway.jsonpath.JsonPath.read(
-                memberResult.getResponse().getContentAsString(), "$.data.id")).longValue();
+        Long donorId = ((Number) com.jayway.jsonpath.JsonPath.read(
+                donorResult.getResponse().getContentAsString(), "$.data.id")).longValue();
 
         String donationPayload = """
                 {
-                  "memberId": %d,
+                  "donorId": %d,
                   "amount": 100.00,
                   "donationType": "ONE_TIME",
                   "source": "IN_PERSON"
                 }
-                """.formatted(memberId);
+                """.formatted(donorId);
 
         MvcResult donationResult = mockMvc.perform(post("/api/v1/donations")
                         .header("Authorization", "Bearer " + accessToken)

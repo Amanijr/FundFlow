@@ -18,9 +18,15 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, variant = "neutral", className }: MetricCardProps) {
   return (
-    <div className={cn("rounded-md border px-3 py-2.5", variantClasses[variant], className)}>
-      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-lg font-semibold tabular-nums text-foreground">{value}</p>
+    <div
+      className={cn(
+        "rounded-[var(--radius-card)] border px-[var(--space-3)] py-[var(--space-3)]",
+        variantClasses[variant],
+        className,
+      )}
+    >
+      <p className="text-label uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-[var(--space-1)] text-kpi text-foreground">{value}</p>
     </div>
   );
 }

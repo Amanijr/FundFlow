@@ -66,14 +66,15 @@ export function FormActions({
           type="button"
           variant="secondary"
           onClick={onSaveDraft}
-          disabled={isSubmitting || isSavingDraft}
+          loading={isSavingDraft}
+          disabled={isSubmitting}
         >
-          {isSavingDraft ? "Saving draft…" : draftLabel}
+          {draftLabel}
         </Button>
       )}
       {isLastStep ? (
-        <Button type="submit" disabled={isSubmitting || submitDisabled}>
-          {isSubmitting ? "Saving…" : submitLabel}
+        <Button type="submit" loading={isSubmitting} disabled={submitDisabled}>
+          {submitLabel}
         </Button>
       ) : (
         <Button type="button" onClick={onNext} disabled={isSubmitting || submitDisabled}>

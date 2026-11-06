@@ -7,9 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { MemberMinistriesPanel } from "@/components/church/member-ministries-panel";
-import { MemberPartnershipsPanel } from "@/components/church/member-partnerships-panel";
-import { ChurchNav } from "@/components/church/church-nav";
 import { DetailCard } from "@/components/display/detail-card";
 import { ConfirmDialog } from "@/components/feedback/confirm-dialog";
 import { ErrorAlert } from "@/components/feedback/error-alert";
@@ -24,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { deletePerson, getPerson } from "@/lib/api/donors";
 import { peopleCopy } from "@/lib/people/copy";
-import { peopleListPath, personEditPath, personPath, type PeopleModule } from "@/lib/people/module";
+import { peopleListPath, personEditPath, type PeopleModule } from "@/lib/people/module";
 import { formatCurrency, toNumber } from "@/lib/utils/format";
 import { formatDate, formatDateTime } from "@/lib/utils/dates";
 import { ApiError } from "@/types/api";
@@ -51,7 +48,7 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
     () => [
       {
         accessorKey: "id",
-        header: copy.church ? "Gift" : "Donation",
+        header: "Donation",
         cell: ({ row }) => (
           <Link href={`/donations/${row.original.id}`} className="text-primary hover:underline">
             #{row.original.id}
@@ -79,7 +76,7 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
         cell: ({ row }) => formatDateTime(row.original.donationTime),
       },
     ],
-    [copy.church],
+    [],
   );
 
   const activityEvents = useMemo(() => {
@@ -114,18 +111,13 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
 
   return (
     <div className="space-y-4">
-      {module === "members" ? <ChurchNav /> : null}
       <PageHeader
         breadcrumbs={[
           { label: copy.title, href: peopleListPath(module) },
           { label: `${person.firstName} ${person.lastName}` },
         ]}
         title={`${person.firstName} ${person.lastName}`}
-        description={
-          module === "members" && person.memberNumber
-            ? `Member ${person.memberNumber}${person.email ? ` · ${person.email}` : ""}`
-            : (person.email ?? copy.title)
-        }
+        description={person.email ?? copy.title}
         action={
           <div className="flex gap-2">
             <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER", "FINANCE_MANAGER", "STAFF"]}>
@@ -134,7 +126,7 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
               </Button>
             </PermissionGate>
             <PermissionGate roles={["ORG_ADMIN", "FUNDRAISING_MANAGER"]}>
-              <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
+              <Button variant="outline" onClick={() => setDeleteOpen(true)}>
                 Delete
               </Button>
             </PermissionGate>
@@ -150,17 +142,13 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
           title="Giving summary"
           fields={[
             { label: "Lifetime value", value: formatCurrency(toNumber(person.lifetimeValue)) },
-            { label: copy.church ? "Gifts" : "Donations", value: String(person.donationCount) },
-            { label: copy.church ? "Member since" : "Added", value: formatDate(person.createdAt) },
+            { label: "Donations", value: String(person.donationCount) },
+            { label: "Added", value: formatDate(person.createdAt) },
           ]}
         />
         <DetailCard
           title="Contact"
           fields={[
-            ...(module === "members"
-              ? [{ label: "Member number", value: person.memberNumber ?? "—" }]
-              : []),
-            { label: "Status", value: person.membershipStatus ?? "ACTIVE" },
             { label: "Email", value: person.email || "—" },
             { label: "Phone", value: person.phone || "—" },
             {
@@ -171,13 +159,6 @@ export function PeopleDetailPage({ module }: { module: PeopleModule }) {
           className="md:col-span-2"
         />
       </div>
-
-      {module === "members" && accessToken ? (
-        <>
-          <MemberPartnershipsPanel memberId={person.id} accessToken={accessToken} />
-          <MemberMinistriesPanel memberId={person.id} accessToken={accessToken} />
-        </>
-      ) : null}
 
       <section className="space-y-4">
         <SectionHeader title={copy.recentGiftsTitle} description={copy.recentGiftsDescription} />

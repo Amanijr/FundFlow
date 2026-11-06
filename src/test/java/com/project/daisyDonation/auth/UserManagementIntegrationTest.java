@@ -31,12 +31,12 @@ class UserManagementIntegrationTest {
         String registerPayload = """
                 {
                   "organization": {
-                    "name": "User Mgmt Church",
-                    "slug": "user-mgmt-church-%d",
-                    "type": "CHURCH",
-                    "email": "admin-%d@church.org"
+                    "name": "User Mgmt Foundation",
+                    "slug": "user-mgmt-org-%d",
+                    "type": "FOUNDATION",
+                    "email": "admin-%d@org.example"
                   },
-                  "email": "admin-%d@church.org",
+                  "email": "admin-%d@org.example",
                   "password": "password123",
                   "firstName": "Admin",
                   "lastName": "User"
@@ -60,7 +60,7 @@ class UserManagementIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "staff-%d@church.org",
+                                  "email": "staff-%d@org.example",
                                   "password": "password123",
                                   "firstName": "Staff",
                                   "lastName": "Member",
@@ -69,7 +69,7 @@ class UserManagementIntegrationTest {
                                 """.formatted(suffix)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.role").value("STAFF"))
-                .andExpect(jsonPath("$.data.email").value("staff-" + suffix + "@church.org"))
+                .andExpect(jsonPath("$.data.email").value("staff-" + suffix + "@org.example"))
                 .andReturn();
 
         Long staffUserId = ((Number) com.jayway.jsonpath.JsonPath.read(
@@ -95,7 +95,7 @@ class UserManagementIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "staff2-%d@church.org",
+                                  "email": "staff2-%d@org.example",
                                   "password": "password123",
                                   "firstName": "Staff",
                                   "lastName": "Two",
@@ -108,7 +108,7 @@ class UserManagementIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "staff2-%d@church.org",
+                                  "email": "staff2-%d@org.example",
                                   "password": "password123"
                                 }
                                 """.formatted(suffix)))
@@ -130,7 +130,7 @@ class UserManagementIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "bad-%d@church.org",
+                                  "email": "bad-%d@org.example",
                                   "password": "password123",
                                   "firstName": "Bad",
                                   "lastName": "Role",

@@ -65,7 +65,7 @@ export function ForgotPasswordForm({ variant = "card", className }: ForgotPasswo
         </div>
         {content}
         <p className="text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="font-medium text-link hover:underline">
             Back to sign in
           </Link>
         </p>
@@ -82,7 +82,7 @@ export function ForgotPasswordForm({ variant = "card", className }: ForgotPasswo
       <CardContent className="space-y-4">
         {content}
         <p className="text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="font-medium text-link hover:underline">
             Back to sign in
           </Link>
         </p>

@@ -30,8 +30,8 @@ export function UploadProgress({ item, onCancel, onRetry, onRemove, className }:
     <div
       className={cn(
         "rounded-md border border-border px-3 py-2",
-        item.status === "failed" && "border-red-200 bg-red-50/50",
-        item.status === "complete" && "border-emerald-200 bg-emerald-50/30",
+        item.status === "failed" && "border-destructive/30 bg-destructive/10",
+        item.status === "complete" && "border-success/30 bg-success/10",
         className,
       )}
       aria-live="polite"
