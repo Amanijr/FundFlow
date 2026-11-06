@@ -4,15 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 text-sm [&>svg+div]:translate-y-[-2px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg~*]:pl-7",
+  "relative w-full rounded-[var(--radius-card)] border p-4 text-sm [&>svg+div]:translate-y-[-2px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-[var(--color-status-icon)] [&>svg~*]:pl-7",
   {
     variants: {
       variant: {
-        default: "border-border bg-background text-foreground [&>svg]:text-foreground",
+        default: "border-border bg-card text-foreground",
         destructive:
-          "border-destructive/30 bg-destructive/10 text-destructive [&>svg]:text-destructive",
-        success: "border-success/30 bg-success/10 text-success [&>svg]:text-success",
-        warning: "border-warning/30 bg-warning/10 text-warning [&>svg]:text-warning",
+          "border-transparent bg-[var(--color-danger-soft)] text-[var(--color-danger)] [&>svg]:text-[var(--color-status-icon)]",
+        success:
+          "border-transparent bg-[var(--color-success-soft)] text-[var(--color-success)] [&>svg]:text-[var(--color-status-icon)]",
+        warning:
+          "border-transparent bg-[var(--color-warning-soft)] text-[var(--color-warning)] [&>svg]:text-[var(--color-status-icon)]",
+        info: "border-transparent bg-[var(--color-info-soft)] text-[var(--color-info)] [&>svg]:text-[var(--color-status-icon)]",
       },
     },
     defaultVariants: {
