@@ -14,13 +14,10 @@ import com.project.daisyDonation.donation.entity.DonationType;
 import com.project.daisyDonation.accounting.service.AccountingPostingService;
 import com.project.daisyDonation.campaign.entity.Campaign;
 import com.project.daisyDonation.campaign.service.CampaignService;
-import com.project.daisyDonation.church.service.MemberService;
-import com.project.daisyDonation.church.service.PartnershipService;
 import com.project.daisyDonation.common.exception.BadRequestException;
 import com.project.daisyDonation.common.exception.ResourceNotFoundException;
 import com.project.daisyDonation.common.security.UserPrincipal;
 import com.project.daisyDonation.common.service.TenantSupport;
-import com.project.daisyDonation.common.service.VerticalAccess;
 import com.project.daisyDonation.audit.dto.DomainAuditEventResponse;
 import com.project.daisyDonation.audit.service.DomainAuditService;
 import com.project.daisyDonation.donation.dto.DonationCreateRequest;
@@ -47,8 +44,6 @@ public class DonationService {
     private final DonationRepository donationRepository;
     private final TenantSupport tenantSupport;
     private final DonorService donorService;
-    private final MemberService memberService;
-    private final PartnershipService partnershipService;
     private final CampaignService campaignService;
     private final PledgeService pledgeService;
     private final RecurringDonationService recurringDonationService;
@@ -72,7 +67,7 @@ public class DonationService {
         donation.setItemDescription(request.getItemDescription());
         donation.setEstimatedValue(request.getEstimatedValue());
         donation.setDonationTime(LocalDateTime.now());
-        assignGiver(principal, organization, donation, request);
+        assignGiver(principal, donation, request);
 
         if (request.getCampaignId() != null) {
             Campaign campaign = campaignService.requireCampaign(principal, request.getCampaignId());
@@ -86,14 +81,13 @@ public class DonationService {
         if (request.getPledgeId() != null) {
             Pledge pledge = pledgeService.requirePledge(principal, request.getPledgeId());
             donation.setPledge(pledge);
-            if (!request.isAnonymous() && donation.getDonor() == null && donation.getMember() == null) {
+            if (!request.isAnonymous() && donation.getDonor() == null) {
                 donation.setDonor(pledge.getDonor());
             }
         }
 
         if (request.isAnonymous()) {
             donation.setDonor(null);
-            donation.setMember(null);
         }
 
         if (request.getRecurringDonationId() != null) {
@@ -101,15 +95,13 @@ public class DonationService {
                     request.getRecurringDonationId());
             donation.setRecurringDonation(recurring);
             donation.setDonationType(DonationType.RECURRING);
-            if (!request.isAnonymous() && donation.getDonor() == null && donation.getMember() == null) {
+            if (!request.isAnonymous() && donation.getDonor() == null) {
                 donation.setDonor(recurring.getDonor());
             }
             if (request.getCampaignId() == null && recurring.getCampaign() != null) {
                 donation.setCampaign(recurring.getCampaign());
             }
         }
-
-        partnershipService.attachToDonation(principal, donation, request);
 
         if (request.getDonationType() == DonationType.IN_KIND) {
             donation.setStatus(DonationStatus.COMPLETED);
@@ -205,19 +197,8 @@ public class DonationService {
         return DonationMapper.toDetail(donation, paymentId);
     }
 
-    private void assignGiver(
-            UserPrincipal principal, Organization organization, Donation donation, DonationCreateRequest request) {
+    private void assignGiver(UserPrincipal principal, Donation donation, DonationCreateRequest request) {
         if (request.isAnonymous()) {
-            donation.setDonor(null);
-            donation.setMember(null);
-            return;
-        }
-        if (VerticalAccess.isChurch(organization)) {
-            Long memberId = request.getMemberId() != null ? request.getMemberId() : request.getDonorId();
-            if (memberId == null) {
-                throw new BadRequestException("Member is required for non-anonymous gifts");
-            }
-            donation.setMember(memberService.requireMember(principal, memberId));
             donation.setDonor(null);
             return;
         }
@@ -228,7 +209,7 @@ public class DonationService {
     }
 
     private void validateCreateRequest(DonationCreateRequest request) {
-        if (request.isAnonymous() && (request.getDonorId() != null || request.getMemberId() != null)) {
+        if (request.isAnonymous() && request.getDonorId() != null) {
             throw new BadRequestException("Anonymous donations cannot include a donor");
         }
 
