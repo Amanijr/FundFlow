@@ -51,7 +51,7 @@ Do this once after funds are set up.
 1. Go to **Finance → Accounting** (chart of accounts)  
 2. Click **Initialize**  
 3. Confirm — default accounts are created for **your organization type**  
-   (church, NGO, school, foundation, etc.)  
+   (NGO, school, foundation, community organization, etc.)
 
 **Who can initialize:** Finance Manager, Org Admin  
 
@@ -61,12 +61,11 @@ Do this once after funds are set up.
 
 | Org type | Focus of default accounts |
 |----------|---------------------------|
-| **Church / Religious institution** | Cash on hand, bank, mobile money / Lipa; tithes, offerings & gifts; ministry & evangelism expenses |
 | **NGO / Charity / Community** | Cash, bank, mobile money; donation revenue; operations / program / fundraising expenses |
 | **School** | Cash, bank, mobile money; fees, sponsorships & gifts; student programs |
 | **Foundation** | Cash, bank; grants & contributions; grant/program expenses |
 
-Automatic posting still uses the same system codes (e.g. cash `1000`, contribution income `4000`). Extra detail accounts (tithes `4010`, offerings `4020`, Lipa `1020`) are available for church treasurers to use with funds or later splits.
+Automatic posting uses stable system codes (for example, cash `1000` and contribution income `4000`).
 
 ---
 

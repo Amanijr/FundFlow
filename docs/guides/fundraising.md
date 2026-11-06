@@ -157,14 +157,12 @@ Export CSV from report pages for board meetings or external analysis.
 
 ---
 
-## Church: group offerings (Sunday service)
+## Group cash collections
 
-For counted cash offerings (entire congregation), your finance team may use **collection sessions** (API workflow). After counting:
+For counted group cash, your finance team may use **collection sessions** (API workflow). After counting:
 
 1. Staff creates and submits the session count  
 2. Finance Manager **verifies** → one consolidated donation is created  
-
-See [Church Guide](./church.md) for details.
 
 ---
 
@@ -177,4 +175,4 @@ See [Church Guide](./church.md) for details.
 
 ---
 
-**Related:** [Finance Guide](./finance.md) · [Reports Guide](./reports.md) · [Church Guide](./church.md)
+**Related:** [Finance Guide](./finance.md) · [Reports Guide](./reports.md)

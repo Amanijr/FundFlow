@@ -2,7 +2,7 @@
 
 Welcome to the **FundFlow ERP** documentation site — a financial accountability and resource management platform for nonprofits.
 
-FundFlow helps churches, NGOs, charities, foundations, schools, and community organizations manage **donations**, **expenses**, **funds**, **accounting**, **budgets**, **campaigns**, and **reporting** in one auditable system.
+FundFlow helps NGOs, charities, foundations, schools, and community organizations manage **donations**, **expenses**, **funds**, **accounting**, **budgets**, **campaigns**, and **reporting** in one auditable system.
 
 ---
 
@@ -57,7 +57,6 @@ FundFlow helps churches, NGOs, charities, foundations, schools, and community or
 | [Accounting](guides/accounting.md) | Ledger, trial balance, period close |
 | [Reports](guides/reports.md) | Financial and operational reports |
 | [Programs & Grants](guides/programs-and-grants.md) | NGOs — programs, grants, beneficiaries |
-| [Church](guides/church.md) | Ministries, attendance, offerings |
 | [School](guides/school.md) | Sponsorships and student records |
 | [Platform Owner](guides/platform-owner.md) | Super admin — multi-tenant management |
 

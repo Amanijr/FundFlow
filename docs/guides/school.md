@@ -16,7 +16,7 @@
 | **Donations & campaigns** | `/donations`, `/campaigns` | Fees, fundraising drives |
 | **Finance** | `/funds`, `/budgets`, `/expenses` | School budgeting and spending |
 
-Schools do **not** see Church menus (ministries, attendance) or NGO **Grants** unless organization type includes those modules.
+Schools do **not** see NGO **Grants** unless the organization type includes that module.
 
 ---
 

@@ -116,7 +116,7 @@ Use query filters: `type`, `severity`, `category`, `organizationId`, `alertsOnly
 
 ## Guide 5 — Act on behalf of a tenant
 
-Super admins have **no default organization**. To call org-scoped APIs (donations, expenses, church, etc.):
+Super admins have **no default organization**. To call org-scoped APIs (donations, expenses, analytics, etc.):
 
 ```http
 X-Organization-Id: <organizationId>
