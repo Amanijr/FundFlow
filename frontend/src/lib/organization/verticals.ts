@@ -1,10 +1,5 @@
 import type { OrganizationType } from "@/types/api";
 
-export const CHURCH_ORGANIZATION_TYPES: OrganizationType[] = [
-  "CHURCH",
-  "RELIGIOUS_INSTITUTION",
-];
-
 export const NGO_ORGANIZATION_TYPES: OrganizationType[] = [
   "NGO",
   "FOUNDATION",
@@ -19,10 +14,6 @@ export const PROGRAM_ORGANIZATION_TYPES: OrganizationType[] = [
   ...SCHOOL_ORGANIZATION_TYPES,
 ];
 
-export function isChurchOrganization(type?: OrganizationType | null): boolean {
-  return type != null && CHURCH_ORGANIZATION_TYPES.includes(type);
-}
-
 export function isSchoolOrganization(type?: OrganizationType | null): boolean {
   return type != null && SCHOOL_ORGANIZATION_TYPES.includes(type);
 }
@@ -33,15 +24,6 @@ export function isNgoOrganization(type?: OrganizationType | null): boolean {
 
 /** First matching prefix wins. */
 export function requiredOrganizationTypesForPath(pathname: string): OrganizationType[] | null {
-  if (pathname === "/church" || pathname.startsWith("/church/")) {
-    return CHURCH_ORGANIZATION_TYPES;
-  }
-  if (pathname === "/members" || pathname.startsWith("/members/")) {
-    return CHURCH_ORGANIZATION_TYPES;
-  }
-  if (pathname === "/reports/members" || pathname === "/reports/attendance") {
-    return CHURCH_ORGANIZATION_TYPES;
-  }
   if (pathname === "/school" || pathname.startsWith("/school/")) {
     return SCHOOL_ORGANIZATION_TYPES;
   }

@@ -1,9 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
-  CalendarDays,
   ClipboardCheck,
-  CircleDollarSign,
   HandCoins,
   Megaphone,
   Receipt,
@@ -45,54 +43,22 @@ export interface HomeChecklistItem {
 
 export const homeTasks: HomeTask[] = [
   {
-    id: "sunday-collection",
-    title: "Sunday collection",
-    description: "Count the offering, then treasurer verifies",
-    href: "/church/collections/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-    emphasis: "primary",
-    icon: CalendarDays,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "verify-collections",
-    title: "Verify offerings",
-    description: "Confirm Sunday counts so they post to the books",
-    href: "/church/collections",
-    roles: ["ORG_ADMIN", "FINANCE_MANAGER"],
-    emphasis: "primary",
-    icon: ClipboardCheck,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "record-attendance",
-    title: "Record attendance",
-    description: "Headcount for a Sunday or midweek service",
-    href: "/church/attendance",
-    roles: ["ORG_ADMIN", "FINANCE_MANAGER", "STAFF"],
-    emphasis: "secondary",
-    icon: ClipboardCheck,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "add-partnership",
-    title: "Add a partnership",
-    description: "Monthly amount a member promised, then track gifts against it",
-    href: "/church/partnerships/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-    emphasis: "secondary",
-    icon: CircleDollarSign,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "record-donation",
-    title: "Record a member gift",
-    description: "Zaka, sadaka, or a named gift — cash, Lipa, or pay later",
-    href: "/donations/new",
+    id: "collection",
+    title: "Record collection",
+    description: "Count collected funds, then have finance verify",
+    href: "/collections/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "primary",
     icon: HandCoins,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
+  },
+  {
+    id: "verify-collections",
+    title: "Verify collections",
+    description: "Confirm counts so they post to the books",
+    href: "/collections",
+    roles: ["ORG_ADMIN", "FINANCE_MANAGER"],
+    emphasis: "primary",
+    icon: ClipboardCheck,
   },
   {
     id: "record-donation",
@@ -102,17 +68,6 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "primary",
     icon: HandCoins,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "add-donor",
-    title: "Add a member",
-    description: "Create a giver profile before recording gifts",
-    href: "/members/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
-    emphasis: "secondary",
-    icon: Users,
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "add-donor",
@@ -122,7 +77,6 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER", "STAFF"],
     emphasis: "secondary",
     icon: Users,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "submit-expense",
@@ -150,7 +104,6 @@ export const homeTasks: HomeTask[] = [
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
     emphasis: "secondary",
     icon: Megaphone,
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "view-funds",
@@ -193,38 +146,21 @@ export const homeTasks: HomeTask[] = [
 export const homeChecklist: HomeChecklistItem[] = [
   {
     id: "collection",
-    label: "Record a Sunday collection",
-    href: "/church/collections/new",
+    label: "Record a collection",
+    href: "/collections/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "donor",
-    label: "Add a member",
-    href: "/members/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
-  },
-  {
-    id: "donation",
-    label: "Record a member gift",
-    href: "/donations/new",
-    roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
-    organizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "donor",
     label: "Add a donor",
     href: "/donors/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "donation",
     label: "Record a donation",
     href: "/donations/new",
     roles: ["ORG_ADMIN", "FUNDRAISING_MANAGER"],
-    excludeOrganizationTypes: ["CHURCH", "RELIGIOUS_INSTITUTION"],
   },
   {
     id: "fund",
@@ -283,20 +219,7 @@ export function checklistForRole(role: Role, organizationType?: OrganizationType
 }
 
 export function homeGreeting(role: Role, organizationType?: OrganizationType) {
-  if (organizationType && ["CHURCH", "RELIGIOUS_INSTITUTION"].includes(organizationType)) {
-    switch (role) {
-      case "FINANCE_MANAGER":
-      case "ACCOUNTANT":
-        return "Offerings to verify, then funds and spend.";
-      case "FUNDRAISING_MANAGER":
-        return "Members, gifts, and Sunday collection.";
-      case "STAFF":
-      case "VOLUNTEER":
-        return "Count the offering and the people.";
-      default:
-        return "Today’s collections, attendance, and cash position.";
-    }
-  }
+  void organizationType;
   switch (role) {
     case "FINANCE_MANAGER":
     case "ACCOUNTANT":

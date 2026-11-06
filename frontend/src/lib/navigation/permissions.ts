@@ -61,9 +61,7 @@ export function getDefaultDashboardPath(role: Role) {
 
 /** Role-specific analytics overview (linked from Home). */
 export function getRoleOverviewPath(role: Role, organizationType?: OrganizationType | null) {
-  if (organizationType && ["CHURCH", "RELIGIOUS_INSTITUTION"].includes(organizationType)) {
-    return "/church";
-  }
+  void organizationType;
   switch (role) {
     case "SUPER_ADMIN":
       return "/platform/dashboard";

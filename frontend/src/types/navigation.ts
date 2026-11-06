@@ -11,7 +11,7 @@ export interface NavItem {
   roles: Role[];
   organizationTypes?: OrganizationType[];
   excludeOrganizationTypes?: OrganizationType[];
-  /** Use exact so a parent path like /church does not stay active on /church/collections. */
+  /** Use exact when a parent path should not stay active on nested routes. */
   match?: "prefix" | "exact";
   /** Primary stays visible; secondary lives under More (hidden in Simple mode). */
   priority?: NavPriority;
