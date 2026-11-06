@@ -6,12 +6,10 @@ FundFlow ERP is a multi-tenant SaaS platform designed to help nonprofit organiza
 
 The platform is being built to serve:
 
-* Churches
 * NGOs
 * Charities
 * Foundations
 * Community Organizations
-* Religious Institutions
 * Educational Nonprofits
 * Donor-Funded Projects
 
@@ -187,21 +185,6 @@ Generate:
 * Grant Tracking
 * Grant Compliance
 * Grant Utilization Reporting
-
----
-
-## Attendance Management
-
-Applicable to:
-
-* Churches
-* Membership Organizations
-
-Features:
-
-* Service Attendance
-* Event Attendance
-* Participation Analytics
 
 ---
 

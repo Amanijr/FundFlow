@@ -81,7 +81,7 @@ Priority: Critical
 Objectives:
 
 * Manual payment recording (cash, cheque, in-person)
-* Collection sessions for group/church collections
+* Collection sessions for group cash collections
 * Anonymous physical payment support
 * Finance Manager verification workflow
 
@@ -233,11 +233,7 @@ Priority: Medium
 
 Examples:
 
-Church:
-
-* Attendance
-* Ministries
-* Pledges
+> Church CMS examples previously listed here were permanently removed in Flyway V21.
 
 NGO:
 
