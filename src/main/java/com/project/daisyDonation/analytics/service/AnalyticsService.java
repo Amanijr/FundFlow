@@ -345,10 +345,14 @@ public class AnalyticsService {
     }
 
     private BigDecimal resolveCashBalance(Long organizationId) {
-        return chartOfAccountRepository
-                .findByOrganizationIdAndCodeAndDeletedFalse(organizationId, AccountCodes.CASH)
-                .map(account -> cashBalance(organizationId, account))
-                .orElse(BigDecimal.ZERO);
+        BigDecimal total = BigDecimal.ZERO;
+        for (String code : List.of(AccountCodes.CASH, AccountCodes.BANK, AccountCodes.MOBILE_MONEY)) {
+            total = total.add(chartOfAccountRepository
+                    .findByOrganizationIdAndCodeAndDeletedFalse(organizationId, code)
+                    .map(account -> cashBalance(organizationId, account))
+                    .orElse(BigDecimal.ZERO));
+        }
+        return total;
     }
 
     private BigDecimal cashBalance(Long organizationId, ChartOfAccount account) {
