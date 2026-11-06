@@ -1,9 +1,9 @@
 package com.project.daisyDonation.collection.entity;
 
+/** Bulk cash intake categories for civil society collections. */
 public enum CollectionType {
-    SERVICE_OFFERING,
+    GENERAL,
     EVENT,
-    DEPARTMENT,
     PROJECT,
     SPECIAL_APPEAL
 }

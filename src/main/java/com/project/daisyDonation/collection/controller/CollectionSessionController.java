@@ -46,7 +46,7 @@ public class CollectionSessionController {
     @PreAuthorize("hasAnyRole('ORG_ADMIN','FUNDRAISING_MANAGER','STAFF')")
     @Operation(
             summary = "Create collection session",
-            description = "Creates a new collection session for recording offering/cash counts.")
+            description = "Creates a new collection session for recording cash and bulk contribution counts.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201",
