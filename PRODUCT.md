@@ -10,8 +10,6 @@ web
 
 Finance and operations staff at civil society institutions—NGOs, CBOs, foundations, charities, development organizations, and grant-funded nonprofits. Daytime desk work: contributions, funds, expenses, budgets, projects/grants, accounting, and reporting.
 
-Church congregation/ministry operations are **out of product scope** (separate CMS product direction). CrossLife church pilot data may remain as legacy/demo only until migrated.
-
 ## Product Purpose
 
 FundFlow ERP is a multi-tenant financial management system for civil society institutions: contributions and income, donors/funding sources, fund accounting, budgeting, expenses, programs/grants, financial reporting, approvals, and organizational accountability.
@@ -20,7 +18,7 @@ Success means money is traceable (source → allocation → spend → balance), 
 
 ## Positioning
 
-Dedicated financial management for CSOs—not a church management system, not consumer banking, not general membership CRM. Single money path (donation/contribution → payment → funds/accounting). Programs/grants support restricted funding; church membership, ministries, attendance, and congregation workflows belong to a separate CMS product.
+Dedicated financial management for CSOs—not consumer banking, not general membership CRM. Single money path (donation/contribution → payment → funds/accounting). Programs/grants support restricted funding.
 
 ## Operating Context
 
@@ -29,12 +27,9 @@ Staff sign in to role-aware dashboards, receive gifts, manage donors/campaigns, 
 ## Capabilities and Constraints
 
 - Web app: Next.js frontend (`frontend/`) + Spring API; local mock API via `NEXT_PUBLIC_MOCK_API`.
-- Core domains: donors, donations, payments, campaigns, funds, budgets, expenses, accounting, reports, admin, platform owner, programs/grants/church/school verticals.
+- Core domains: donors, donations, payments, campaigns, funds, budgets, expenses, accounting, reports, admin, platform owner, programs/grants, and school sponsorships.
 - Public hosted giving / Lipa self-serve is parked until explicitly requested.
-- Church vertical (members, ministries, services, attendance, partnerships, Sunday-collection UX) is scheduled for removal from the FundFlow product surface per TASK 00; DB tables parked, not dropped, until CMS extraction is approved.
-- School sponsorships: undecided keep vs park.
 - Undecided: production gateway vendor details beyond Phase-1 thin payment path.
-- Scope audit: `docs/architecture/TASK_00_PRODUCT_SCOPE_REDEFINITION.md`.
 
 ## Brand Commitments
 
