@@ -15,7 +15,10 @@ export function ContentContainer({ children, className }: ContentContainerProps)
   return (
     <div
       key={pathname}
-      className={cn("content-reveal w-full px-4 py-4 sm:px-5 lg:px-6", className)}
+      className={cn(
+        "content-reveal w-full px-[var(--layout-content-padding)] py-[var(--space-6)] lg:px-[var(--layout-content-padding-lg)]",
+        className,
+      )}
     >
       {children}
     </div>

@@ -4,7 +4,6 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { materialGradientClasses } from "@/lib/utils/material-styles";
 
 export interface SidebarItemProps {
   href: string;
@@ -31,14 +30,22 @@ export function SidebarItem({
         title={collapsed ? label : undefined}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex items-center rounded-lg text-sm font-normal transition-colors duration-200",
+          "group flex items-center rounded-[var(--radius-control)] text-sm font-medium transition-colors duration-150",
           collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
           active
-            ? materialGradientClasses
-            : "border border-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+            ? "bg-[var(--color-sidebar-active)] text-[var(--color-sidebar-active-foreground)]"
+            : "text-sidebar-foreground/75 hover:bg-[var(--color-sidebar-hover)] hover:text-sidebar-foreground",
         )}
       >
-        <Icon className={cn("h-4 w-4 shrink-0", collapsed ? "" : "mr-3")} />
+        <Icon
+          className={cn(
+            "h-4 w-4 shrink-0 transition-colors",
+            collapsed ? "" : "mr-3",
+            active
+              ? "text-[var(--brand-cyan)]"
+              : "text-[var(--color-status-icon)] group-hover:text-[var(--brand-cyan)]",
+          )}
+        />
         {!collapsed && <span className="truncate">{label}</span>}
       </Link>
     </li>
