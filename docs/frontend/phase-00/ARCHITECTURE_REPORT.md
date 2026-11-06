@@ -1,5 +1,7 @@
 # Phase 00 — Architecture Report
 
+> **Historical report:** Church routes shown here were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Systems:** FundFlow ERP Frontend · Material Shadcn Template
 

@@ -1,5 +1,7 @@
 # Authorization Model
 
+> **Superseded in part:** Church organization-type examples and gates in this historical model were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Phase:** 09 — Authentication & Identity Experience  
 **Current model:** Role-Based Access Control (RBAC)  
 **Target model:** RBAC + fine-grained permissions from API

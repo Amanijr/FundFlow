@@ -1,5 +1,7 @@
 # Phase 00 — Migration Plan
 
+> **Historical plan:** Church frontend modules mentioned here were permanently removed and are not migration targets. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Objective:** Migrate FundFlow ERP frontend to the Material + shadcn visual design system while preserving all backend contracts, authentication, Zustand stores, routing, and business logic.
 

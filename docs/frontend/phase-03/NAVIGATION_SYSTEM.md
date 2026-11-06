@@ -1,5 +1,7 @@
 # Phase 03 — Navigation System
 
+> **Superseded in part:** Church navigation items in this historical specification were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Config:** frontend/src/lib/navigation/navigation.ts  
 **RBAC:** frontend/src/lib/navigation/permissions.ts

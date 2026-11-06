@@ -1,5 +1,7 @@
 # Phase 02 — Folder Structure
 
+> **Superseded in part:** Church folders, routes, and services in this historical structure were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Base path:** `frontend/src/`
 

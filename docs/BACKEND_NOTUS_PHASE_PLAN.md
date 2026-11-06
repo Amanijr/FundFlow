@@ -1,5 +1,7 @@
 # CrossLife ERP — Backend Phase Plan (Notus Frontend)
 
+> **Superseded in part:** Church CMS APIs and modules in this historical plan were permanently removed from FundFlow. See [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Version:** 1.0  
 **Status:** In progress  
 **Pairs with:** [FRONTEND_NOTUS_PHASE_PLAN.md](./FRONTEND_NOTUS_PHASE_PLAN.md)  

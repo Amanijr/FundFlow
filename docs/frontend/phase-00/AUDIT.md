@@ -1,5 +1,7 @@
 # Phase 00 — Project Audit
 
+> **Historical audit:** Church routes and API modules in this inventory were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Scope:** FundFlow ERP frontend (`frontend/`) and Material + shadcn template (`material-shadcn-1.0.0/`)  
 **Status:** Complete — no application code modified

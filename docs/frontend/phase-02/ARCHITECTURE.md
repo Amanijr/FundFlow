@@ -1,5 +1,7 @@
 # Phase 02 — Frontend Architecture
 
+> **Superseded in part:** Church feature boundaries and routes in this historical architecture were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Status:** Approved  
 **Scope:** Architecture and project structure — no UI implementation, no routing changes, no business logic changes

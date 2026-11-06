@@ -1,5 +1,7 @@
 # CrossLife ERP — Notus Template Frontend Phase Plan
 
+> **Superseded in part:** Church CMS routes and modules in this historical plan were permanently removed from FundFlow. See [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Version:** 1.0  
 **Status:** Planning  
 **Target app:** `frontend-notus/`  

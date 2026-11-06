@@ -1,5 +1,7 @@
 # Phase 02 — Current to Target Mapping
 
+> **Superseded in part:** Church components, routes, and services in this historical map were permanently removed. See [Church CMS Extraction](../../architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** 2026-06-30  
 **Purpose:** File-by-file guide for incremental migration from layer-based to feature-first architecture.
 

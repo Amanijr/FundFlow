@@ -1,5 +1,7 @@
 # Frontend Feature Audit & Implementation Plan
 
+> **Historical audit:** Church routes and modules recorded here were permanently removed. This audit is superseded by Flyway V21 and [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Date:** June 29, 2026  
 **Scope:** All frontend documentation vs actual code in `frontend/` and `frontend-notus/`  
 **Backend reference:** Phases 1–10 implemented (`docs/PHASE*_IMPLEMENTATION.md`)

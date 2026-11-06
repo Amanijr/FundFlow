@@ -1,5 +1,7 @@
 # FundFlow ERP — Frontend Phase Plan
 
+> **Superseded in part:** All Church CMS routes, navigation, and phase deliverables in this plan were permanently removed. See [Church CMS Extraction](./architecture/CHURCH_CMS_EXTRACTION.md).
+
 **Version:** 1.0  
 **Status:** Planning  
 **Guiding docs:** [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) · [FRONTEND_ARCHITECTURE.md](./FRONTEND_ARCHITECTURE.md) · [COMPONENT_INVENTORY.md](./COMPONENT_INVENTORY.md) · [SCREEN_INVENTORY.md](./SCREEN_INVENTORY.md) · [INFORMATION_ARCHITECTURE.md](./INFORMATION_ARCHITECTURE.md) · [WORKFLOWS.md](./WORKFLOWS.md) · [RBAC_MATRIX.md](./RBAC_MATRIX.md) · [PLATFORM_OBSERVABILITY.md](./PLATFORM_OBSERVABILITY.md)
